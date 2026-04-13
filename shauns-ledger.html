@@ -10,7 +10,7 @@
     --cream:#f4efe4; --parchment:#ede6d6; --warm:#e4dbc8;
     --teal:#2a6b5e; --teal-light:#3a8a7c; --teal-faint:#e8f4f2;
     --burnt:#b8511e; --burnt-faint:#faf0ea;
-    --purple:#5a3a7a; --purple-faint:#f0eaf8;
+    --purple:#5a3a7a; --purple-light:#7a5a9a; --purple-faint:#f0eaf8;
     --ink:#1a1410; --muted:#7a6a5a; --faint:#c4b89e; --border:#d5c9b2;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -20,41 +20,91 @@
   .home-btn:hover { background:var(--teal-light); opacity:1; }
 
   .header { background:var(--purple); color:var(--cream); padding:2.5rem 2rem 2rem; text-align:center; position:relative; overflow:hidden; }
-  .header::before { content:'📚'; position:absolute; right:-0.5rem; top:-0.5rem; font-size:9rem; opacity:0.08; pointer-events:none; }
+  .header::before { content:'📚'; position:absolute; right:-0.5rem; top:-0.5rem; font-size:9rem; opacity:0.07; pointer-events:none; }
   .header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(244,239,228,0.45); margin-bottom:0.6rem; }
   .header h1 { font-family:'Noto Serif',serif; font-size:clamp(1.8rem,5vw,2.8rem); font-weight:300; letter-spacing:0.05em; margin-bottom:0.3rem; }
   .header-sub { font-size:0.82rem; color:rgba(244,239,228,0.5); font-style:italic; font-family:'Noto Serif',serif; }
 
   .tabs { background:#3a2050; display:flex; overflow-x:auto; scrollbar-width:none; }
   .tabs::-webkit-scrollbar { display:none; }
-  .tab { flex:1; padding:0.75rem; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(244,239,228,0.45); cursor:pointer; text-align:center; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; white-space:nowrap; }
+  .tab { flex:1; padding:0.75rem; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(244,239,228,0.45); cursor:pointer; text-align:center; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; white-space:nowrap; min-width:80px; }
   .tab.active { color:var(--cream); border-bottom-color:var(--cream); }
   .tab:hover { color:rgba(244,239,228,0.8); }
 
   main { max-width:820px; margin:0 auto; padding:2rem 1.5rem; }
   .panel { display:none; } .panel.active { display:block; }
 
+  /* SHARED */
   .card { background:var(--parchment); border:1px solid var(--border); border-radius:10px; padding:1.5rem; margin-bottom:1.25rem; }
-  .card-title { font-family:'Noto Serif',serif; font-size:1rem; color:var(--purple); margin-bottom:1rem; font-weight:400; }
+  .card-title { font-family:'Noto Serif',serif; font-size:1rem; color:var(--purple); margin-bottom:0.25rem; font-weight:400; }
+  .card-sub { font-size:0.8rem; color:var(--muted); font-style:italic; font-family:'Noto Serif',serif; margin-bottom:1.25rem; }
   .field { margin-bottom:0.85rem; }
   .field label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:0.4rem; }
   .field input, .field select, .field textarea { width:100%; background:white; border:1px solid var(--border); border-radius:6px; padding:0.6rem 0.85rem; font-family:'Noto Sans',sans-serif; font-size:0.85rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
   .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--purple); }
   .field input::placeholder, .field textarea::placeholder { color:var(--border); }
-  .field textarea { resize:vertical; min-height:80px; font-family:'Noto Serif',serif; font-style:italic; font-size:0.85rem; }
+  .field textarea { resize:vertical; min-height:80px; font-family:'Noto Serif',serif; font-style:italic; }
   .two-col { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
   .btn { background:var(--purple); color:var(--cream); border:none; border-radius:6px; padding:0.6rem 1.4rem; font-family:'Noto Sans',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; transition:background 0.2s; }
-  .btn:hover { background:#7a5a9a; }
+  .btn:hover { background:var(--purple-light); }
+  .btn:disabled { opacity:0.45; cursor:not-allowed; }
   .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:6px; padding:0.6rem 1.1rem; font-family:'Noto Sans',sans-serif; font-size:0.82rem; cursor:pointer; transition:all 0.2s; margin-left:0.5rem; }
   .btn-ghost:hover { border-color:var(--purple); color:var(--purple); }
   .status-msg { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); margin-top:0.75rem; min-height:16px; }
   .status-msg.ok { color:var(--teal); } .status-msg.err { color:var(--burnt); }
 
+  /* ── LIVE SEARCH ── */
+  .search-wrap { position:relative; margin-bottom:1rem; }
+  .search-input { width:100%; background:white; border:1px solid var(--border); border-radius:8px; padding:0.85rem 1rem 0.85rem 2.75rem; font-family:'Noto Sans',sans-serif; font-size:1rem; color:var(--ink); outline:none; transition:border-color 0.2s, box-shadow 0.2s; }
+  .search-input:focus { border-color:var(--purple); box-shadow:0 0 0 3px rgba(90,58,122,0.08); }
+  .search-input::placeholder { color:var(--faint); }
+  .search-icon { position:absolute; left:0.9rem; top:50%; transform:translateY(-50%); font-size:1rem; pointer-events:none; opacity:0.4; }
+  .search-spinner { position:absolute; right:0.9rem; top:50%; transform:translateY(-50%); width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--purple); border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
+  .search-spinner.show { display:block; }
+  @keyframes spin { to{transform:translateY(-50%) rotate(360deg)} }
+
+  .search-results { background:white; border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 20px rgba(26,20,16,0.1); margin-top:0.35rem; overflow:hidden; display:none; max-height:420px; overflow-y:auto; }
+  .search-results.show { display:block; }
+
+  .search-result-item { display:flex; gap:0.85rem; padding:0.85rem 1rem; border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.15s; align-items:flex-start; }
+  .search-result-item:last-child { border-bottom:none; }
+  .search-result-item:hover { background:var(--purple-faint); }
+
+  .book-cover { width:42px; height:60px; object-fit:cover; border-radius:3px; flex-shrink:0; background:var(--warm); }
+  .book-cover-placeholder { width:42px; height:60px; background:var(--warm); border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.1rem; opacity:0.4; }
+
+  .result-info { flex:1; min-width:0; }
+  .result-title { font-family:'Noto Serif',serif; font-size:0.9rem; font-weight:400; color:var(--ink); margin-bottom:0.2rem; line-height:1.3; }
+  .result-author { font-size:0.78rem; color:var(--muted); font-style:italic; font-family:'Noto Serif',serif; margin-bottom:0.2rem; }
+  .result-meta { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); display:flex; gap:0.5rem; flex-wrap:wrap; }
+  .result-add { background:var(--purple); color:var(--cream); border:none; border-radius:4px; padding:0.3rem 0.7rem; font-size:0.75rem; cursor:pointer; flex-shrink:0; align-self:center; transition:background 0.2s; font-family:'Noto Sans',sans-serif; }
+  .result-add:hover { background:var(--purple-light); }
+
+  .search-no-results { padding:1.5rem; text-align:center; color:var(--faint); font-family:'Noto Serif',serif; font-style:italic; font-size:0.88rem; }
+
+  /* BOOK ADD FORM (after search select) */
+  .selected-book-preview { background:var(--purple-faint); border:1px solid rgba(90,58,122,0.2); border-radius:8px; padding:1rem; margin-bottom:1rem; display:flex; gap:1rem; align-items:flex-start; display:none; }
+  .selected-book-preview.show { display:flex; }
+  .preview-cover { width:48px; height:68px; object-fit:cover; border-radius:3px; flex-shrink:0; background:var(--warm); }
+  .preview-cover-placeholder { width:48px; height:68px; background:var(--warm); border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.2rem; opacity:0.4; }
+  .preview-info { flex:1; }
+  .preview-title { font-family:'Noto Serif',serif; font-size:1rem; color:var(--purple); margin-bottom:0.15rem; }
+  .preview-author { font-size:0.82rem; color:var(--muted); font-style:italic; font-family:'Noto Serif',serif; }
+  .preview-clear { background:none; border:none; color:var(--faint); cursor:pointer; font-size:0.8rem; font-family:'IBM Plex Mono',monospace; margin-top:0.25rem; padding:0; transition:color 0.2s; }
+  .preview-clear:hover { color:var(--burnt); }
+
   /* STAR RATING */
-  .star-row { display:flex; gap:0.25rem; margin-bottom:0.85rem; }
-  .star { font-size:1.4rem; cursor:pointer; opacity:0.3; transition:opacity 0.15s; user-select:none; }
-  .star.active { opacity:1; }
   .rating-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); margin-bottom:0.4rem; display:block; }
+  .star-row { display:flex; gap:0.3rem; margin-bottom:0.85rem; }
+  .star { font-size:1.5rem; cursor:pointer; opacity:0.25; transition:opacity 0.15s, transform 0.1s; user-select:none; line-height:1; }
+  .star:hover { transform:scale(1.15); }
+  .star.active { opacity:1; }
+
+  /* STATS */
+  .stats-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:0.75rem; margin-bottom:1.5rem; }
+  .stat-box { background:var(--parchment); border:1px solid var(--border); border-radius:8px; padding:0.9rem; text-align:center; }
+  .stat-num { font-family:'IBM Plex Mono',monospace; font-size:1.6rem; color:var(--purple); line-height:1; margin-bottom:0.2rem; }
+  .stat-label { font-size:0.72rem; color:var(--muted); }
 
   /* YEAR FILTER */
   .year-tabs { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1.25rem; }
@@ -62,21 +112,18 @@
   .year-chip:hover { border-color:var(--purple); color:var(--purple); }
   .year-chip.active { background:var(--purple-faint); border-color:var(--purple); color:var(--purple); font-weight:500; }
 
-  /* STATS */
-  .stats-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:0.75rem; margin-bottom:1.5rem; }
-  .stat-box { background:var(--parchment); border:1px solid var(--border); border-radius:8px; padding:1rem; text-align:center; }
-  .stat-num { font-family:'IBM Plex Mono',monospace; font-size:1.8rem; color:var(--purple); line-height:1; margin-bottom:0.25rem; }
-  .stat-label { font-size:0.75rem; color:var(--muted); }
-
   /* BOOK GRID */
-  .book-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:0.85rem; }
-  .book-card { background:var(--parchment); border:1px solid var(--border); border-radius:8px; padding:1rem; transition:border-color 0.2s; }
-  .book-card:hover { border-color:var(--purple); }
-  .book-title { font-family:'Noto Serif',serif; font-size:0.9rem; font-weight:400; color:var(--ink); margin-bottom:0.2rem; line-height:1.35; }
-  .book-author { font-size:0.75rem; color:var(--muted); font-style:italic; margin-bottom:0.5rem; font-family:'Noto Serif',serif; }
-  .book-stars { font-size:0.85rem; margin-bottom:0.3rem; letter-spacing:0.1em; }
-  .book-meta { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); margin-bottom:0.3rem; text-transform:uppercase; letter-spacing:0.1em; }
-  .book-notes { font-size:0.75rem; color:var(--muted); font-style:italic; font-family:'Noto Serif',serif; line-height:1.5; margin-top:0.4rem; }
+  .book-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem; }
+  .book-card { background:var(--parchment); border:1px solid var(--border); border-radius:8px; overflow:hidden; transition:border-color 0.2s, transform 0.15s; }
+  .book-card:hover { border-color:var(--purple); transform:translateY(-2px); }
+  .book-card-cover { width:100%; height:120px; object-fit:cover; background:var(--warm); display:block; }
+  .book-card-cover-ph { width:100%; height:120px; background:linear-gradient(135deg,var(--warm),var(--parchment)); display:flex; align-items:center; justify-content:center; font-size:2rem; opacity:0.35; }
+  .book-card-body { padding:0.85rem; }
+  .book-card-title { font-family:'Noto Serif',serif; font-size:0.85rem; color:var(--ink); margin-bottom:0.15rem; line-height:1.35; }
+  .book-card-author { font-size:0.72rem; color:var(--muted); font-style:italic; margin-bottom:0.4rem; font-family:'Noto Serif',serif; }
+  .book-card-stars { font-size:0.8rem; letter-spacing:0.1em; margin-bottom:0.25rem; }
+  .book-card-meta { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); }
+  .book-card-notes { font-size:0.72rem; color:var(--muted); font-style:italic; font-family:'Noto Serif',serif; margin-top:0.35rem; line-height:1.45; }
 
   /* IMPORT */
   .import-zone { background:var(--parchment); border:2px dashed var(--border); border-radius:10px; padding:2rem; text-align:center; cursor:pointer; transition:all 0.2s; position:relative; margin-bottom:1.25rem; }
@@ -88,8 +135,8 @@
 
   .empty-state { text-align:center; padding:3rem 1rem; color:var(--faint); font-family:'Noto Serif',serif; font-style:italic; }
   .loading-overlay { text-align:center; padding:2rem; }
-  .spinner { width:28px; height:28px; border:2px solid var(--border); border-top-color:var(--purple); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 0.75rem; }
-  @keyframes spin { to { transform:rotate(360deg); } }
+  .spinner-lg { width:32px; height:32px; border:2px solid var(--border); border-top-color:var(--purple); border-radius:50%; animation:spin2 0.8s linear infinite; margin:0 auto 0.75rem; }
+  @keyframes spin2 { to{transform:rotate(360deg)} }
   .loading-text { font-family:'Noto Serif',serif; font-style:italic; font-size:0.85rem; color:var(--muted); }
 
   @media(max-width:600px) { .two-col{grid-template-columns:1fr;} .book-grid{grid-template-columns:1fr 1fr;} }
@@ -121,6 +168,27 @@
   <div class="panel" id="panel-add">
     <div class="card">
       <div class="card-title">Add a book</div>
+      <div class="card-sub">Search by title or author, or fill in manually below.</div>
+
+      <!-- LIVE SEARCH -->
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" id="bookSearch" placeholder="Search for a book — title, author…" oninput="debounceSearch()" autocomplete="off">
+        <div class="search-spinner" id="searchSpinner"></div>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+
+      <!-- SELECTED PREVIEW -->
+      <div class="selected-book-preview" id="selectedPreview">
+        <div id="previewCoverWrap"></div>
+        <div class="preview-info">
+          <div class="preview-title" id="previewTitle"></div>
+          <div class="preview-author" id="previewAuthor"></div>
+          <button class="preview-clear" onclick="clearSelectedBook()">✕ Clear selection</button>
+        </div>
+      </div>
+
+      <!-- FORM -->
       <div class="two-col">
         <div class="field"><label>Title</label><input type="text" id="bookTitle" placeholder="Book title…"></div>
         <div class="field"><label>Author</label><input type="text" id="bookAuthor" placeholder="Author name…"></div>
@@ -137,16 +205,16 @@
         </div>
         <div class="field">
           <label>Year read</label>
-          <input type="number" id="bookYear" placeholder="2025" min="1900" max="2099">
+          <input type="number" id="bookYear" min="1900" max="2099">
         </div>
       </div>
       <span class="rating-label">Rating</span>
       <div class="star-row" id="starRow">
-        <span class="star" onclick="setRating(1)">★</span>
-        <span class="star" onclick="setRating(2)">★</span>
-        <span class="star" onclick="setRating(3)">★</span>
-        <span class="star" onclick="setRating(4)">★</span>
-        <span class="star" onclick="setRating(5)">★</span>
+        <span class="star" onclick="setRating(1)" onmouseover="hoverRating(1)" onmouseout="unhoverRating()">★</span>
+        <span class="star" onclick="setRating(2)" onmouseover="hoverRating(2)" onmouseout="unhoverRating()">★</span>
+        <span class="star" onclick="setRating(3)" onmouseover="hoverRating(3)" onmouseout="unhoverRating()">★</span>
+        <span class="star" onclick="setRating(4)" onmouseover="hoverRating(4)" onmouseout="unhoverRating()">★</span>
+        <span class="star" onclick="setRating(5)" onmouseover="hoverRating(5)" onmouseout="unhoverRating()">★</span>
       </div>
       <div class="two-col">
         <div class="field">
@@ -158,10 +226,7 @@
             <option>Biography</option><option>Adventure</option><option>Other</option>
           </select>
         </div>
-        <div class="field">
-          <label>Pages</label>
-          <input type="number" id="bookPages" placeholder="320" min="1">
-        </div>
+        <div class="field"><label>Pages</label><input type="number" id="bookPages" placeholder="320" min="1"></div>
       </div>
       <div class="field"><label>Notes / thoughts</label><textarea id="bookNotes" placeholder="What did you think…"></textarea></div>
       <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.25rem;">
@@ -176,8 +241,8 @@
   <div class="panel" id="panel-import">
     <div class="card">
       <div class="card-title">Import from StoryGraph</div>
-      <p style="font-size:0.82rem;color:var(--muted);font-style:italic;font-family:'Noto Serif',serif;margin-bottom:1.25rem;">Export your library from StoryGraph: Account → Import/Export → Export your library. Then upload the CSV here.</p>
-      <div class="import-zone" id="importZone">
+      <div class="card-sub">Export your library from StoryGraph: Account → Import/Export → Export your library. Then upload the CSV here.</div>
+      <div class="import-zone">
         <input type="file" accept=".csv" onchange="handleImport(this.files[0])">
         <div class="import-icon">📄</div>
         <div class="import-title">Drop your StoryGraph CSV here</div>
@@ -192,11 +257,11 @@
   <div class="panel" id="panel-settings">
     <div class="card">
       <div class="card-title">GitHub Connection</div>
-      <div style="font-size:0.8rem;color:var(--muted);font-style:italic;font-family:'Noto Serif',serif;margin-bottom:1.25rem;">Token stored locally in your browser only.</div>
+      <div class="card-sub">Token stored locally in your browser only.</div>
       <div class="field"><label>GitHub Token</label><input type="password" id="ghToken" placeholder="ghp_…"></div>
       <div class="field"><label>Repo</label><input type="text" id="ghRepo" value="sh4unn/shaunzen"></div>
       <button class="btn" onclick="saveSettings()">Save</button>
-      <button class="btn-ghost" onclick="testConnection()">Test</button>
+      <button class="btn-ghost" onclick="testConnection()">Test connection</button>
       <div class="status-msg" id="settingsStatus"></div>
     </div>
   </div>
@@ -206,20 +271,21 @@
   let currentRating = 0;
   let allBooks = [];
   let activeYear = 'All';
+  let searchTimer = null;
+  let selectedBook = null;
 
+  // ── GITHUB ──
   function getConfig() { return { token: localStorage.getItem('gh_token')||'', repo: localStorage.getItem('gh_repo')||'sh4unn/shaunzen' }; }
-
   async function ghSave(path, content) {
     const { token, repo } = getConfig();
     if (!token) throw new Error('No token — go to Settings first');
     let sha = null;
     try { const r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' }}); if(r.ok) sha=(await r.json()).sha; } catch(e){}
-    const body = { message:`Ledger: save ${path}`, content:btoa(unescape(encodeURIComponent(content))) };
+    const body = { message:`Ledger: update ${path}`, content:btoa(unescape(encodeURIComponent(content))) };
     if(sha) body.sha=sha;
     const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { method:'PUT', headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' }, body:JSON.stringify(body) });
     if(!res.ok) throw new Error('Save failed ('+res.status+')');
   }
-
   async function ghLoad(path) {
     const { token, repo } = getConfig();
     if (!token) throw new Error('No token');
@@ -228,27 +294,122 @@
     if(!r.ok) throw new Error('Load failed ('+r.status+')');
     return decodeURIComponent(escape(atob((await r.json()).content.replace(/\n/g,''))));
   }
-
   function saveSettings() { localStorage.setItem('gh_token',document.getElementById('ghToken').value.trim()); localStorage.setItem('gh_repo',document.getElementById('ghRepo').value.trim()||'sh4unn/shaunzen'); setStatus('settingsStatus','Saved ✓','ok'); }
-  async function testConnection() { setStatus('settingsStatus','Testing…',''); try { const {token,repo}=getConfig(); const r=await fetch(`https://api.github.com/repos/${repo}`,{headers:{Authorization:`token ${token}`}}); r.ok?setStatus('settingsStatus','Connected ✓','ok'):setStatus('settingsStatus','Failed','err'); } catch(e){setStatus('settingsStatus','Error: '+e.message,'err');} }
+  async function testConnection() { setStatus('settingsStatus','Testing…',''); try { const {token,repo}=getConfig(); const r=await fetch(`https://api.github.com/repos/${repo}`,{headers:{Authorization:`token ${token}`}}); r.ok?setStatus('settingsStatus','Connected ✓','ok'):setStatus('settingsStatus','Failed — check token','err'); } catch(e){setStatus('settingsStatus','Error: '+e.message,'err');} }
   function loadSettingsFields() { document.getElementById('ghToken').value=localStorage.getItem('gh_token')||''; document.getElementById('ghRepo').value=localStorage.getItem('gh_repo')||'sh4unn/shaunzen'; }
 
-  function setRating(n) {
-    currentRating = n;
-    document.querySelectorAll('.star').forEach((s,i) => s.classList.toggle('active', i<n));
+  // ── LIVE SEARCH ──
+  function debounceSearch() {
+    clearTimeout(searchTimer);
+    const q = document.getElementById('bookSearch').value.trim();
+    if(q.length < 2) { hideSearchResults(); return; }
+    searchTimer = setTimeout(() => searchBooks(q), 350);
   }
 
+  async function searchBooks(query) {
+    document.getElementById('searchSpinner').classList.add('show');
+    try {
+      const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=8&fields=key,title,author_name,first_publish_year,number_of_pages_median,cover_i,subject`;
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('Search failed');
+      const data = await res.json();
+      renderSearchResults(data.docs || []);
+    } catch(e) {
+      document.getElementById('searchResults').innerHTML = `<div class="search-no-results">Search unavailable — fill in manually below.</div>`;
+      document.getElementById('searchResults').classList.add('show');
+    }
+    document.getElementById('searchSpinner').classList.remove('show');
+  }
+
+  function renderSearchResults(books) {
+    const container = document.getElementById('searchResults');
+    if(!books.length) {
+      container.innerHTML = '<div class="search-no-results">No results found — try a different search or fill in manually.</div>';
+      container.classList.add('show');
+      return;
+    }
+    container.innerHTML = books.map((b,i) => {
+      const cover = b.cover_i ? `https://covers.openlibrary.org/b/id/${b.cover_i}-S.jpg` : null;
+      const author = b.author_name ? b.author_name[0] : 'Unknown';
+      const year = b.first_publish_year || '';
+      const pages = b.number_of_pages_median || '';
+      const imgHtml = cover
+        ? `<img class="book-cover" src="${cover}" alt="" onerror="this.parentNode.innerHTML='<div class=book-cover-placeholder>📖</div>'">`
+        : `<div class="book-cover-placeholder">📖</div>`;
+      return `
+        <div class="search-result-item">
+          ${imgHtml}
+          <div class="result-info">
+            <div class="result-title">${b.title}</div>
+            <div class="result-author">${author}</div>
+            <div class="result-meta">
+              ${year?`<span>${year}</span>`:''}
+              ${pages?`<span>${pages}p</span>`:''}
+            </div>
+          </div>
+          <button class="result-add" onclick='selectBook(${JSON.stringify({title:b.title,author,year,pages,cover:b.cover_i||null}).replace(/'/g,"&#39;")})'>Add</button>
+        </div>`;
+    }).join('');
+    container.classList.add('show');
+  }
+
+  function selectBook(book) {
+    selectedBook = book;
+    document.getElementById('bookTitle').value = book.title || '';
+    document.getElementById('bookAuthor').value = book.author || '';
+    document.getElementById('bookYear').value = book.year || new Date().getFullYear();
+    document.getElementById('bookPages').value = book.pages || '';
+    document.getElementById('bookSearch').value = '';
+    hideSearchResults();
+
+    // Show preview
+    const coverWrap = document.getElementById('previewCoverWrap');
+    if(book.cover) {
+      coverWrap.innerHTML = `<img class="preview-cover" src="https://covers.openlibrary.org/b/id/${book.cover}-M.jpg" alt="" onerror="this.parentNode.innerHTML='<div class=preview-cover-placeholder>📖</div>'">`;
+    } else {
+      coverWrap.innerHTML = '<div class="preview-cover-placeholder">📖</div>';
+    }
+    document.getElementById('previewTitle').textContent = book.title;
+    document.getElementById('previewAuthor').textContent = book.author;
+    document.getElementById('selectedPreview').classList.add('show');
+    document.getElementById('bookNotes').focus();
+  }
+
+  function clearSelectedBook() {
+    selectedBook = null;
+    document.getElementById('selectedPreview').classList.remove('show');
+    document.getElementById('bookSearch').value = '';
+  }
+
+  function hideSearchResults() {
+    document.getElementById('searchResults').classList.remove('show');
+    document.getElementById('searchResults').innerHTML = '';
+  }
+
+  // Close search on outside click
+  document.addEventListener('click', e => {
+    if(!e.target.closest('.search-wrap') && !e.target.closest('.search-results')) hideSearchResults();
+  });
+
+  // ── RATING ──
+  function setRating(n) { currentRating=n; renderStars(n); }
+  function hoverRating(n) { renderStars(n); }
+  function unhoverRating() { renderStars(currentRating); }
+  function renderStars(n) { document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('active',i<n)); }
+
+  // ── ADD BOOK ──
   function clearBookForm() {
     ['bookTitle','bookAuthor','bookPages','bookNotes'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('bookYear').value = new Date().getFullYear();
-    currentRating=0;
-    document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));
+    document.getElementById('bookYear').value=new Date().getFullYear();
+    document.getElementById('bookSearch').value='';
+    currentRating=0; renderStars(0);
+    clearSelectedBook();
     setStatus('addBookStatus','','');
   }
 
   async function addBook() {
     const title = document.getElementById('bookTitle').value.trim();
-    if (!title) { setStatus('addBookStatus','Need at least a title','err'); return; }
+    if(!title) { setStatus('addBookStatus','Need at least a title','err'); return; }
     const btn = document.getElementById('addBookBtn');
     btn.disabled=true; btn.textContent='Saving…';
     try {
@@ -257,136 +418,122 @@
         title,
         author: document.getElementById('bookAuthor').value.trim(),
         status: document.getElementById('bookStatus').value,
-        year: parseInt(document.getElementById('bookYear').value) || new Date().getFullYear(),
+        year: parseInt(document.getElementById('bookYear').value)||new Date().getFullYear(),
         rating: currentRating,
         genre: document.getElementById('bookGenre').value,
         pages: parseInt(document.getElementById('bookPages').value)||0,
         notes: document.getElementById('bookNotes').value.trim(),
+        cover: selectedBook?.cover || null,
         added: new Date().toISOString().split('T')[0]
       };
-      let books = [];
+      let books=[];
       const ex = await ghLoad('ledger/books.json');
-      if (ex) books = JSON.parse(ex);
+      if(ex) books=JSON.parse(ex);
       books.unshift(book);
       await ghSave('ledger/books.json', JSON.stringify(books,null,2));
-      allBooks = books;
+      allBooks=books;
       setStatus('addBookStatus','Saved ✓','ok');
       clearBookForm();
     } catch(e) { setStatus('addBookStatus',e.message,'err'); }
     btn.disabled=false; btn.textContent='Save to GitHub';
   }
 
+  // ── MY BOOKS ──
   async function loadBooks() {
     const container = document.getElementById('bookContent');
-    container.innerHTML = '<div class="loading-overlay"><div class="spinner"></div><div class="loading-text">Loading your library…</div></div>';
+    container.innerHTML='<div class="loading-overlay"><div class="spinner-lg"></div><div class="loading-text">Loading your library…</div></div>';
     try {
       const raw = await ghLoad('ledger/books.json');
-      if (!raw) { allBooks=[]; renderBooks(); return; }
-      allBooks = JSON.parse(raw);
-      renderBooks();
+      if(!raw) { allBooks=[]; renderBooks(); return; }
+      allBooks=JSON.parse(raw); renderBooks();
     } catch(e) { container.innerHTML='<div class="empty-state">Could not load — check settings.</div>'; }
   }
 
   function renderBooks() {
     const readBooks = allBooks.filter(b=>b.status==='read');
     const years = [...new Set(readBooks.map(b=>b.year).filter(Boolean))].sort((a,b)=>b-a);
-
-    // Stats
     const totalPages = readBooks.reduce((s,b)=>s+(b.pages||0),0);
-    const avgRating = readBooks.filter(b=>b.rating).length ? (readBooks.filter(b=>b.rating).reduce((s,b)=>s+b.rating,0)/readBooks.filter(b=>b.rating).length).toFixed(1) : '—';
+    const rated = readBooks.filter(b=>b.rating);
+    const avgRating = rated.length ? (rated.reduce((s,b)=>s+b.rating,0)/rated.length).toFixed(1) : '—';
+
     document.getElementById('statsRow').innerHTML = `
       <div class="stat-box"><div class="stat-num">${readBooks.length}</div><div class="stat-label">Books read</div></div>
       <div class="stat-box"><div class="stat-num">${totalPages>0?Math.round(totalPages/1000)+'k':'—'}</div><div class="stat-label">Pages</div></div>
       <div class="stat-box"><div class="stat-num">${avgRating}</div><div class="stat-label">Avg rating</div></div>
-      <div class="stat-box"><div class="stat-num">${years[0]||'—'}</div><div class="stat-label">Latest year</div></div>`;
+      <div class="stat-box"><div class="stat-num">${allBooks.filter(b=>b.status==='to-read').length}</div><div class="stat-label">To read</div></div>`;
 
-    // Year tabs
-    const allYears = ['All', ...years];
+    const allYears = ['All',...years];
     document.getElementById('yearTabs').innerHTML = allYears.map(y=>`<div class="year-chip${y==activeYear?' active':''}" onclick="setYear(${JSON.stringify(y)})">${y}</div>`).join('');
 
-    // Books
     const filtered = activeYear==='All' ? allBooks : allBooks.filter(b=>b.year==activeYear);
     const container = document.getElementById('bookContent');
-    if (!filtered.length) { container.innerHTML='<div class="empty-state">No books yet — add your first one.</div>'; return; }
-    container.innerHTML = `<div class="book-grid">${filtered.map(b=>`
-      <div class="book-card">
-        <div class="book-meta">${b.year||''} ${b.genre?'· '+b.genre:''}</div>
-        <div class="book-title">${b.title}</div>
-        <div class="book-author">${b.author||''}</div>
-        ${b.rating?`<div class="book-stars">${'★'.repeat(b.rating)}${'☆'.repeat(5-b.rating)}</div>`:''}
-        ${b.notes?`<div class="book-notes">"${b.notes.slice(0,100)}${b.notes.length>100?'…':''}"</div>`:''}
-      </div>`).join('')}</div>`;
+    if(!filtered.length) { container.innerHTML='<div class="empty-state">No books yet — add your first one.</div>'; return; }
+
+    container.innerHTML = `<div class="book-grid">${filtered.map(b=>{
+      const coverHtml = b.cover
+        ? `<img class="book-card-cover" src="https://covers.openlibrary.org/b/id/${b.cover}-M.jpg" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`+`<div class="book-card-cover-ph" style="display:none">📖</div>`
+        : `<div class="book-card-cover-ph">📖</div>`;
+      const stars = b.rating ? '★'.repeat(b.rating)+'☆'.repeat(5-b.rating) : '';
+      return `<div class="book-card">
+        ${coverHtml}
+        <div class="book-card-body">
+          <div class="book-card-title">${b.title}</div>
+          <div class="book-card-author">${b.author||''}</div>
+          ${stars?`<div class="book-card-stars">${stars}</div>`:''}
+          <div class="book-card-meta">${b.year||''} ${b.genre?'· '+b.genre:''} ${b.pages?'· '+b.pages+'p':''}</div>
+          ${b.notes?`<div class="book-card-notes">"${b.notes.slice(0,80)}${b.notes.length>80?'…':''}"</div>`:''}
+        </div>
+      </div>`;
+    }).join('')}</div>`;
   }
 
   function setYear(y) { activeYear=y; renderBooks(); }
 
-  // STORYGRAPH IMPORT
+  // ── STORYGRAPH IMPORT ──
   function handleImport(file) {
     if(!file) return;
     const reader = new FileReader();
-    reader.onload = e => {
-      const books = parseStoryGraph(e.target.result);
-      showImportPreview(books);
-    };
+    reader.onload = e => { const books=parseStoryGraph(e.target.result); showImportPreview(books); };
     reader.readAsText(file);
   }
 
   function parseStoryGraph(csv) {
-    const lines = csv.split('\n').filter(l=>l.trim());
+    const lines=csv.split('\n').filter(l=>l.trim());
     if(lines.length<2) return [];
-    const headers = parseCSVLine(lines[0]).map(h=>h.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,''));
-    const books = [];
-    for(let i=1;i<lines.length;i++){
-      const vals = parseCSVLine(lines[i]);
-      const obj = {};
-      headers.forEach((h,j)=>obj[h]=(vals[j]||'').trim());
-      if(obj.title) books.push({
-        id: Date.now()+i,
-        title: obj.title,
-        author: obj.authors || obj.author || '',
-        status: obj.read_status==='read'?'read':obj.read_status==='currently-reading'?'reading':'to-read',
-        year: obj.date_read ? parseInt(obj.date_read.split('-')[0]) : (obj.date_added?parseInt(obj.date_added.split('-')[0]):new Date().getFullYear()),
-        rating: obj.star_rating ? Math.round(parseFloat(obj.star_rating)) : 0,
-        genre: obj.genres ? obj.genres.split(',')[0].trim() : 'Other',
-        pages: parseInt(obj.num_pages||obj.pages||0)||0,
-        notes: '',
-        added: obj.date_added || new Date().toISOString().split('T')[0]
-      });
-    }
-    return books;
+    const headers=parseCSVLine(lines[0]).map(h=>h.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,''));
+    return lines.slice(1).map((line,i)=>{
+      const vals=parseCSVLine(line);
+      const obj={}; headers.forEach((h,j)=>obj[h]=(vals[j]||'').trim());
+      if(!obj.title) return null;
+      return { id:Date.now()+i, title:obj.title, author:obj.authors||obj.author||'', status:obj.read_status==='read'?'read':obj.read_status==='currently-reading'?'reading':'to-read', year:obj.date_read?parseInt(obj.date_read.split('-')[0]):(obj.date_added?parseInt(obj.date_added.split('-')[0]):new Date().getFullYear()), rating:obj.star_rating?Math.round(parseFloat(obj.star_rating)):0, genre:obj.genres?obj.genres.split(',')[0].trim():'Other', pages:parseInt(obj.num_pages||obj.pages||0)||0, notes:'', cover:null, added:obj.date_added||new Date().toISOString().split('T')[0] };
+    }).filter(Boolean);
   }
 
   function parseCSVLine(line) {
-    const result=[]; let current=''; let inQ=false;
-    for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){inQ=!inQ;}else if(c===','&&!inQ){result.push(current);current='';}else{current+=c;}}
-    result.push(current); return result;
+    const result=[]; let cur=''; let inQ=false;
+    for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){inQ=!inQ;}else if(c===','&&!inQ){result.push(cur);cur='';}else{cur+=c;}}
+    result.push(cur); return result;
   }
 
   function showImportPreview(books) {
-    const preview = document.getElementById('importPreview');
+    const preview=document.getElementById('importPreview');
     if(!books.length){preview.innerHTML='<div class="empty-state">No books found in CSV.</div>';return;}
-    preview.innerHTML = `
-      <div style="background:var(--teal-faint);border:1px solid #90c0b8;border-radius:8px;padding:1rem;margin-bottom:1rem;">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);margin-bottom:0.5rem;">Found ${books.length} books</div>
-        <div style="font-size:0.82rem;color:var(--muted);font-style:italic;font-family:'Noto Serif',serif;">This will merge with your existing library (won't delete anything).</div>
-      </div>
-      <button class="btn" onclick="confirmImport(${JSON.stringify(books).replace(/"/g,'&quot;')})">Import ${books.length} books to GitHub</button>`;
+    preview.innerHTML=`<div style="background:var(--teal-faint);border:1px solid #90c0b8;border-radius:8px;padding:1rem;margin-bottom:1rem;"><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);margin-bottom:0.4rem">Found ${books.length} books</div><div style="font-size:0.82rem;color:var(--muted);font-style:italic;font-family:'Noto Serif',serif">This will merge with your existing library and won't delete anything already saved.</div></div>
+    <button class="btn" onclick='confirmImport(${JSON.stringify(books).replace(/\\/g,"\\\\").replace(/'/g,"&#39;")})'>Import ${books.length} books to GitHub</button>`;
   }
 
   async function confirmImport(newBooks) {
     setStatus('importStatus','Importing…','');
     try {
-      let existing = [];
-      const raw = await ghLoad('ledger/books.json');
-      if(raw) existing = JSON.parse(raw);
-      const existingTitles = new Set(existing.map(b=>b.title.toLowerCase()));
-      const toAdd = newBooks.filter(b=>!existingTitles.has(b.title.toLowerCase()));
-      const merged = [...toAdd, ...existing];
-      await ghSave('ledger/books.json', JSON.stringify(merged,null,2));
-      allBooks = merged;
+      let existing=[]; const raw=await ghLoad('ledger/books.json'); if(raw) existing=JSON.parse(raw);
+      const existingTitles=new Set(existing.map(b=>b.title.toLowerCase()));
+      const toAdd=newBooks.filter(b=>!existingTitles.has(b.title.toLowerCase()));
+      const merged=[...toAdd,...existing];
+      await ghSave('ledger/books.json',JSON.stringify(merged,null,2));
+      allBooks=merged;
       setStatus('importStatus',`Imported ${toAdd.length} new books ✓ (${newBooks.length-toAdd.length} already existed)`,'ok');
       document.getElementById('importPreview').innerHTML='';
-    } catch(e) { setStatus('importStatus',e.message,'err'); }
+    } catch(e){setStatus('importStatus',e.message,'err');}
   }
 
   function setStatus(id,msg,type){const el=document.getElementById(id);el.textContent=msg;el.className='status-msg'+(type?' '+type:'');}
@@ -400,6 +547,8 @@
     if(id==='settings') loadSettingsFields();
     if(id==='add') document.getElementById('bookYear').value=new Date().getFullYear();
   }
+
+  document.getElementById('bookYear').value = new Date().getFullYear();
 </script>
 </body>
 </html>

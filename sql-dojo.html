@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Dojo</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400&family=Noto+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+<style>
+  :root {
+    --bg:#0e0c0a; --surface:#151210; --card:#1a1612;
+    --border:#2a2418; --green:#2a8a3a; --green-bright:#3aaa4a; --green-faint:#e8f5ea;
+    --gold:#c9963a; --gold-dim:#6a4a10;
+    --red:#8a2020; --yellow:#aa8a20;
+    --text:#e0d5b8; --muted:#8a7a5a; --faint:#4a3a20;
+    --cream:#f4efe4; --teal:#2a6b5e;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'IBM Plex Mono',monospace; min-height:100vh; display:flex; flex-direction:column; }
+
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--gold-dim); color:var(--text); text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; opacity:0.8; transition:opacity 0.2s; }
+  .home-btn:hover { opacity:1; }
+
+  /* HEADER */
+  .header { background:var(--surface); border-bottom:1px solid var(--border); padding:1rem 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem; padding-left:8rem; }
+  .header-title { font-family:'Noto Serif',serif; font-size:1.3rem; font-weight:300; color:var(--gold); }
+  .header-sub { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+  .progress-badge { font-size:11px; color:var(--green-bright); background:rgba(42,138,58,0.15); border:1px solid rgba(42,138,58,0.3); border-radius:20px; padding:0.25rem 0.85rem; }
+
+  /* LAYOUT */
+  .workspace { display:grid; grid-template-columns:280px 1fr; flex:1; min-height:0; height:calc(100vh - 62px); }
+
+  /* SIDEBAR */
+  .sidebar { background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+  .sidebar-tabs { display:flex; border-bottom:1px solid var(--border); }
+  .stab { flex:1; padding:0.6rem; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); cursor:pointer; text-align:center; border-bottom:2px solid transparent; transition:all 0.2s; }
+  .stab.active { color:var(--gold); border-bottom-color:var(--gold); }
+  .sidebar-content { flex:1; overflow-y:auto; padding:0.75rem; }
+
+  .question-item { padding:0.75rem; border:1px solid var(--border); border-radius:4px; margin-bottom:0.5rem; cursor:pointer; transition:all 0.2s; }
+  .question-item:hover { border-color:var(--gold-dim); background:var(--card); }
+  .question-item.active { border-color:var(--gold); background:var(--card); }
+  .question-item.solved { border-color:rgba(42,138,58,0.4); }
+  .q-header { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.3rem; }
+  .q-num { font-size:9px; color:var(--faint); }
+  .q-diff { font-size:9px; border-radius:20px; padding:0.1rem 0.4rem; }
+  .q-diff.easy { background:rgba(42,138,58,0.15); color:var(--green-bright); }
+  .q-diff.medium { background:rgba(170,138,32,0.15); color:var(--yellow); }
+  .q-diff.hard { background:rgba(138,32,32,0.15); color:#cc5555; }
+  .q-solved { margin-left:auto; font-size:10px; color:var(--green-bright); }
+  .q-title { font-size:11px; color:var(--text); line-height:1.4; }
+
+  /* SCHEMA PANEL */
+  .schema-item { margin-bottom:1rem; }
+  .schema-table { font-size:11px; color:var(--gold); margin-bottom:0.4rem; }
+  .schema-col { font-size:10px; color:var(--muted); padding-left:0.5rem; line-height:1.8; }
+  .schema-col span { color:var(--faint); margin-left:0.5rem; }
+
+  /* MAIN EDITOR */
+  .editor-area { display:flex; flex-direction:column; overflow:hidden; }
+
+  .question-panel { background:var(--surface); border-bottom:1px solid var(--border); padding:1rem 1.25rem; }
+  .q-panel-title { font-family:'Noto Serif',serif; font-size:1rem; font-weight:300; color:var(--gold); margin-bottom:0.4rem; }
+  .q-panel-desc { font-family:'Noto Serif',serif; font-style:italic; font-size:0.85rem; color:var(--muted); line-height:1.65; margin-bottom:0.5rem; }
+  .q-panel-hint { font-size:10px; color:var(--faint); display:none; margin-top:0.4rem; line-height:1.6; }
+  .q-panel-hint.show { display:block; }
+  .hint-btn { background:none; border:1px solid var(--border); color:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:10px; padding:0.2rem 0.6rem; cursor:pointer; border-radius:2px; transition:all 0.2s; }
+  .hint-btn:hover { border-color:var(--gold-dim); color:var(--gold); }
+
+  .sql-editor-wrap { flex:1; display:flex; flex-direction:column; min-height:0; position:relative; }
+  .line-nums { position:absolute; left:0; top:0; bottom:0; width:36px; background:var(--surface); border-right:1px solid var(--border); padding:0.75rem 0; text-align:right; font-size:12px; color:var(--faint); line-height:1.6; pointer-events:none; z-index:1; overflow:hidden; }
+  .sql-editor { flex:1; background:var(--card); border:none; border-bottom:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:13px; line-height:1.6; padding:0.75rem 0.75rem 0.75rem 44px; resize:none; outline:none; tab-size:2; }
+  .sql-editor::selection { background:rgba(201,150,58,0.2); }
+
+  .editor-toolbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0.6rem 1rem; display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; }
+  .run-btn { background:var(--green); color:white; border:none; border-radius:4px; padding:0.5rem 1.25rem; font-family:'IBM Plex Mono',monospace; font-size:12px; cursor:pointer; transition:background 0.2s; letter-spacing:0.05em; }
+  .run-btn:hover { background:var(--green-bright); }
+  .run-btn:active { transform:scale(0.97); }
+  .clear-btn { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:4px; padding:0.5rem 1rem; font-family:'IBM Plex Mono',monospace; font-size:12px; cursor:pointer; transition:all 0.2s; }
+  .clear-btn:hover { border-color:var(--gold-dim); color:var(--gold); }
+  .check-btn { background:transparent; border:1px solid rgba(42,138,58,0.4); color:var(--green-bright); border-radius:4px; padding:0.5rem 1rem; font-family:'IBM Plex Mono',monospace; font-size:12px; cursor:pointer; transition:all 0.2s; }
+  .check-btn:hover { background:rgba(42,138,58,0.1); }
+  .solution-btn { background:transparent; border:1px solid var(--border); color:var(--faint); border-radius:4px; padding:0.5rem 1rem; font-family:'IBM Plex Mono',monospace; font-size:12px; cursor:pointer; transition:all 0.2s; margin-left:auto; }
+  .solution-btn:hover { border-color:var(--gold-dim); color:var(--muted); }
+  .shortcut-hint { font-size:10px; color:var(--faint); margin-left:0.25rem; }
+
+  /* RESULTS */
+  .results-panel { background:var(--card); min-height:160px; max-height:260px; overflow:auto; }
+  .results-toolbar { background:var(--surface); border-top:1px solid var(--border); padding:0.4rem 1rem; font-size:10px; color:var(--faint); display:flex; justify-content:space-between; align-items:center; }
+  .result-status { display:flex; align-items:center; gap:0.5rem; }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:var(--faint); }
+  .status-dot.ok { background:var(--green-bright); }
+  .status-dot.err { background:#cc4444; }
+  .status-dot.check-pass { background:var(--green-bright); animation:pulse 1s ease-in-out 3; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+  .result-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .result-table th { background:var(--surface); color:var(--gold); padding:0.5rem 0.85rem; text-align:left; border-bottom:1px solid var(--border); position:sticky; top:0; font-weight:400; letter-spacing:0.05em; }
+  .result-table td { padding:0.45rem 0.85rem; border-bottom:1px solid rgba(42,36,24,0.5); color:var(--text); }
+  .result-table tr:hover td { background:rgba(201,150,58,0.04); }
+  .result-empty { padding:1.5rem; text-align:center; color:var(--faint); font-style:italic; font-family:'Noto Serif',serif; }
+  .result-error { padding:1rem; color:#cc5555; font-size:12px; line-height:1.6; }
+  .result-success { padding:0.75rem 1rem; color:var(--green-bright); font-size:12px; }
+  .solution-reveal { padding:0.85rem 1rem; background:rgba(201,150,58,0.06); border-top:1px solid var(--border); font-size:12px; color:var(--gold); }
+
+  @media(max-width:768px) {
+    .workspace { grid-template-columns:1fr; height:auto; }
+    .sidebar { height:200px; }
+    .sql-editor { min-height:150px; }
+  }
+</style>
+</head>
+<body>
+
+<a class="home-btn" href="index.html">← Home</a>
+
+<div class="header">
+  <div>
+    <div class="header-title">SQL Dojo</div>
+    <div class="header-sub">Practice workspace</div>
+  </div>
+  <div class="progress-badge" id="progressBadge">0 / 12 solved</div>
+</div>
+
+<div class="workspace">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-tabs">
+      <div class="stab active" onclick="showSideTab('questions',this)">Questions</div>
+      <div class="stab" onclick="showSideTab('schema',this)">Schema</div>
+    </div>
+    <div class="sidebar-content" id="sidebar-questions"></div>
+    <div class="sidebar-content" id="sidebar-schema" style="display:none">
+      <div class="schema-item">
+        <div class="schema-table">📋 patients</div>
+        <div class="schema-col">id<span>INTEGER PK</span></div>
+        <div class="schema-col">name<span>TEXT</span></div>
+        <div class="schema-col">age<span>INTEGER</span></div>
+        <div class="schema-col">gender<span>TEXT</span></div>
+        <div class="schema-col">ward<span>TEXT</span></div>
+        <div class="schema-col">admitted<span>DATE</span></div>
+        <div class="schema-col">diagnosis<span>TEXT</span></div>
+      </div>
+      <div class="schema-item">
+        <div class="schema-table">💊 medications</div>
+        <div class="schema-col">id<span>INTEGER PK</span></div>
+        <div class="schema-col">patient_id<span>INTEGER FK</span></div>
+        <div class="schema-col">drug_name<span>TEXT</span></div>
+        <div class="schema-col">dose<span>TEXT</span></div>
+        <div class="schema-col">route<span>TEXT</span></div>
+        <div class="schema-col">frequency<span>TEXT</span></div>
+        <div class="schema-col">prescribed_by<span>TEXT</span></div>
+      </div>
+      <div class="schema-item">
+        <div class="schema-table">📊 observations</div>
+        <div class="schema-col">id<span>INTEGER PK</span></div>
+        <div class="schema-col">patient_id<span>INTEGER FK</span></div>
+        <div class="schema-col">recorded_at<span>DATETIME</span></div>
+        <div class="schema-col">bp_systolic<span>INTEGER</span></div>
+        <div class="schema-col">bp_diastolic<span>INTEGER</span></div>
+        <div class="schema-col">heart_rate<span>INTEGER</span></div>
+        <div class="schema-col">spo2<span>INTEGER</span></div>
+        <div class="schema-col">temp<span>REAL</span></div>
+        <div class="schema-col">nurse<span>TEXT</span></div>
+      </div>
+      <div class="schema-item">
+        <div class="schema-table">🏥 procedures</div>
+        <div class="schema-col">id<span>INTEGER PK</span></div>
+        <div class="schema-col">patient_id<span>INTEGER FK</span></div>
+        <div class="schema-col">procedure_name<span>TEXT</span></div>
+        <div class="schema-col">performed_on<span>DATE</span></div>
+        <div class="schema-col">performed_by<span>TEXT</span></div>
+        <div class="schema-col">duration_mins<span>INTEGER</span></div>
+        <div class="schema-col">outcome<span>TEXT</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="editor-area">
+
+    <div class="question-panel">
+      <div class="q-panel-title" id="qTitle">Select a question to begin</div>
+      <div class="q-panel-desc" id="qDesc">Choose a question from the list on the left, or just write your own SQL below and hit Run.</div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button class="hint-btn" onclick="toggleHint()" id="hintBtn" style="display:none">Show hint</button>
+      </div>
+      <div class="q-panel-hint" id="qHint"></div>
+    </div>
+
+    <div class="editor-toolbar">
+      <button class="run-btn" onclick="runQuery()">▶ Run</button>
+      <span class="shortcut-hint">⌘↵</span>
+      <button class="clear-btn" onclick="clearEditor()">Clear</button>
+      <button class="check-btn" onclick="checkAnswer()" id="checkBtn" style="display:none">Check answer</button>
+      <button class="solution-btn" onclick="showSolution()" id="solBtn" style="display:none">Show solution</button>
+    </div>
+
+    <div class="sql-editor-wrap">
+      <div class="line-nums" id="lineNums">1</div>
+      <textarea class="sql-editor" id="sqlEditor" placeholder="-- Write your SQL here&#10;-- e.g. SELECT * FROM patients LIMIT 5;"
+        onkeydown="handleKey(event)" oninput="updateLineNums()" spellcheck="false"></textarea>
+    </div>
+
+    <div class="results-panel" id="resultsPanel">
+      <div class="result-empty">Run a query to see results here</div>
+    </div>
+
+    <div class="results-toolbar">
+      <div class="result-status">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Ready</span>
+      </div>
+      <span id="rowCount"></span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── QUESTIONS ──
+  const QUESTIONS = [
+    { id:1, title:'Select all patients', diff:'easy', desc:'Retrieve every patient from the patients table — all columns, all rows.', hint:'Use SELECT * to get all columns. No WHERE clause needed.', solution:'SELECT * FROM patients;', check: q => q.toLowerCase().includes('patients') && q.toLowerCase().includes('select') },
+    { id:2, title:'List patient names and wards', diff:'easy', desc:'Show only the patient name and ward columns from the patients table.', hint:'Name the specific columns you want after SELECT, separated by commas.', solution:'SELECT name, ward FROM patients;', check: q => q.toLowerCase().includes('name') && q.toLowerCase().includes('ward') },
+    { id:3, title:'Patients in ICU', diff:'easy', desc:"Find all patients currently in the 'ICU' ward.", hint:"Use a WHERE clause: WHERE ward = 'ICU'", solution:"SELECT * FROM patients WHERE ward = 'ICU';", check: q => q.toLowerCase().includes('where') && q.toLowerCase().includes('icu') },
+    { id:4, title:'Count patients per ward', diff:'easy', desc:'How many patients are in each ward? Show the ward name and the count.', hint:'Use GROUP BY ward and the COUNT() function.', solution:'SELECT ward, COUNT(*) AS patient_count FROM patients GROUP BY ward;', check: q => q.toLowerCase().includes('count') && q.toLowerCase().includes('group by') },
+    { id:5, title:'Patients over 65', diff:'easy', desc:'List all patients older than 65. Show their name, age and diagnosis.', hint:'Use WHERE age > 65', solution:'SELECT name, age, diagnosis FROM patients WHERE age > 65;', check: q => q.toLowerCase().includes('age') && q.toLowerCase().includes('65') },
+    { id:6, title:'Medications for a patient', diff:'medium', desc:'List all medications prescribed to patient id 3. Show drug name, dose and route.', hint:'Filter medications table with WHERE patient_id = 3', solution:'SELECT drug_name, dose, route FROM medications WHERE patient_id = 3;', check: q => q.toLowerCase().includes('medications') && q.toLowerCase().includes('patient_id') },
+    { id:7, title:'Join patients and medications', diff:'medium', desc:'Show each patient name alongside their prescribed medications. Use a JOIN.', hint:'JOIN medications ON medications.patient_id = patients.id', solution:'SELECT patients.name, medications.drug_name, medications.dose FROM patients JOIN medications ON medications.patient_id = patients.id;', check: q => q.toLowerCase().includes('join') && q.toLowerCase().includes('patients') && q.toLowerCase().includes('medications') },
+    { id:8, title:'Average heart rate by ward', diff:'medium', desc:'Calculate the average heart rate for patients in each ward. Join observations to patients.', hint:'You need to JOIN observations to patients, then GROUP BY ward using AVG(heart_rate)', solution:'SELECT patients.ward, ROUND(AVG(observations.heart_rate),1) AS avg_hr FROM patients JOIN observations ON observations.patient_id = patients.id GROUP BY patients.ward;', check: q => q.toLowerCase().includes('avg') && q.toLowerCase().includes('heart_rate') },
+    { id:9, title:'Patients with low SpO2', diff:'medium', desc:'Find any observation where SpO2 dropped below 94. Show patient name, SpO2 value and when it was recorded.', hint:'JOIN observations to patients and filter WHERE spo2 < 94', solution:'SELECT patients.name, observations.spo2, observations.recorded_at FROM patients JOIN observations ON observations.patient_id = patients.id WHERE observations.spo2 < 94;', check: q => q.toLowerCase().includes('spo2') && q.toLowerCase().includes('94') },
+    { id:10, title:'Count medications per patient', diff:'medium', desc:'Show each patient name and how many medications they have been prescribed. Order by most medications first.', hint:'GROUP BY patient, use COUNT(), JOIN to get names, ORDER BY count DESC', solution:'SELECT patients.name, COUNT(medications.id) AS med_count FROM patients LEFT JOIN medications ON medications.patient_id = patients.id GROUP BY patients.id ORDER BY med_count DESC;', check: q => q.toLowerCase().includes('count') && q.toLowerCase().includes('group by') && q.toLowerCase().includes('order by') },
+    { id:11, title:'Patients with no medications', diff:'hard', desc:'Find all patients who have no medications prescribed. Use a LEFT JOIN or subquery.', hint:'Use LEFT JOIN and check WHERE medications.id IS NULL, or use NOT IN with a subquery.', solution:'SELECT patients.name FROM patients LEFT JOIN medications ON medications.patient_id = patients.id WHERE medications.id IS NULL;', check: q => (q.toLowerCase().includes('left join') || q.toLowerCase().includes('not in')) && q.toLowerCase().includes('null') },
+    { id:12, title:'Most common diagnosis', diff:'hard', desc:'What is the most common diagnosis across all patients? Show the diagnosis and how many patients have it.', hint:'GROUP BY diagnosis, COUNT(*), ORDER BY count DESC, LIMIT 1', solution:'SELECT diagnosis, COUNT(*) AS total FROM patients GROUP BY diagnosis ORDER BY total DESC LIMIT 1;', check: q => q.toLowerCase().includes('diagnosis') && q.toLowerCase().includes('count') && q.toLowerCase().includes('limit') },
+  ];
+
+  let db = null;
+  let currentQuestion = null;
+  let solved = JSON.parse(localStorage.getItem('sqlSolved') || '[]');
+  let hintShown = false;
+
+  // ── INIT DB ──
+  async function initDB() {
+    const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}` });
+    db = new SQL.Database();
+
+    db.run(`
+      CREATE TABLE patients (id INTEGER PRIMARY KEY, name TEXT, age INTEGER, gender TEXT, ward TEXT, admitted DATE, diagnosis TEXT);
+      CREATE TABLE medications (id INTEGER PRIMARY KEY, patient_id INTEGER, drug_name TEXT, dose TEXT, route TEXT, frequency TEXT, prescribed_by TEXT);
+      CREATE TABLE observations (id INTEGER PRIMARY KEY, patient_id INTEGER, recorded_at DATETIME, bp_systolic INTEGER, bp_diastolic INTEGER, heart_rate INTEGER, spo2 INTEGER, temp REAL, nurse TEXT);
+      CREATE TABLE procedures (id INTEGER PRIMARY KEY, patient_id INTEGER, procedure_name TEXT, performed_on DATE, performed_by TEXT, duration_mins INTEGER, outcome TEXT);
+
+      INSERT INTO patients VALUES
+        (1,'Margaret Thornton',78,'F','ICU','2025-03-01','Acute MI'),
+        (2,'James Halley',64,'M','Cardiology','2025-03-02','Post-CABG'),
+        (3,'Priya Sharma',45,'F','Endoscopy','2025-03-03','Upper GI bleed'),
+        (4,'Robert Chen',71,'M','ICU','2025-02-28','Sepsis'),
+        (5,'Sandra Williams',58,'F','Cardiology','2025-03-04','Atrial fibrillation'),
+        (6,'Thomas Burke',82,'M','General','2025-03-01','COPD exacerbation'),
+        (7,'Lisa Park',39,'F','Endoscopy','2025-03-05','Colonoscopy surveillance'),
+        (8,'David Nguyen',67,'M','ICU','2025-03-02','Respiratory failure'),
+        (9,'Helen Foster',73,'F','General','2025-03-03','Hip fracture'),
+        (10,'Michael O''Brien',55,'M','Cardiology','2025-03-05','Unstable angina');
+
+      INSERT INTO medications VALUES
+        (1,1,'Aspirin','100mg','Oral','Daily','Dr Smith'),
+        (2,1,'Metoprolol','25mg','Oral','BD','Dr Smith'),
+        (3,1,'Heparin','5000u','SC','TDS','Dr Smith'),
+        (4,2,'Amiodarone','200mg','Oral','Daily','Dr Jones'),
+        (5,2,'Warfarin','5mg','Oral','Daily','Dr Jones'),
+        (6,3,'Pantoprazole','40mg','IV','Daily','Dr Patel'),
+        (7,3,'Ondansetron','4mg','IV','PRN','Dr Patel'),
+        (8,4,'Noradrenaline','0.1mcg/kg/min','IV','Infusion','Dr Kim'),
+        (9,4,'Meropenem','1g','IV','8-hourly','Dr Kim'),
+        (10,4,'Vancomycin','1.5g','IV','12-hourly','Dr Kim'),
+        (11,5,'Metoprolol','50mg','Oral','BD','Dr Jones'),
+        (12,5,'Digoxin','125mcg','Oral','Daily','Dr Jones'),
+        (13,8,'Propofol','10mg/mL','IV','Infusion','Dr Kim'),
+        (14,8,'Fentanyl','25mcg/hr','IV','Infusion','Dr Kim'),
+        (15,10,'Aspirin','300mg','Oral','Stat','Dr Jones');
+
+      INSERT INTO observations VALUES
+        (1,1,'2025-03-01 08:00',140,90,88,97,36.8,'Nurse Cheeseman'),
+        (2,1,'2025-03-01 14:00',132,85,82,98,36.9,'Nurse Cheeseman'),
+        (3,2,'2025-03-02 08:00',118,74,72,99,36.7,'Nurse Walsh'),
+        (4,3,'2025-03-03 09:00',105,68,98,96,37.1,'Nurse Cheeseman'),
+        (5,4,'2025-03-02 10:00',88,55,118,91,38.4,'Nurse Walsh'),
+        (6,4,'2025-03-02 16:00',92,60,110,93,38.1,'Nurse Walsh'),
+        (7,5,'2025-03-04 08:00',126,80,105,98,36.6,'Nurse Park'),
+        (8,6,'2025-03-01 12:00',138,88,86,90,36.8,'Nurse Park'),
+        (9,7,'2025-03-05 07:30',120,78,75,99,36.5,'Nurse Cheeseman'),
+        (10,8,'2025-03-02 08:00',82,50,125,88,38.9,'Nurse Walsh'),
+        (11,8,'2025-03-02 14:00',90,58,118,90,38.6,'Nurse Walsh'),
+        (12,9,'2025-03-03 09:00',145,92,80,96,36.9,'Nurse Park'),
+        (13,10,'2025-03-05 10:00',158,98,95,97,37.0,'Nurse Cheeseman');
+
+      INSERT INTO procedures VALUES
+        (1,2,'CABG x3','2025-03-01','Dr Jones',240,'Successful'),
+        (2,3,'OGD','2025-03-03','Dr Patel',45,'Ulcer found — clipped'),
+        (3,5,'DC Cardioversion','2025-03-04','Dr Jones',30,'Sinus rhythm restored'),
+        (4,7,'Colonoscopy','2025-03-05','Dr Patel',40,'No polyps found'),
+        (5,8,'Intubation','2025-03-02','Dr Kim',15,'Successful'),
+        (6,9,'Hip ORIF','2025-03-04','Dr Ortho',120,'Successful');
+    `);
+
+    setStatus('DB ready', 'ok');
+    renderQuestions();
+    updateProgress();
+  }
+
+  // ── EDITOR ──
+  function handleKey(e) {
+    if((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); runQuery(); }
+    if(e.key === 'Tab') { e.preventDefault(); const s=document.getElementById('sqlEditor'); const start=s.selectionStart; s.value=s.value.slice(0,start)+'  '+s.value.slice(s.selectionEnd); s.selectionStart=s.selectionEnd=start+2; }
+    updateLineNums();
+  }
+
+  function updateLineNums() {
+    const lines = (document.getElementById('sqlEditor').value.match(/\n/g)||[]).length + 1;
+    document.getElementById('lineNums').textContent = Array.from({length:lines},(_,i)=>i+1).join('\n');
+  }
+
+  function clearEditor() { document.getElementById('sqlEditor').value=''; updateLineNums(); document.getElementById('resultsPanel').innerHTML='<div class="result-empty">Run a query to see results here</div>'; setStatus('Ready',''); }
+
+  // ── RUN QUERY ──
+  function runQuery() {
+    if(!db) { setStatus('DB not ready','err'); return; }
+    const sql = document.getElementById('sqlEditor').value.trim();
+    if(!sql) return;
+    const panel = document.getElementById('resultsPanel');
+    try {
+      const results = db.exec(sql);
+      if(!results.length) { panel.innerHTML='<div class="result-success">✓ Query executed successfully (no rows returned)</div>'; setStatus('OK — no rows','ok'); document.getElementById('rowCount').textContent=''; return; }
+      const { columns, values } = results[0];
+      const rowCount = values.length;
+      let html = '<table class="result-table"><thead><tr>' + columns.map(c=>`<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+      html += values.map(row=>'<tr>'+row.map(v=>`<td>${v===null?'<span style="color:var(--faint)">NULL</span>':v}</td>`).join('')+'</tr>').join('');
+      html += '</tbody></table>';
+      panel.innerHTML = html;
+      setStatus(`${rowCount} row${rowCount!==1?'s':''}`, 'ok');
+      document.getElementById('rowCount').textContent = `${columns.length} col${columns.length!==1?'s':''}`;
+    } catch(e) {
+      panel.innerHTML = `<div class="result-error">⚠ ${e.message}</div>`;
+      setStatus('Error','err');
+      document.getElementById('rowCount').textContent='';
+    }
+  }
+
+  // ── QUESTIONS ──
+  function renderQuestions() {
+    const container = document.getElementById('sidebar-questions');
+    container.innerHTML = QUESTIONS.map(q => `
+      <div class="question-item${solved.includes(q.id)?' solved':''}" id="qi-${q.id}" onclick="loadQuestion(${q.id})">
+        <div class="q-header">
+          <span class="q-num">#${q.id}</span>
+          <span class="q-diff ${q.diff}">${q.diff}</span>
+          ${solved.includes(q.id)?'<span class="q-solved">✓</span>':''}
+        </div>
+        <div class="q-title">${q.title}</div>
+      </div>`).join('');
+  }
+
+  function loadQuestion(id) {
+    currentQuestion = QUESTIONS.find(q=>q.id===id);
+    if(!currentQuestion) return;
+    document.querySelectorAll('.question-item').forEach(el=>el.classList.remove('active'));
+    document.getElementById('qi-'+id)?.classList.add('active');
+    document.getElementById('qTitle').textContent = `#${id} — ${currentQuestion.title}`;
+    document.getElementById('qDesc').textContent = currentQuestion.desc;
+    document.getElementById('hintBtn').style.display='inline-block';
+    document.getElementById('checkBtn').style.display='inline-block';
+    document.getElementById('solBtn').style.display='inline-block';
+    hintShown=false;
+    document.getElementById('qHint').classList.remove('show');
+    document.getElementById('hintBtn').textContent='Show hint';
+    document.getElementById('sqlEditor').value='';
+    document.getElementById('resultsPanel').innerHTML='<div class="result-empty">Write your query and hit Run</div>';
+    setStatus('Ready','');
+    updateLineNums();
+    document.getElementById('sqlEditor').focus();
+  }
+
+  function toggleHint() {
+    hintShown = !hintShown;
+    if(currentQuestion) document.getElementById('qHint').textContent = '💡 ' + currentQuestion.hint;
+    document.getElementById('qHint').classList.toggle('show', hintShown);
+    document.getElementById('hintBtn').textContent = hintShown ? 'Hide hint' : 'Show hint';
+  }
+
+  function checkAnswer() {
+    if(!currentQuestion) return;
+    const q = document.getElementById('sqlEditor').value.trim();
+    if(!q) { setStatus('Write a query first','err'); return; }
+    runQuery();
+    if(currentQuestion.check(q)) {
+      setStatus('Correct! ✓','ok');
+      document.getElementById('statusDot').className='status-dot check-pass';
+      if(!solved.includes(currentQuestion.id)) {
+        solved.push(currentQuestion.id);
+        localStorage.setItem('sqlSolved',JSON.stringify(solved));
+        updateProgress();
+        renderQuestions();
+      }
+    } else {
+      setStatus('Not quite — check the hint','err');
+    }
+  }
+
+  function showSolution() {
+    if(!currentQuestion) return;
+    const panel = document.getElementById('resultsPanel');
+    panel.innerHTML = `<div class="solution-reveal">📖 Solution: <span style="color:var(--text)">${currentQuestion.solution}</span></div>`;
+    setStatus('Solution shown','');
+  }
+
+  function updateProgress() {
+    document.getElementById('progressBadge').textContent = solved.length + ' / ' + QUESTIONS.length + ' solved';
+  }
+
+  function setStatus(msg,type) {
+    document.getElementById('statusText').textContent=msg;
+    const dot=document.getElementById('statusDot');
+    dot.className='status-dot'+(type==='ok'?' ok':type==='err'?' err':'');
+  }
+
+  function showSideTab(id, el) {
+    document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('sidebar-questions').style.display = id==='questions'?'':'none';
+    document.getElementById('sidebar-schema').style.display = id==='schema'?'':'none';
+  }
+
+  initDB();
+</script>
+</body>
+</html>

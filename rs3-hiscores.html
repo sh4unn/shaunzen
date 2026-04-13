@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RS3 Hiscores — sh4unn</title>
+<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=IM+Fell+English:ital@0;1&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d0a06; --surface:#181208; --card:#1e1608;
+    --border:#3a2e18; --gold:#c9963a; --gold-dim:#6a4a10;
+    --bronze:#cd7f32; --silver:#a8a9ad;
+    --green:#4a8a3a; --red:#8a2a2a;
+    --text:#e8d5a3; --muted:#8a7a5a; --faint:#4a3a20;
+    --teal:#2a6b5e;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'IM Fell English',serif; min-height:100vh; padding-bottom:4rem; }
+
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--gold-dim); color:var(--text); text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; opacity:0.8; transition:opacity 0.2s; }
+  .home-btn:hover { opacity:1; }
+
+  /* BG orbs */
+  .bg-layer { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .orb { position:absolute; border-radius:50%; filter:blur(100px); opacity:0.12; animation:drift 25s ease-in-out infinite alternate; }
+  .orb1 { width:50vw; height:50vw; background:radial-gradient(circle,#c9963a,transparent 70%); top:-15%; left:-15%; animation-duration:22s; }
+  .orb2 { width:40vw; height:40vw; background:radial-gradient(circle,#2a3a6b,transparent 70%); bottom:-10%; right:-10%; animation-duration:30s; animation-delay:-12s; }
+  @keyframes drift { 0%{transform:translate(0,0)}50%{transform:translate(3vw,-3vh)}100%{transform:translate(-2vw,2vh)} }
+
+  /* HEADER */
+  header { position:relative; z-index:2; text-align:center; padding:3.5rem 2rem 2.5rem; border-bottom:1px solid var(--border); }
+  .header-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.35em; text-transform:uppercase; color:var(--gold-dim); margin-bottom:0.75rem; }
+  h1 { font-family:'MedievalSharp',cursive; font-size:clamp(2.5rem,8vw,5rem); color:var(--gold); text-shadow:0 0 40px rgba(201,150,58,0.4),0 2px 8px rgba(0,0,0,0.9); margin-bottom:0.3rem; line-height:1; }
+  .header-sub { font-family:'IM Fell English',serif; font-style:italic; font-size:0.85rem; color:var(--muted); }
+
+  /* SEARCH */
+  .search-wrap { position:relative; z-index:2; max-width:500px; margin:0 auto; padding:2rem 1.5rem 0; }
+  .search-row { display:flex; gap:0.5rem; }
+  .search-input { flex:1; background:var(--surface); border:1px solid var(--border); padding:0.75rem 1rem; font-family:'IBM Plex Mono',monospace; font-size:0.9rem; color:var(--text); outline:none; transition:border-color 0.2s; border-radius:0; }
+  .search-input:focus { border-color:var(--gold-dim); }
+  .search-input::placeholder { color:var(--faint); }
+  .search-btn { background:var(--gold-dim); color:var(--text); border:none; padding:0.75rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:0.85rem; cursor:pointer; transition:background 0.2s; letter-spacing:0.05em; }
+  .search-btn:hover { background:var(--gold); color:var(--bg); }
+  .search-btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+  /* MAIN */
+  main { position:relative; z-index:2; max-width:900px; margin:0 auto; padding:2rem 1.5rem; }
+
+  /* PLAYER HEADER */
+  .player-card { background:var(--surface); border:1px solid var(--border); padding:1.5rem; margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+  .player-name { font-family:'MedievalSharp',cursive; font-size:2rem; color:var(--gold); text-shadow:0 0 20px rgba(201,150,58,0.3); }
+  .player-stats { display:flex; gap:1.5rem; flex-wrap:wrap; }
+  .player-stat { text-align:center; }
+  .player-stat-num { font-family:'IBM Plex Mono',monospace; font-size:1.4rem; color:var(--gold); }
+  .player-stat-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-top:0.2rem; }
+
+  /* SKILLS GRID */
+  .section-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--faint); margin-bottom:1rem; }
+  .skills-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:1px; background:var(--border); margin-bottom:1.5rem; }
+  .skill-cell { background:var(--card); padding:0.85rem 1rem; display:flex; align-items:center; gap:0.75rem; transition:background 0.2s; }
+  .skill-cell:hover { background:var(--surface); }
+  .skill-icon { font-size:1.1rem; width:24px; text-align:center; flex-shrink:0; }
+  .skill-info { flex:1; min-width:0; }
+  .skill-name { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.2rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .skill-level { font-family:'IBM Plex Mono',monospace; font-size:1.1rem; color:var(--gold); line-height:1; }
+  .skill-level.maxed { color:#00ff88; text-shadow:0 0 8px rgba(0,255,136,0.5); }
+  .skill-xp { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); margin-top:0.1rem; }
+  .skill-rank { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); }
+
+  /* ACTIVITIES */
+  .activities-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1px; background:var(--border); }
+  .activity-cell { background:var(--card); padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center; transition:background 0.2s; }
+  .activity-cell:hover { background:var(--surface); }
+  .activity-name { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.05em; color:var(--muted); }
+  .activity-score { font-family:'IBM Plex Mono',monospace; font-size:0.95rem; color:var(--gold); }
+
+  /* LOADING / ERROR */
+  .loading { text-align:center; padding:3rem; }
+  .spinner { width:36px; height:36px; border:2px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1rem; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .loading-text { font-style:italic; color:var(--muted); }
+  .error-box { background:var(--red); border:1px solid #aa3a3a; padding:1rem 1.25rem; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; color:#ffaaaa; margin-bottom:1rem; }
+  .empty { text-align:center; padding:3rem; color:var(--muted); font-style:italic; }
+
+  @media(max-width:600px) { .skills-grid{grid-template-columns:1fr 1fr;} .player-card{flex-direction:column;} }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"><div class="orb orb1"></div><div class="orb orb2"></div></div>
+<a class="home-btn" href="index.html">← Home</a>
+
+<header>
+  <div class="header-label">RuneScape 3</div>
+  <h1>Hiscores</h1>
+  <div class="header-sub">Live stats from the RS3 hiscores</div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-row">
+    <input type="text" class="search-input" id="playerInput" placeholder="Player name…" value="sh4unn" onkeydown="if(event.key==='Enter')lookup()">
+    <button class="search-btn" onclick="lookup()" id="searchBtn">Lookup</button>
+  </div>
+</div>
+
+<main id="mainContent">
+  <div class="empty">Enter a player name and hit Lookup</div>
+</main>
+
+<script>
+  const SKILLS = [
+    {name:'Overall',icon:'⚔️'},{name:'Attack',icon:'⚔️'},{name:'Defence',icon:'🛡️'},
+    {name:'Strength',icon:'💪'},{name:'Constitution',icon:'❤️'},{name:'Ranged',icon:'🏹'},
+    {name:'Prayer',icon:'🙏'},{name:'Magic',icon:'🔮'},{name:'Cooking',icon:'🍳'},
+    {name:'Woodcutting',icon:'🪓'},{name:'Fletching',icon:'🏹'},{name:'Fishing',icon:'🎣'},
+    {name:'Firemaking',icon:'🔥'},{name:'Crafting',icon:'🪡'},{name:'Smithing',icon:'⚒️'},
+    {name:'Mining',icon:'⛏️'},{name:'Herblore',icon:'🌿'},{name:'Agility',icon:'🏃'},
+    {name:'Thieving',icon:'🗝️'},{name:'Slayer',icon:'💀'},{name:'Farming',icon:'🌾'},
+    {name:'Runecrafting',icon:'🔵'},{name:'Hunter',icon:'🦊'},{name:'Construction',icon:'🏠'},
+    {name:'Summoning',icon:'✨'},{name:'Dungeoneering',icon:'🗡️'},{name:'Divination',icon:'💎'},
+    {name:'Invention',icon:'⚙️'},{name:'Archaeology',icon:'🏺'},{name:'Necromancy',icon:'💀'}
+  ];
+
+  function fmtNum(n) {
+    if(n >= 1000000000) return (n/1000000000).toFixed(1)+'b';
+    if(n >= 1000000) return (n/1000000).toFixed(1)+'m';
+    if(n >= 1000) return (n/1000).toFixed(1)+'k';
+    return n.toString();
+  }
+
+  function fmtRank(r) {
+    if(!r || r < 0) return '—';
+    return '#' + parseInt(r).toLocaleString();
+  }
+
+  async function lookup() {
+    const name = document.getElementById('playerInput').value.trim();
+    if(!name) return;
+    const btn = document.getElementById('searchBtn');
+    btn.disabled = true; btn.textContent = '…';
+    const main = document.getElementById('mainContent');
+    main.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">Fetching hiscores for ' + name + '…</div></div>';
+
+    try {
+      // Use Claude API to fetch RS3 hiscores (bypasses CORS)
+      const prompt = `Fetch the RS3 hiscores for the player "${name}" from this URL: https://secure.runescape.com/m=hiscore/index_lite.ws?player=${encodeURIComponent(name)}
+
+The response is CSV with one skill/activity per line, each line has: rank,level,xp
+Return ONLY a JSON object with two arrays:
+{
+  "skills": [{"rank":"123","level":"99","xp":"200000000"}, ...],
+  "activities": [{"rank":"50","score":"100"}, ...]
+}
+The first 30 lines are skills, remaining lines are activities.
+If the player is not found or there's an error, return: {"error": "Player not found"}
+Return only the JSON, no other text.`;
+
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:2000,
+          tools:[{type:'web_search_20250305',name:'web_search'}],
+          messages:[{role:'user',content:prompt}]
+        })
+      });
+
+      if(!res.ok) throw new Error('API error ' + res.status);
+      const data = await res.json();
+      const text = data.content.filter(c=>c.type==='text').map(c=>c.text).join('');
+      const clean = text.replace(/```json|```/g,'').trim();
+      const parsed = JSON.parse(clean);
+
+      if(parsed.error) { main.innerHTML = `<div class="error-box">${parsed.error}</div>`; return; }
+      renderStats(name, parsed.skills || [], parsed.activities || []);
+
+    } catch(e) {
+      main.innerHTML = `<div class="error-box">Could not load hiscores: ${e.message}</div>`;
+    }
+    btn.disabled = false; btn.textContent = 'Lookup';
+  }
+
+  function renderStats(name, skills, activities) {
+    const main = document.getElementById('mainContent');
+
+    // Overall stats
+    const overall = skills[0] || {};
+    const totalLevel = skills.slice(1).reduce((s,sk)=>s+(parseInt(sk.level)||0),0);
+    const totalXp = skills.slice(1).reduce((s,sk)=>s+(parseInt(sk.xp)||0),0);
+
+    let html = `
+      <div class="player-card">
+        <div class="player-name">${name}</div>
+        <div class="player-stats">
+          <div class="player-stat">
+            <div class="player-stat-num">${overall.level || totalLevel || '—'}</div>
+            <div class="player-stat-label">Total Level</div>
+          </div>
+          <div class="player-stat">
+            <div class="player-stat-num">${fmtNum(totalXp)}</div>
+            <div class="player-stat-label">Total XP</div>
+          </div>
+          <div class="player-stat">
+            <div class="player-stat-num">${fmtRank(overall.rank)}</div>
+            <div class="player-stat-label">Overall Rank</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">— Skills</div>
+      <div class="skills-grid">`;
+
+    skills.slice(1).forEach((sk, i) => {
+      const skill = SKILLS[i+1] || {name:'Skill '+(i+1), icon:'⚡'};
+      const level = parseInt(sk.level) || 0;
+      const isMaxed = level >= 99;
+      const isDung = skill.name === 'Dungeoneering';
+      const isInv = skill.name === 'Invention';
+      const trueMax = isDung ? 120 : isInv ? 120 : 99;
+      html += `
+        <div class="skill-cell">
+          <div class="skill-icon">${skill.icon}</div>
+          <div class="skill-info">
+            <div class="skill-name">${skill.name}</div>
+            <div class="skill-level${level>=trueMax?' maxed':''}">${level || '—'}</div>
+            <div class="skill-xp">${sk.xp && parseInt(sk.xp)>0 ? fmtNum(parseInt(sk.xp))+' xp' : ''}</div>
+          </div>
+          <div class="skill-rank">${fmtRank(sk.rank)}</div>
+        </div>`;
+    });
+
+    html += `</div>`;
+
+    // Activities
+    const ACTIVITIES = [
+      'Bounty Hunter','B.H. Rogues','Dominion Tower','The Crucible','Castle Wars Games',
+      'B.A. Attackers','B.A. Defenders','B.A. Collectors','B.A. Healers','Duel Tournament',
+      'Mobilising Armies','Conquest','Fist of Guthix','GG: Athletics','GG: Resource Race',
+      'WE2: Armadyl Lifetime Contrib','WE2: Bandos Lifetime Contrib','WE2: Armadyl PvP Kills','WE2: Bandos PvP Kills',
+      'Heist Guard Level','Heist Robber Level','CFP: 5 Game Average','AF15: Cow Tipping','AF15: Rat Kills After',
+      'RuneScore','Clue Scrolls Easy','Clue Scrolls Medium','Clue Scrolls Hard','Clue Scrolls Elite','Clue Scrolls Master'
+    ];
+
+    const activeActs = activities.filter(a => parseInt(a.score) > 0);
+    if(activeActs.length > 0) {
+      html += `<div class="section-label" style="margin-top:1.5rem">— Activities & Minigames</div><div class="activities-grid">`;
+      activities.forEach((act, i) => {
+        const score = parseInt(act.score);
+        if(score <= 0) return;
+        html += `
+          <div class="activity-cell">
+            <div class="activity-name">${ACTIVITIES[i] || 'Activity '+(i+1)}</div>
+            <div class="activity-score">${score.toLocaleString()}</div>
+          </div>`;
+      });
+      html += `</div>`;
+    }
+
+    main.innerHTML = html;
+  }
+
+  // Auto-lookup on load
+  window.addEventListener('load', () => lookup());
+</script>
+</body>
+</html>
