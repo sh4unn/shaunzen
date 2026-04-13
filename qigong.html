@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qigong Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#f4efe4; --parchment:#ede6d6; --warm:#e4dbc8;
+    --teal:#2a6b5e; --teal-light:#3a8a7c; --teal-faint:#e8f4f2;
+    --burnt:#b8511e; --burnt-faint:#faf0ea;
+    --gold:#9a7820; --ink:#1a1410; --muted:#7a6a5a; --faint:#c4b89e; --border:#d5c9b2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:'Noto Sans',sans-serif;min-height:100vh;line-height:1.7;padding-bottom:4rem;}
+  /* HOME BTN */
+  .home-btn{position:fixed;top:1rem;left:1rem;z-index:100;background:var(--teal);color:var(--cream);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;border-radius:2px;transition:background 0.2s;opacity:0.85;}
+  .home-btn:hover{background:var(--teal-light);opacity:1;}
+  /* HEADER */
+  .header{background:var(--teal);color:var(--cream);padding:3rem 2rem 2.5rem;position:relative;overflow:hidden;text-align:center;}
+  .yinyang-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18rem;opacity:0.05;line-height:1;pointer-events:none;user-select:none;}
+  .header-chinese{font-family:'Noto Serif SC',serif;font-size:3rem;color:rgba(244,239,228,0.15);letter-spacing:0.5rem;margin-bottom:0.5rem;position:relative;}
+  .header-label{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(244,239,228,0.45);margin-bottom:0.75rem;position:relative;}
+  header h1{font-family:'Noto Serif',serif;font-size:clamp(2rem,5vw,2.8rem);font-weight:300;letter-spacing:0.05em;position:relative;margin-bottom:0.5rem;}
+  .header-sub{font-size:0.85rem;color:rgba(244,239,228,0.5);font-weight:300;font-style:italic;position:relative;}
+  .yinyang-row{margin-top:1.5rem;font-size:1.4rem;opacity:0.4;letter-spacing:1rem;position:relative;}
+  /* TABS */
+  .tabs{background:var(--teal-light);display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:10;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{padding:0.85rem 1.5rem;font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(244,239,228,0.5);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s;font-family:'Noto Sans',sans-serif;}
+  .tab:hover{color:rgba(244,239,228,0.85);}
+  .tab.active{color:var(--cream);border-bottom-color:var(--cream);}
+  main{max-width:820px;margin:0 auto;padding:2.5rem 1.5rem 4rem;position:relative;}
+  .panel{display:none;} .panel.active{display:block;}
+  .section-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.75rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);}
+  .section-head h2{font-family:'Noto Serif',serif;font-size:1.4rem;font-weight:300;color:var(--teal);}
+  .section-head .chinese{font-family:'Noto Serif SC',serif;font-size:1.1rem;color:var(--border);}
+  /* PRINCIPLES */
+  .principles{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2.5rem;}
+  .principle-card{background:var(--parchment);border:1px solid var(--border);border-radius:8px;padding:1.25rem;position:relative;overflow:hidden;}
+  .principle-card::before{content:attr(data-symbol);position:absolute;bottom:-0.5rem;right:0.5rem;font-family:'Noto Serif SC',serif;font-size:3rem;color:var(--teal);opacity:0.06;pointer-events:none;}
+  .principle-name{font-family:'Noto Serif',serif;font-size:0.95rem;color:var(--teal);margin-bottom:0.3rem;}
+  .principle-chinese{font-family:'Noto Serif SC',serif;font-size:0.8rem;color:var(--gold);margin-bottom:0.5rem;}
+  .principle-desc{font-size:0.82rem;color:var(--muted);font-weight:300;line-height:1.6;}
+  /* WORKOUTS */
+  .workout-grid{display:flex;flex-direction:column;gap:1.5rem;}
+  .workout-card{background:var(--parchment);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .workout-header{background:var(--teal);color:var(--cream);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
+  .workout-header:hover{background:var(--teal-light);}
+  .workout-title-group{display:flex;flex-direction:column;gap:0.15rem;}
+  .workout-title{font-family:'Noto Serif',serif;font-size:1rem;font-weight:400;}
+  .workout-meta{font-size:0.75rem;color:rgba(244,239,228,0.55);font-weight:300;}
+  .workout-chevron{font-size:0.8rem;opacity:0.6;transition:transform 0.25s;}
+  .workout-card.open .workout-chevron{transform:rotate(180deg);}
+  .workout-body{display:none;padding:1.5rem;}
+  .workout-card.open .workout-body{display:block;}
+  .workout-intro{font-size:0.85rem;color:var(--muted);font-style:italic;margin-bottom:1.25rem;font-family:'Noto Serif',serif;line-height:1.7;padding-left:1rem;border-left:2px solid var(--border);}
+  .exercise-list{list-style:none;display:flex;flex-direction:column;gap:0.85rem;}
+  .exercise-item{display:grid;grid-template-columns:2rem 1fr;gap:0.75rem;align-items:start;}
+  .exercise-num{font-family:'Noto Serif SC',serif;font-size:0.75rem;color:var(--teal);opacity:0.5;padding-top:0.1rem;text-align:center;}
+  .exercise-name{font-size:0.9rem;font-weight:500;color:var(--ink);margin-bottom:0.2rem;}
+  .exercise-desc{font-size:0.8rem;color:var(--muted);font-weight:300;line-height:1.55;}
+  .exercise-reps{display:inline-block;margin-top:0.3rem;font-size:0.72rem;background:var(--teal-faint);color:var(--teal);border-radius:20px;padding:0.1rem 0.6rem;font-weight:500;letter-spacing:0.05em;}
+  /* BREATHING */
+  .breath-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;}
+  .breath-card{background:var(--parchment);border:1px solid var(--border);border-radius:8px;padding:1.25rem;}
+  .breath-name{font-family:'Noto Serif',serif;font-size:0.95rem;color:var(--teal);margin-bottom:0.2rem;}
+  .breath-chinese{font-family:'Noto Serif SC',serif;font-size:0.8rem;color:var(--gold);margin-bottom:0.6rem;}
+  .breath-steps{list-style:none;font-size:0.82rem;color:var(--muted);font-weight:300;line-height:1.7;}
+  .breath-steps li::before{content:'— ';color:var(--border);}
+  /* PHILOSOPHY */
+  .philosophy-intro{font-family:'Noto Serif',serif;font-size:1rem;color:var(--muted);font-style:italic;font-weight:300;line-height:1.85;margin-bottom:2rem;padding:1.25rem 1.5rem;background:var(--parchment);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;}
+  .concept-list{display:flex;flex-direction:column;gap:1.25rem;}
+  .concept-item{display:grid;grid-template-columns:3rem 1fr;gap:1rem;align-items:start;padding:1.1rem;background:var(--parchment);border:1px solid var(--border);border-radius:8px;}
+  .concept-char{font-family:'Noto Serif SC',serif;font-size:2rem;color:var(--teal);opacity:0.7;line-height:1;text-align:center;padding-top:0.1rem;}
+  .concept-name{font-family:'Noto Serif',serif;font-size:0.95rem;color:var(--ink);margin-bottom:0.25rem;}
+  .concept-desc{font-size:0.82rem;color:var(--muted);font-weight:300;line-height:1.6;}
+  /* KOAN */
+  .koan-box{margin-top:3rem;text-align:center;padding:2rem 1.5rem;border-top:1px solid var(--border);}
+  .koan-symbol{font-size:1.5rem;opacity:0.2;margin-bottom:0.75rem;}
+  .koan-text{font-family:'Noto Serif',serif;font-size:0.95rem;font-style:italic;color:var(--muted);font-weight:300;line-height:1.8;max-width:400px;margin:0 auto 0.5rem;}
+  .koan-source{font-size:0.75rem;color:var(--border);letter-spacing:0.1em;}
+  @media(max-width:600px){main{padding:2rem 1rem 3rem;} .principles{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<a class="home-btn" href="index.html">← Home</a>
+<div class="header">
+  <div class="yinyang-bg">☯</div>
+  <div class="header-chinese">氣功</div>
+  <div class="header-label">Personal Practice Reference</div>
+  <h1>Qigong</h1>
+  <div class="header-sub">Cultivating life energy through breath, movement & stillness</div>
+  <div class="yinyang-row">☯ ☯ ☯</div>
+</div>
+<nav class="tabs">
+  <div class="tab active" onclick="showTab('workouts',this)">Workouts</div>
+  <div class="tab" onclick="showTab('breathing',this)">Breathing</div>
+  <div class="tab" onclick="showTab('principles',this)">Principles</div>
+  <div class="tab" onclick="showTab('philosophy',this)">Philosophy</div>
+</nav>
+<main>
+  <!-- WORKOUTS -->
+  <div class="panel active" id="panel-workouts">
+    <div class="section-head"><h2>Practice Routines</h2><span class="chinese">功法</span></div>
+    <div class="workout-grid">
+      <div class="workout-card" onclick="toggleWorkout(this)">
+        <div class="workout-header"><div class="workout-title-group"><div class="workout-title">Morning Wake & Flow</div><div class="workout-meta">20 min · Gentle · Energy raising</div></div><div class="workout-chevron">▼</div></div>
+        <div class="workout-body">
+          <div class="workout-intro">Begin before the mind fills with the day. Move slowly, breathe deeply. This practice opens the channels and invites yang energy to rise gently with the sun.</div>
+          <ul class="exercise-list">
+            <li class="exercise-item"><div class="exercise-num">一</div><div><div class="exercise-name">Wu Ji Standing</div><div class="exercise-desc">Stand with feet shoulder-width, knees softly bent, spine long. Arms hang naturally. Simply arrive in the body and breathe.</div><span class="exercise-reps">3–5 minutes</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">二</div><div><div class="exercise-name">Neck & Shoulder Release</div><div class="exercise-desc">Slow head circles, ear to shoulder stretches, shoulder rolls. Let the breath lead each movement.</div><span class="exercise-reps">8 circles each way</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">三</div><div><div class="exercise-name">Lift the Sky</div><div class="exercise-desc">Fingers interlaced, palms down at dantian. Inhale as arms sweep wide and overhead. Exhale as arms open and descend.</div><span class="exercise-reps">9 repetitions</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">四</div><div><div class="exercise-name">Kidney Drumming</div><div class="exercise-desc">Loose fists, gentle twisting at the waist, letting the backs of hands tap the lower back over the kidneys alternately.</div><span class="exercise-reps">30–50 taps</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">五</div><div><div class="exercise-name">Horse Stance Wave</div><div class="exercise-desc">Wide stance, knees bent. Arms rise and fall like ocean waves — inhale to raise, exhale to lower. Sink deeper with each breath.</div><span class="exercise-reps">9 waves</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">六</div><div><div class="exercise-name">Gathering Qi to Dantian</div><div class="exercise-desc">Both hands hover over the lower abdomen. Breathe slowly and imagine warm golden light collecting beneath the palms.</div><span class="exercise-reps">3 slow breaths</span></div></li>
+          </ul>
+        </div>
+      </div>
+      <div class="workout-card" onclick="toggleWorkout(this)">
+        <div class="workout-header"><div class="workout-title-group"><div class="workout-title">Eight Pieces of Brocade</div><div class="workout-meta">30 min · Traditional · Full body</div></div><div class="workout-chevron">▼</div></div>
+        <div class="workout-body">
+          <div class="workout-intro">Ba Duan Jin — one of the oldest and most complete qigong forms. Each of the eight movements targets a different organ system and meridian pathway.</div>
+          <ul class="exercise-list">
+            <li class="exercise-item"><div class="exercise-num">一</div><div><div class="exercise-name">Two Hands Hold Up the Heavens</div><div class="exercise-desc">Interlace fingers, palms up. Inhale and press upward fully. Exhale and lower. Stretches the triple warmer meridian.</div><span class="exercise-reps">8 reps</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">二</div><div><div class="exercise-name">Drawing the Bow</div><div class="exercise-desc">Horse stance. One arm extends as if drawing a bow, the other pulls back. Opens the chest and strengthens lung qi.</div><span class="exercise-reps">8 each side</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">三</div><div><div class="exercise-name">Separate Heaven and Earth</div><div class="exercise-desc">One hand presses skyward, one presses down. Alternate. Stimulates spleen and stomach meridians.</div><span class="exercise-reps">8 each side</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">四</div><div><div class="exercise-name">Wise Owl Looks Behind</div><div class="exercise-desc">Feet fixed. Slowly rotate head and upper body to look behind. Relieves tension, stimulates governing vessel.</div><span class="exercise-reps">8 each side</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">五</div><div><div class="exercise-name">Sway the Head and Swing the Tail</div><div class="exercise-desc">Horse stance. Lean forward and swing hips side to side. Releases heart fire and tension from the spine.</div><span class="exercise-reps">8 each side</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">六</div><div><div class="exercise-name">Two Hands Hold the Feet</div><div class="exercise-desc">Bend forward reaching toward feet. Strengthens kidney qi and stretches the governing vessel along the back.</div><span class="exercise-reps">8 reps</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">七</div><div><div class="exercise-name">Punch with Angry Eyes</div><div class="exercise-desc">Horse stance. Punch slowly forward with intention, eyes wide, exhaling sharply. Increases liver qi and vital force.</div><span class="exercise-reps">8 each side</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">八</div><div><div class="exercise-name">Bouncing on the Toes</div><div class="exercise-desc">Rise on tiptoes, hold briefly, then drop back to heels. This vibration clears stagnant qi from the meridians.</div><span class="exercise-reps">7 rises</span></div></li>
+          </ul>
+        </div>
+      </div>
+      <div class="workout-card" onclick="toggleWorkout(this)">
+        <div class="workout-header"><div class="workout-title-group"><div class="workout-title">Evening Wind-Down</div><div class="workout-meta">15 min · Yin · Nervous system calming</div></div><div class="workout-chevron">▼</div></div>
+        <div class="workout-body">
+          <div class="workout-intro">This practice is for the transition between doing and resting. Move slowly. Let go of the day's accumulations.</div>
+          <ul class="exercise-list">
+            <li class="exercise-item"><div class="exercise-num">一</div><div><div class="exercise-name">Ocean Breath</div><div class="exercise-desc">Inhale for 4 counts through the nose, out for 6 through slightly parted lips. Let the exhale lengthen with each round.</div><span class="exercise-reps">10 breaths</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">二</div><div><div class="exercise-name">Swaying Bamboo</div><div class="exercise-desc">Feet together, arms loose. Sway gently side to side like bamboo in a breeze. Let the spine undulate.</div><span class="exercise-reps">2 minutes</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">三</div><div><div class="exercise-name">Liver Cleanse Side Stretch</div><div class="exercise-desc">One arm sweeps overhead, lean to opposite side. Hold and breathe. Releases liver and gallbladder meridians.</div><span class="exercise-reps">5 breaths each side</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">四</div><div><div class="exercise-name">Patting the Meridians</div><div class="exercise-desc">With flat hands, gently pat down the arms, across the chest, down the legs. Stimulates surface qi flow.</div><span class="exercise-reps">Full body once</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">五</div><div><div class="exercise-name">Still Lake Closing</div><div class="exercise-desc">Hands over dantian, eyes closed. Imagine the mind as a still mountain lake at night. Rest here.</div><span class="exercise-reps">3–5 minutes</span></div></li>
+          </ul>
+        </div>
+      </div>
+      <div class="workout-card" onclick="toggleWorkout(this)">
+        <div class="workout-header"><div class="workout-title-group"><div class="workout-title">Standing Post — Zhan Zhuang</div><div class="workout-meta">10–30 min · Advanced · Root building</div></div><div class="workout-chevron">▼</div></div>
+        <div class="workout-body">
+          <div class="workout-intro">The most deceptively simple and profoundly demanding of all practices. The body holds still while the internal landscape moves.</div>
+          <ul class="exercise-list">
+            <li class="exercise-item"><div class="exercise-num">一</div><div><div class="exercise-name">Wu Ji — Empty Stance</div><div class="exercise-desc">Feet shoulder-width, knees slightly bent, spine long. Arms at sides. Simply stand and observe.</div><span class="exercise-reps">3–5 min</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">二</div><div><div class="exercise-name">Embracing the Tree</div><div class="exercise-desc">Raise arms as if holding a large ball. Elbows at shoulder height. Hold without effort, breathe into the lower belly.</div><span class="exercise-reps">5–20 min</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">三</div><div><div class="exercise-name">Lower Ball Hold</div><div class="exercise-desc">Arms lower, holding a ball at waist level. Attention on the lower dantian, two inches below navel.</div><span class="exercise-reps">5–10 min</span></div></li>
+            <li class="exercise-item"><div class="exercise-num">四</div><div><div class="exercise-name">Closing Sequence</div><div class="exercise-desc">Lower arms slowly to dantian. Place one hand over the other. Three deep slow breaths. Stand quietly before moving.</div><span class="exercise-reps">3 breaths</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="koan-box"><div class="koan-symbol">☯</div><div class="koan-text" id="wKoan"></div><div class="koan-source" id="wKoanSrc"></div></div>
+  </div>
+  <!-- BREATHING -->
+  <div class="panel" id="panel-breathing">
+    <div class="section-head"><h2>Breathing Methods</h2><span class="chinese">調息</span></div>
+    <div class="breath-cards">
+      <div class="breath-card"><div class="breath-name">Natural Abdominal Breathing</div><div class="breath-chinese">腹式呼吸</div><ul class="breath-steps"><li>Hand on lower belly</li><li>Inhale — belly expands outward</li><li>Exhale — belly falls naturally</li><li>Chest remains still throughout</li><li>No force; pure natural rhythm</li></ul></div>
+      <div class="breath-card"><div class="breath-name">Reverse Abdominal Breathing</div><div class="breath-chinese">逆腹式呼吸</div><ul class="breath-steps"><li>Inhale — belly draws gently inward</li><li>Perineum lifts slightly</li><li>Exhale — belly releases outward</li><li>Used in martial and healing arts</li><li>Builds internal pressure and qi</li></ul></div>
+      <div class="breath-card"><div class="breath-name">Four-Count Box Breath</div><div class="breath-chinese">方形呼吸</div><ul class="breath-steps"><li>Inhale for 4 counts</li><li>Hold for 4 counts</li><li>Exhale for 4 counts</li><li>Hold empty for 4 counts</li><li>Calms the nervous system rapidly</li></ul></div>
+      <div class="breath-card"><div class="breath-name">Six Healing Sounds</div><div class="breath-chinese">六字訣</div><ul class="breath-steps"><li>XU — Liver</li><li>HE — Heart</li><li>HU — Spleen</li><li>SI — Lungs</li><li>CHUI — Kidneys</li><li>XI — Triple warmer</li></ul></div>
+      <div class="breath-card"><div class="breath-name">Long Exhale Breathing</div><div class="breath-chinese">長呼氣</div><ul class="breath-steps"><li>Inhale naturally (4–5 counts)</li><li>Exhale slowly and completely</li><li>Exhale twice as long as inhale</li><li>Activates parasympathetic response</li><li>Ideal for evening practice</li></ul></div>
+      <div class="breath-card"><div class="breath-name">Dantian Breathing</div><div class="breath-chinese">丹田呼吸</div><ul class="breath-steps"><li>Awareness on lower dantian</li><li>Breathe into this centre</li><li>Feel warmth accumulate there</li><li>Used in standing meditation</li><li>Foundation of all internal work</li></ul></div>
+    </div>
+    <div class="koan-box"><div class="koan-symbol">☯</div><div class="koan-text" id="bKoan"></div><div class="koan-source" id="bKoanSrc"></div></div>
+  </div>
+  <!-- PRINCIPLES -->
+  <div class="panel" id="panel-principles">
+    <div class="section-head"><h2>Core Principles</h2><span class="chinese">原則</span></div>
+    <div class="principles">
+      <div class="principle-card" data-symbol="氣"><div class="principle-name">Qi — Vital Energy</div><div class="principle-chinese">氣</div><div class="principle-desc">The fundamental life force that flows through all living things. Qigong cultivates, refines, and circulates qi through the meridian network.</div></div>
+      <div class="principle-card" data-symbol="陰"><div class="principle-name">Yin & Yang Balance</div><div class="principle-chinese">陰陽</div><div class="principle-desc">All phenomena contain complementary opposites. Practice cultivates the dynamic balance between stillness and movement.</div></div>
+      <div class="principle-card" data-symbol="丹"><div class="principle-name">Three Dantians</div><div class="principle-chinese">三丹田</div><div class="principle-desc">Lower (below navel), Middle (heart), Upper (third eye). Most practice focuses on the lower dantian as the root reservoir.</div></div>
+      <div class="principle-card" data-symbol="柔"><div class="principle-name">Softness Over Force</div><div class="principle-chinese">柔</div><div class="principle-desc">Tension blocks qi flow. Movement should feel effortless, unhurried. The mind leads qi, and qi leads the body.</div></div>
+      <div class="principle-card" data-symbol="鬆"><div class="principle-name">Song — Sung Relaxation</div><div class="principle-chinese">鬆</div><div class="principle-desc">Alert softness: joints open, muscles soft, spine lifted. The prerequisite for all internal work.</div></div>
+      <div class="principle-card" data-symbol="意"><div class="principle-name">Yi — Intention</div><div class="principle-chinese">意</div><div class="principle-desc">Where the mind goes, qi follows. The quality of attention determines the quality of the work.</div></div>
+    </div>
+    <div class="koan-box"><div class="koan-symbol">☯</div><div class="koan-text" id="pKoan"></div><div class="koan-source" id="pKoanSrc"></div></div>
+  </div>
+  <!-- PHILOSOPHY -->
+  <div class="panel" id="panel-philosophy">
+    <div class="section-head"><h2>Taoist Foundations</h2><span class="chinese">道家</span></div>
+    <div class="philosophy-intro">Qigong is not merely exercise — it is an embodied practice of Taoist philosophy. Each movement is an inquiry into the nature of energy, emptiness, and the relationship between the practitioner and the ten thousand things.</div>
+    <div class="concept-list">
+      <div class="concept-item"><div class="concept-char">道</div><div><div class="concept-name">Tao — The Way</div><div class="concept-desc">The undifferentiated ground of all being. Qigong practice does not seek to control or achieve but to align with what is already flowing.</div></div></div>
+      <div class="concept-item"><div class="concept-char">無</div><div><div class="concept-name">Wu Wei — Non-Forcing</div><div class="concept-desc">Action that arises naturally, without effort or agenda. Do not grip the forms. Do not chase results. Allow the body's intelligence to move through you.</div></div></div>
+      <div class="concept-item"><div class="concept-char">虛</div><div><div class="concept-name">Xu — Emptiness</div><div class="concept-desc">Emptiness is not absence but potential. The empty bowl is useful precisely because it is empty.</div></div></div>
+      <div class="concept-item"><div class="concept-char">自</div><div><div class="concept-name">Ziran — Naturalness</div><div class="concept-desc">Being as one naturally is. Qigong practice is in part a return to the body's native intelligence.</div></div></div>
+      <div class="concept-item"><div class="concept-char">靜</div><div><div class="concept-name">Jing — Stillness</div><div class="concept-desc">Stillness is not the absence of movement but its source. The deepest practice is often the one in which nothing visible happens.</div></div></div>
+    </div>
+    <div class="koan-box"><div class="koan-symbol">☯</div><div class="koan-text" id="phKoan"></div><div class="koan-source" id="phKoanSrc"></div></div>
+  </div>
+</main>
+<script>
+  const koans=[{text:"To the mind that is still, the whole universe surrenders.",source:"Lao Tzu"},{text:"Flow with whatever may happen and let your mind be free.",source:"Zhuangzi"},{text:"Nature does not hurry, yet everything is accomplished.",source:"Lao Tzu"},{text:"The usefulness of a cup is its emptiness.",source:"Lao Tzu"},{text:"Do you have the patience to wait until your mud settles and the water is clear?",source:"Lao Tzu"},{text:"He who knows does not speak. He who speaks does not know.",source:"Tao Te Ching"},{text:"Act without expectation, accomplish without claiming credit.",source:"Lao Tzu"},{text:"To return to the root is to find peace.",source:"Tao Te Ching"},{text:"A tree that is unbending is easily broken. The soft and supple will prevail.",source:"Tao Te Ching"},{text:"The ten thousand things rise and fall while the Self watches their return.",source:"Tao Te Ching"}];
+  function rk(){return koans[Math.floor(Math.random()*koans.length)];}
+  [['wKoan','wKoanSrc'],['bKoan','bKoanSrc'],['pKoan','pKoanSrc'],['phKoan','phKoanSrc']].forEach(([t,s])=>{const k=rk();document.getElementById(t).textContent='\u201c'+k.text+'\u201d';document.getElementById(s).textContent='\u2014 '+k.source;});
+  function showTab(id,el){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('panel-'+id).classList.add('active');el.classList.add('active');}
+  function toggleWorkout(card){card.classList.toggle('open');}
+</script>
+</body>
+</html>

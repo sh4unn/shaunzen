@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shaun's Watch</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#f4efe4; --parchment:#ede6d6; --warm:#e4dbc8;
+    --teal:#2a6b5e; --teal-light:#3a8a7c; --teal-faint:#e8f4f2;
+    --burnt:#b8511e; --gold:#9a7820;
+    --ink:#1a1410; --muted:#7a6a5a; --faint:#c4b89e; --border:#d5c9b2;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--cream); color:var(--ink); font-family:'Noto Sans',sans-serif; min-height:100vh; padding-bottom:5rem; }
+
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--teal); color:var(--cream); text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; opacity:0.85; transition:background 0.2s; }
+  .home-btn:hover { background:var(--teal-light); opacity:1; }
+
+  .header { background:var(--ink); color:var(--cream); padding:2.5rem 2rem 2rem; text-align:center; position:relative; overflow:hidden; }
+  .header::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:16rem; opacity:0.04; pointer-events:none; font-family:'Noto Serif',serif; content:'☽'; }
+  .header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(244,239,228,0.35); margin-bottom:0.6rem; }
+  .header h1 { font-family:'Noto Serif',serif; font-size:clamp(1.8rem,5vw,2.8rem); font-weight:300; letter-spacing:0.05em; margin-bottom:0.3rem; }
+  .header-sub { font-size:0.82rem; color:rgba(244,239,228,0.4); font-style:italic; font-family:'Noto Serif',serif; }
+
+  .tabs { background:#2a2520; display:flex; }
+  .tab { flex:1; padding:0.75rem; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(244,239,228,0.4); cursor:pointer; text-align:center; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; }
+  .tab.active { color:var(--cream); border-bottom-color:var(--gold); }
+  .tab:hover { color:rgba(244,239,228,0.75); }
+
+  main { max-width:700px; margin:0 auto; padding:2rem 1.5rem; }
+  .panel { display:none; } .panel.active { display:block; }
+
+  /* SETTINGS */
+  .settings-card { background:var(--parchment); border:1px solid var(--border); border-radius:10px; padding:1.5rem; margin-bottom:1.5rem; }
+  .settings-title { font-family:'Noto Serif',serif; font-size:1rem; color:var(--teal); margin-bottom:0.3rem; }
+  .settings-sub { font-size:0.8rem; color:var(--muted); font-style:italic; font-family:'Noto Serif',serif; margin-bottom:1.25rem; }
+  .field { margin-bottom:0.85rem; }
+  .field label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:0.4rem; }
+  .field input { width:100%; background:white; border:1px solid var(--border); border-radius:6px; padding:0.6rem 0.85rem; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .field input:focus { border-color:var(--teal); }
+  .field input::placeholder { color:var(--border); }
+  .btn { background:var(--teal); color:var(--cream); border:none; border-radius:6px; padding:0.6rem 1.4rem; font-family:'Noto Sans',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; transition:background 0.2s; }
+  .btn:hover { background:var(--teal-light); }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:6px; padding:0.6rem 1.1rem; font-family:'Noto Sans',sans-serif; font-size:0.82rem; cursor:pointer; transition:all 0.2s; margin-left:0.5rem; }
+  .btn-ghost:hover { border-color:var(--teal); color:var(--teal); }
+  .status-msg { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); margin-top:0.75rem; min-height:16px; }
+  .status-msg.ok { color:var(--teal); }
+  .status-msg.err { color:var(--burnt); }
+
+  /* WRITE */
+  .write-card { background:var(--parchment); border:1px solid var(--border); border-radius:10px; padding:1.5rem; margin-bottom:1.5rem; }
+  .date-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  .date-display { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--faint); }
+  .mood-row { display:flex; gap:0.4rem; margin-bottom:1rem; }
+  .mood-chip { background:white; border:1.5px solid var(--border); border-radius:20px; padding:0.3rem 0.75rem; font-size:0.8rem; cursor:pointer; transition:all 0.2s; color:var(--muted); user-select:none; }
+  .mood-chip.active { border-color:var(--teal); background:var(--teal-faint); color:var(--teal); }
+  .entry-title { width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); padding:0.5rem 0; font-family:'Noto Serif',serif; font-size:1.1rem; color:var(--ink); outline:none; margin-bottom:1rem; transition:border-color 0.2s; }
+  .entry-title:focus { border-bottom-color:var(--teal); }
+  .entry-title::placeholder { color:var(--border); font-style:italic; }
+  .entry-body { width:100%; background:transparent; border:none; font-family:'Noto Serif',serif; font-size:0.95rem; color:var(--ink); outline:none; resize:none; line-height:1.9; min-height:260px; }
+  .entry-body::placeholder { color:var(--border); font-style:italic; }
+  .write-footer { display:flex; align-items:center; justify-content:space-between; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border); }
+  .word-count { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--border); }
+
+  /* ENTRIES LIST */
+  .entry-card { background:var(--parchment); border:1px solid var(--border); border-radius:10px; padding:1.25rem 1.5rem; margin-bottom:0.85rem; cursor:pointer; transition:border-color 0.2s; }
+  .entry-card:hover { border-color:var(--teal); }
+  .entry-card-date { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); margin-bottom:0.3rem; display:flex; justify-content:space-between; }
+  .entry-card-title { font-family:'Noto Serif',serif; font-size:1rem; font-weight:400; color:var(--ink); margin-bottom:0.3rem; }
+  .entry-card-preview { font-size:0.8rem; color:var(--muted); font-style:italic; font-family:'Noto Serif',serif; line-height:1.5; }
+  .entry-mood { font-size:0.8rem; }
+
+  .empty-state { text-align:center; padding:3rem 1rem; color:var(--faint); font-family:'Noto Serif',serif; font-style:italic; }
+
+  /* READER */
+  .reader-back { background:none; border:none; color:var(--teal); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; cursor:pointer; margin-bottom:1.5rem; padding:0; text-transform:uppercase; }
+  .reader-date { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--faint); margin-bottom:0.5rem; }
+  .reader-title { font-family:'Noto Serif',serif; font-size:1.6rem; font-weight:300; color:var(--ink); margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
+  .reader-body { font-family:'Noto Serif',serif; font-size:1rem; line-height:1.9; color:var(--ink); white-space:pre-wrap; }
+
+  .loading-overlay { text-align:center; padding:2rem; }
+  .spinner { width:28px; height:28px; border:2px solid var(--border); border-top-color:var(--teal); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 0.75rem; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .loading-text { font-family:'Noto Serif',serif; font-style:italic; font-size:0.85rem; color:var(--muted); }
+</style>
+</head>
+<body>
+<a class="home-btn" href="index.html">← Home</a>
+<div class="header">
+  <div class="header-label">Personal Journal</div>
+  <h1>Shaun's Watch</h1>
+  <div class="header-sub">A place to think out loud under the night sky</div>
+</div>
+<nav class="tabs">
+  <div class="tab active" onclick="showTab('write',this)">Write</div>
+  <div class="tab" onclick="showTab('entries',this)">Entries</div>
+  <div class="tab" onclick="showTab('settings',this)">Settings</div>
+</nav>
+<main>
+
+  <!-- WRITE -->
+  <div class="panel active" id="panel-write">
+    <div class="write-card">
+      <div class="date-row">
+        <div class="date-display" id="writeDate"></div>
+        <div class="mood-row">
+          <div class="mood-chip" onclick="toggleMood(this,'🌑')">🌑</div>
+          <div class="mood-chip" onclick="toggleMood(this,'🌤')">🌤</div>
+          <div class="mood-chip" onclick="toggleMood(this,'☯')">☯</div>
+          <div class="mood-chip" onclick="toggleMood(this,'⚡')">⚡</div>
+          <div class="mood-chip" onclick="toggleMood(this,'🌿')">🌿</div>
+        </div>
+      </div>
+      <input type="text" class="entry-title" id="entryTitle" placeholder="Title (optional)…">
+      <textarea class="entry-body" id="entryBody" placeholder="What's on your mind tonight…" oninput="updateWordCount()"></textarea>
+      <div class="write-footer">
+        <div class="word-count" id="wordCount">0 words</div>
+        <div>
+          <button class="btn-ghost" onclick="clearWrite()">Clear</button>
+          <button class="btn" onclick="saveEntry()" id="saveBtn" style="margin-left:0.5rem">Save to GitHub</button>
+        </div>
+      </div>
+      <div class="status-msg" id="saveStatus"></div>
+    </div>
+  </div>
+
+  <!-- ENTRIES -->
+  <div class="panel" id="panel-entries">
+    <div id="entriesContent"></div>
+  </div>
+
+  <!-- READER -->
+  <div class="panel" id="panel-reader">
+    <button class="reader-back" onclick="showTab('entries', document.querySelectorAll('.tab')[1])">← Back to entries</button>
+    <div class="reader-date" id="readerDate"></div>
+    <div class="reader-title" id="readerTitle"></div>
+    <div class="reader-body" id="readerBody"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="panel" id="panel-settings">
+    <div class="settings-card">
+      <div class="settings-title">GitHub Connection</div>
+      <div class="settings-sub">Your token is stored locally in your browser only — never sent anywhere except GitHub's API.</div>
+      <div class="field">
+        <label>GitHub Personal Access Token</label>
+        <input type="password" id="ghToken" placeholder="ghp_…" value="">
+      </div>
+      <div class="field">
+        <label>GitHub Repo (username/reponame)</label>
+        <input type="text" id="ghRepo" placeholder="sh4unn/shaunzen" value="sh4unn/shaunzen">
+      </div>
+      <button class="btn" onclick="saveSettings()">Save settings</button>
+      <button class="btn-ghost" onclick="testConnection()">Test connection</button>
+      <div class="status-msg" id="settingsStatus"></div>
+    </div>
+  </div>
+
+</main>
+<script>
+  let selectedMood = '';
+
+  // ── GITHUB ──
+  function getConfig() {
+    return {
+      token: localStorage.getItem('gh_token') || '',
+      repo: localStorage.getItem('gh_repo') || 'sh4unn/shaunzen'
+    };
+  }
+
+  async function ghSave(path, content) {
+    const { token, repo } = getConfig();
+    if (!token) throw new Error('No token — go to Settings first');
+    let sha = null;
+    try {
+      const r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+        headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (r.ok) sha = (await r.json()).sha;
+    } catch(e) {}
+    const body = { message: `Watch: save ${path}`, content: btoa(unescape(encodeURIComponent(content))) };
+    if (sha) body.sha = sha;
+    const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error('Save failed (' + res.status + ')');
+  }
+
+  async function ghLoad(path) {
+    const { token, repo } = getConfig();
+    if (!token) throw new Error('No token');
+    const r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error('Load failed (' + r.status + ')');
+    const d = await r.json();
+    return decodeURIComponent(escape(atob(d.content.replace(/\n/g, ''))));
+  }
+
+  // ── SETTINGS ──
+  function saveSettings() {
+    localStorage.setItem('gh_token', document.getElementById('ghToken').value.trim());
+    localStorage.setItem('gh_repo', document.getElementById('ghRepo').value.trim() || 'sh4unn/shaunzen');
+    setStatus('settingsStatus', 'Saved ✓', 'ok');
+  }
+
+  async function testConnection() {
+    setStatus('settingsStatus', 'Testing…', '');
+    try {
+      const { token, repo } = getConfig();
+      const r = await fetch(`https://api.github.com/repos/${repo}`, {
+        headers: { Authorization: `token ${token}` }
+      });
+      if (r.ok) setStatus('settingsStatus', 'Connected ✓ — ' + repo, 'ok');
+      else setStatus('settingsStatus', 'Failed — check token and repo name', 'err');
+    } catch(e) { setStatus('settingsStatus', 'Error: ' + e.message, 'err'); }
+  }
+
+  function loadSettingsFields() {
+    document.getElementById('ghToken').value = localStorage.getItem('gh_token') || '';
+    document.getElementById('ghRepo').value = localStorage.getItem('gh_repo') || 'sh4unn/shaunzen';
+  }
+
+  // ── WRITE ──
+  function updateWordCount() {
+    const words = document.getElementById('entryBody').value.trim().split(/\s+/).filter(w => w).length;
+    document.getElementById('wordCount').textContent = words + ' word' + (words !== 1 ? 's' : '');
+  }
+
+  function toggleMood(el, val) {
+    if (selectedMood === val) { el.classList.remove('active'); selectedMood = ''; }
+    else { document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); selectedMood = val; }
+  }
+
+  function clearWrite() {
+    document.getElementById('entryTitle').value = '';
+    document.getElementById('entryBody').value = '';
+    document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active'));
+    selectedMood = '';
+    updateWordCount();
+  }
+
+  async function saveEntry() {
+    const body = document.getElementById('entryBody').value.trim();
+    if (!body) { setStatus('saveStatus', 'Nothing to save', 'err'); return; }
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    setStatus('saveStatus', '', '');
+    try {
+      const now = new Date();
+      const dateKey = now.toISOString().split('T')[0];
+      const timeStr = now.toLocaleTimeString('en-AU', { hour:'2-digit', minute:'2-digit' });
+      const title = document.getElementById('entryTitle').value.trim() || dateKey;
+      const mood = selectedMood;
+      const entry = { date: dateKey, time: timeStr, title, mood, body };
+
+      // Load existing index
+      let index = [];
+      const existing = await ghLoad('watch/index.json');
+      if (existing) index = JSON.parse(existing);
+
+      // Save entry file
+      const filename = `watch/${dateKey}-${Date.now()}.json`;
+      await ghSave(filename, JSON.stringify(entry, null, 2));
+
+      // Update index
+      index.unshift({ date: dateKey, time: timeStr, title, mood, file: filename });
+      await ghSave('watch/index.json', JSON.stringify(index, null, 2));
+
+      setStatus('saveStatus', 'Saved to GitHub ✓', 'ok');
+      clearWrite();
+    } catch(e) {
+      setStatus('saveStatus', e.message, 'err');
+    }
+    btn.disabled = false; btn.textContent = 'Save to GitHub';
+  }
+
+  // ── ENTRIES ──
+  async function loadEntries() {
+    const container = document.getElementById('entriesContent');
+    container.innerHTML = '<div class="loading-overlay"><div class="spinner"></div><div class="loading-text">Loading entries…</div></div>';
+    try {
+      const raw = await ghLoad('watch/index.json');
+      if (!raw) { container.innerHTML = '<div class="empty-state">No entries yet — write your first one.</div>'; return; }
+      const index = JSON.parse(raw);
+      if (!index.length) { container.innerHTML = '<div class="empty-state">No entries yet.</div>'; return; }
+      container.innerHTML = index.map((e, i) => `
+        <div class="entry-card" onclick="openEntry('${e.file}','${e.date}','${e.time}')">
+          <div class="entry-card-date">
+            <span>${formatDate(e.date)} · ${e.time}</span>
+            <span class="entry-mood">${e.mood || ''}</span>
+          </div>
+          <div class="entry-card-title">${e.title}</div>
+        </div>`).join('');
+    } catch(e) {
+      container.innerHTML = '<div class="empty-state">Could not load — check settings. ' + e.message + '</div>';
+    }
+  }
+
+  async function openEntry(file, date, time) {
+    showTab('reader', null);
+    document.getElementById('readerDate').textContent = formatDate(date) + ' · ' + time;
+    document.getElementById('readerTitle').textContent = 'Loading…';
+    document.getElementById('readerBody').textContent = '';
+    try {
+      const raw = await ghLoad(file);
+      if (!raw) return;
+      const entry = JSON.parse(raw);
+      document.getElementById('readerTitle').textContent = (entry.mood ? entry.mood + ' ' : '') + entry.title;
+      document.getElementById('readerBody').textContent = entry.body;
+    } catch(e) {
+      document.getElementById('readerTitle').textContent = 'Error loading entry';
+    }
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+
+  function setStatus(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'status-msg' + (type ? ' ' + type : '');
+  }
+
+  function showTab(id, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    if (el) el.classList.add('active');
+    if (id === 'entries') loadEntries();
+    if (id === 'settings') loadSettingsFields();
+  }
+
+  // Init
+  const now = new Date();
+  document.getElementById('writeDate').textContent = now.toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + ' · ' + now.toLocaleTimeString('en-AU', { hour:'2-digit', minute:'2-digit' });
+</script>
+</body>
+</html>

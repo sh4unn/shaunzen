@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Daily Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;1,300&family=Noto+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#f4efe4;--parchment:#ede6d6;--warm:#e4dbc8;--teal:#2a6b5e;--teal-light:#3a8a7c;--teal-faint:#e8f4f2;--burnt:#b8511e;--gold:#9a7820;--ink:#1a1410;--muted:#7a6a5a;--faint:#c4b89e;--border:#d5c9b2;--green:#3a6b3a;--green-faint:#eaf2ea;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:'Noto Sans',sans-serif;min-height:100vh;padding-bottom:4rem;}
+  .home-btn{position:fixed;top:1rem;left:1rem;z-index:100;background:var(--teal);color:var(--cream);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;border-radius:2px;transition:background 0.2s;opacity:0.85;}
+  .home-btn:hover{background:var(--teal-light);opacity:1;}
+  .header{background:var(--teal);color:var(--cream);padding:2rem 1.5rem 1.75rem;position:relative;overflow:hidden;}
+  .header::after{content:'☯';position:absolute;right:-1rem;top:-1rem;font-size:8rem;opacity:0.06;pointer-events:none;}
+  .header-top{display:flex;justify-content:space-between;align-items:flex-start;max-width:680px;margin:0 auto;}
+  .header-label{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(244,239,228,0.45);margin-bottom:0.4rem;}
+  .header h1{font-family:'Noto Serif',serif;font-size:1.6rem;font-weight:300;}
+  .header-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(244,239,228,0.45);text-align:right;margin-top:0.25rem;}
+  .tabs{background:var(--teal-light);display:flex;}
+  .tab{flex:1;padding:0.75rem;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(244,239,228,0.5);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s;}
+  .tab.active{color:var(--cream);border-bottom-color:var(--cream);}
+  .tab:hover{color:rgba(244,239,228,0.8);}
+  main{max-width:680px;margin:0 auto;padding:2rem 1.25rem;}
+  .panel{display:none;} .panel.active{display:block;}
+  .mood-section,.habits-section{background:var(--parchment);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem;}
+  .section-title{font-family:'Noto Serif',serif;font-size:1rem;font-weight:400;color:var(--teal);margin-bottom:1rem;}
+  .mood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;margin-bottom:1rem;}
+  .mood-btn{background:var(--cream);border:1.5px solid var(--border);border-radius:8px;padding:0.75rem 0.25rem 0.5rem;cursor:pointer;text-align:center;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;}
+  .mood-btn:hover,.mood-btn.selected{border-color:var(--teal);background:var(--teal-faint);}
+  .mood-emoji{font-size:1.5rem;} .mood-label{font-size:0.65rem;color:var(--muted);letter-spacing:0.05em;}
+  .mood-note{width:100%;background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:0.65rem 0.85rem;font-family:'Noto Serif',serif;font-size:0.85rem;color:var(--ink);resize:none;outline:none;transition:border-color 0.2s;height:70px;}
+  .mood-note:focus{border-color:var(--teal);}
+  .mood-note::placeholder{color:var(--faint);font-style:italic;}
+  .habit-list{display:flex;flex-direction:column;gap:0.6rem;}
+  .habit-row{display:flex;align-items:center;gap:0.85rem;padding:0.75rem 1rem;background:var(--cream);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.2s;user-select:none;}
+  .habit-row:hover{border-color:var(--teal);}
+  .habit-row.done{background:var(--green-faint);border-color:var(--green);}
+  .habit-check{width:22px;height:22px;border:2px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.75rem;transition:all 0.2s;color:transparent;}
+  .habit-row.done .habit-check{background:var(--green);border-color:var(--green);color:white;}
+  .habit-name{font-size:0.9rem;font-weight:400;flex:1;color:var(--ink);}
+  .habit-row.done .habit-name{color:var(--green);}
+  .habit-streak{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);}
+  .habit-row.done .habit-streak{color:var(--green);}
+  .add-habit-row{display:flex;gap:0.5rem;margin-top:1rem;}
+  .add-input{flex:1;background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.85rem;font-family:'Noto Sans',sans-serif;font-size:0.85rem;color:var(--ink);outline:none;transition:border-color 0.2s;}
+  .add-input:focus{border-color:var(--teal);}
+  .add-input::placeholder{color:var(--faint);}
+  .emoji-input{width:48px;flex:none;text-align:center;}
+  .btn-add{background:var(--teal);color:var(--cream);border:none;border-radius:6px;padding:0.6rem 1rem;font-family:'Noto Sans',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;transition:background 0.2s;}
+  .btn-add:hover{background:var(--teal-light);}
+  .save-row{display:flex;justify-content:center;margin-top:1.5rem;}
+  .btn-save{background:var(--teal);color:var(--cream);border:none;border-radius:8px;padding:0.85rem 2.5rem;font-family:'Noto Sans',sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;letter-spacing:0.05em;transition:background 0.2s,transform 0.1s;}
+  .btn-save:hover{background:var(--teal-light);}
+  .btn-save:active{transform:scale(0.98);}
+  .history-entry{background:var(--parchment);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1rem;}
+  .history-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:0.75rem;display:flex;justify-content:space-between;align-items:center;}
+  .history-habits{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.6rem;}
+  .history-habit-tag{font-size:0.75rem;padding:0.2rem 0.6rem;border-radius:20px;background:var(--warm);color:var(--muted);border:1px solid var(--border);}
+  .history-habit-tag.done{background:var(--green-faint);color:var(--green);border-color:var(--green);}
+  .history-note{font-family:'Noto Serif',serif;font-size:0.82rem;font-style:italic;color:var(--muted);margin-top:0.5rem;line-height:1.6;}
+  .empty-history{text-align:center;padding:3rem 1rem;color:var(--faint);font-family:'Noto Serif',serif;font-style:italic;font-size:0.9rem;}
+  .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(4rem);background:var(--teal);color:var(--cream);padding:0.75rem 1.5rem;border-radius:30px;font-size:0.85rem;font-weight:500;transition:transform 0.3s;z-index:100;pointer-events:none;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<a class="home-btn" href="index.html">← Home</a>
+<div class="header">
+  <div class="header-top">
+    <div><div class="header-label">Personal Practice</div><h1>Daily Tracker</h1></div>
+    <div class="header-date" id="headerDate"></div>
+  </div>
+</div>
+<nav class="tabs">
+  <div class="tab active" onclick="showTab('today',this)">Today</div>
+  <div class="tab" onclick="showTab('history',this)">History</div>
+</nav>
+<main>
+  <div class="panel active" id="panel-today">
+    <div class="mood-section">
+      <div class="section-title">How are you feeling?</div>
+      <div class="mood-grid">
+        <div class="mood-btn" onclick="selectMood(this,1)" data-mood="1"><div class="mood-emoji">😔</div><div class="mood-label">Low</div></div>
+        <div class="mood-btn" onclick="selectMood(this,2)" data-mood="2"><div class="mood-emoji">😕</div><div class="mood-label">Meh</div></div>
+        <div class="mood-btn" onclick="selectMood(this,3)" data-mood="3"><div class="mood-emoji">😐</div><div class="mood-label">Okay</div></div>
+        <div class="mood-btn" onclick="selectMood(this,4)" data-mood="4"><div class="mood-emoji">🙂</div><div class="mood-label">Good</div></div>
+        <div class="mood-btn" onclick="selectMood(this,5)" data-mood="5"><div class="mood-emoji">😄</div><div class="mood-label">Great</div></div>
+      </div>
+      <textarea class="mood-note" id="moodNote" placeholder="Any notes on the day…"></textarea>
+    </div>
+    <div class="habits-section">
+      <div class="section-title">Habits</div>
+      <div class="habit-list" id="habitList"></div>
+      <div class="add-habit-row">
+        <input type="text" class="add-input" id="newHabitName" placeholder="Add a habit…" onkeydown="if(event.key==='Enter')addHabit()">
+        <input type="text" class="add-input emoji-input" id="newHabitEmoji" placeholder="🌿">
+        <button class="btn-add" onclick="addHabit()">Add</button>
+      </div>
+    </div>
+    <div class="save-row"><button class="btn-save" onclick="saveDay()">Save today</button></div>
+  </div>
+  <div class="panel" id="panel-history"><div id="historyList"></div></div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+  const MOODS={1:'😔',2:'😕',3:'😐',4:'🙂',5:'😄'};
+  const MOOD_LABELS={1:'Low',2:'Meh',3:'Okay',4:'Good',5:'Great'};
+  let selectedMood=null;
+  const DEFAULT_HABITS=[{id:1,name:'Qigong / movement',icon:'🌿'},{id:2,name:'Reading',icon:'📖'},{id:3,name:'Run or cycle',icon:'🏃'},{id:4,name:'Study / learning',icon:'💻'},{id:5,name:'Good sleep',icon:'🌙'},{id:6,name:'Balcony time',icon:'🌌'}];
+  function getHabits(){return JSON.parse(localStorage.getItem('habits')||JSON.stringify(DEFAULT_HABITS));}
+  function saveHabits(h){localStorage.setItem('habits',JSON.stringify(h));}
+  function getTodayKey(){return new Date().toISOString().split('T')[0];}
+  function getTodayChecked(){return JSON.parse(localStorage.getItem('checked_'+getTodayKey())||'[]');}
+  function getStreaks(){return JSON.parse(localStorage.getItem('streaks')||'{}');}
+  function renderHabits(){const habits=getHabits(),checked=getTodayChecked(),streaks=getStreaks(),list=document.getElementById('habitList');list.innerHTML='';habits.forEach(h=>{const done=checked.includes(h.id),streak=streaks[h.id]||0,row=document.createElement('div');row.className='habit-row'+(done?' done':'');row.innerHTML=`<div class="habit-check">${done?'✓':''}</div><div style="font-size:1rem">${h.icon}</div><div class="habit-name">${h.name}</div><div class="habit-streak">${streak>0?streak+'d':''}</div>`;row.onclick=()=>toggleHabit(h.id);list.appendChild(row);});}
+  function toggleHabit(id){const key='checked_'+getTodayKey();let checked=getTodayChecked();checked.includes(id)?checked=checked.filter(x=>x!==id):checked.push(id);localStorage.setItem(key,JSON.stringify(checked));renderHabits();}
+  function addHabit(){const n=document.getElementById('newHabitName').value.trim();if(!n)return;const icon=document.getElementById('newHabitEmoji').value.trim()||'📌',habits=getHabits();habits.push({id:Date.now(),name:n,icon});saveHabits(habits);document.getElementById('newHabitName').value='';document.getElementById('newHabitEmoji').value='';renderHabits();}
+  function selectMood(el,val){document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');selectedMood=val;}
+  function saveDay(){const key=getTodayKey(),checked=getTodayChecked(),note=document.getElementById('moodNote').value.trim(),entry={date:key,mood:selectedMood,note,habits:checked,habitNames:getHabits().reduce((a,h)=>{a[h.id]={name:h.name,icon:h.icon};return a;},{})};const all=JSON.parse(localStorage.getItem('entries')||'[]'),i=all.findIndex(e=>e.date===key);i>=0?all[i]=entry:all.unshift(entry);localStorage.setItem('entries',JSON.stringify(all));showToast('Saved ✓');renderHabits();}
+  function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+  function renderHistory(){const entries=JSON.parse(localStorage.getItem('entries')||'[]'),list=document.getElementById('historyList');if(!entries.length){list.innerHTML='<div class="empty-history">No entries yet — save your first day above.</div>';return;}list.innerHTML=entries.map(e=>{const d=new Date(e.date+'T12:00:00'),ds=d.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),tags=Object.entries(e.habitNames||{}).map(([id,h])=>`<span class="history-habit-tag ${e.habits.includes(parseInt(id))||e.habits.includes(id)?'done':''}">${h.icon} ${h.name}</span>`).join('');return`<div class="history-entry"><div class="history-date"><span>${ds}</span><span>${e.mood?MOODS[e.mood]+' '+MOOD_LABELS[e.mood]:'—'}</span></div>${e.note?`<div class="history-note">"${e.note}"</div>`:''}<div class="history-habits">${tags}</div></div>`;}).join('');}
+  function showTab(id,el){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('panel-'+id).classList.add('active');el.classList.add('active');if(id==='history')renderHistory();}
+  const now=new Date();document.getElementById('headerDate').innerHTML=now.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'})+'<br>'+now.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+  const todayEntry=JSON.parse(localStorage.getItem('entries')||'[]').find(e=>e.date===getTodayKey());
+  if(todayEntry){if(todayEntry.mood){const btn=document.querySelector(`[data-mood="${todayEntry.mood}"]`);if(btn){btn.classList.add('selected');selectedMood=todayEntry.mood;}}if(todayEntry.note)document.getElementById('moodNote').value=todayEntry.note;}
+  renderHabits();
+</script>
+</body>
+</html>

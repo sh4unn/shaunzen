@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Recommender</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#f4efe4; --parchment:#ede6d6; --warm:#e4dbc8;
+    --teal:#2a6b5e; --teal-light:#3a8a7c; --teal-faint:#e8f4f2;
+    --burnt:#b8511e; --burnt-faint:#faf0ea;
+    --gold:#9a7820; --ink:#1a1410; --muted:#7a6a5a;
+    --faint:#c4b89e; --border:#d5c9b2;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--cream); color:var(--ink); font-family:'Noto Sans',sans-serif; min-height:100vh; padding-bottom:5rem; }
+
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--teal); color:var(--cream); text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; opacity:0.85; }
+  .home-btn:hover { background:var(--teal-light); opacity:1; }
+
+  .header { background:var(--teal); color:var(--cream); padding:2.5rem 2rem 2rem; text-align:center; position:relative; overflow:hidden; }
+  .header::before { content:''; position:absolute; top:-40px; right:-40px; width:250px; height:250px; background:radial-gradient(circle,rgba(244,239,228,0.07),transparent 70%); pointer-events:none; }
+  .header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(244,239,228,0.45); margin-bottom:0.6rem; }
+  .header h1 { font-family:'Noto Serif',serif; font-size:clamp(1.8rem,5vw,2.8rem); font-weight:300; letter-spacing:0.05em; margin-bottom:0.3rem; }
+  .header-sub { font-size:0.82rem; color:rgba(244,239,228,0.5); font-style:italic; font-family:'Noto Serif',serif; }
+
+  main { max-width:760px; margin:0 auto; padding:2.5rem 1.5rem; }
+
+  /* UPLOAD ZONE */
+  .upload-zone { background:var(--parchment); border:2px dashed var(--border); border-radius:12px; padding:2.5rem 2rem; text-align:center; margin-bottom:1.5rem; cursor:pointer; transition:border-color 0.2s, background 0.2s; position:relative; }
+  .upload-zone:hover, .upload-zone.dragover { border-color:var(--teal); background:var(--teal-faint); }
+  .upload-zone.has-file { border-color:var(--teal); border-style:solid; background:var(--teal-faint); }
+  .upload-icon { font-size:2rem; margin-bottom:0.75rem; opacity:0.4; }
+  .upload-title { font-family:'Noto Serif',serif; font-size:1rem; font-weight:400; color:var(--teal); margin-bottom:0.3rem; }
+  .upload-hint { font-size:0.8rem; color:var(--muted); margin-bottom:0.75rem; font-style:italic; font-family:'Noto Serif',serif; }
+  .upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .file-name { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--teal); margin-top:0.5rem; }
+
+  /* PREFERENCES */
+  .prefs-card { background:var(--parchment); border:1px solid var(--border); border-radius:12px; padding:1.75rem; margin-bottom:1.5rem; }
+  .prefs-title { font-family:'Noto Serif',serif; font-size:1rem; font-weight:400; color:var(--teal); margin-bottom:1.25rem; }
+
+  .pref-row { margin-bottom:1rem; }
+  .pref-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); margin-bottom:0.5rem; display:block; }
+  .pref-input, .pref-select, .pref-textarea { width:100%; background:white; border:1px solid var(--border); border-radius:6px; padding:0.6rem 0.85rem; font-family:'Noto Sans',sans-serif; font-size:0.85rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .pref-input:focus, .pref-select:focus, .pref-textarea:focus { border-color:var(--teal); }
+  .pref-input::placeholder, .pref-textarea::placeholder { color:var(--faint); }
+  .pref-textarea { resize:vertical; min-height:70px; font-family:'Noto Serif',serif; font-style:italic; font-size:0.85rem; }
+  .pref-select option { background:white; }
+
+  .chip-group { display:flex; flex-wrap:wrap; gap:0.4rem; }
+  .chip { background:white; border:1.5px solid var(--border); border-radius:20px; padding:0.3rem 0.85rem; font-size:0.8rem; cursor:pointer; transition:all 0.2s; color:var(--muted); user-select:none; }
+  .chip:hover { border-color:var(--teal); color:var(--teal); }
+  .chip.active { background:var(--teal-faint); border-color:var(--teal); color:var(--teal); font-weight:500; }
+
+  /* GENERATE BTN */
+  .gen-btn { width:100%; background:var(--teal); color:var(--cream); border:none; border-radius:10px; padding:1.1rem; font-family:'Noto Sans',sans-serif; font-size:1rem; font-weight:600; cursor:pointer; transition:background 0.2s, transform 0.1s; letter-spacing:0.03em; margin-bottom:1.5rem; }
+  .gen-btn:hover { background:var(--teal-light); }
+  .gen-btn:active { transform:scale(0.99); }
+  .gen-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+  /* LOADING */
+  .loading { text-align:center; padding:3rem 1rem; display:none; }
+  .loading.show { display:block; }
+  .loading-text { font-family:'Noto Serif',serif; font-style:italic; font-size:0.9rem; color:var(--muted); margin-top:1rem; }
+  .spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--teal); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* RESULTS */
+  .results { display:none; }
+  .results.show { display:block; }
+  .results-header { font-family:'Noto Serif',serif; font-size:1.2rem; font-weight:300; color:var(--teal); margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom:1px solid var(--border); }
+  .rec-list { display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem; }
+
+  .rec-card { background:var(--parchment); border:1px solid var(--border); border-radius:10px; padding:1.4rem; transition:border-color 0.2s; }
+  .rec-card:hover { border-color:var(--teal); }
+  .rec-num { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faint); margin-bottom:0.4rem; }
+  .rec-title { font-family:'Noto Serif',serif; font-size:1.1rem; font-weight:400; color:var(--ink); margin-bottom:0.15rem; }
+  .rec-author { font-size:0.82rem; color:var(--muted); margin-bottom:0.7rem; font-style:italic; font-family:'Noto Serif',serif; }
+  .rec-why { font-size:0.83rem; color:var(--muted); line-height:1.65; }
+  .rec-tags { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.75rem; }
+  .rec-tag { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; background:var(--teal-faint); color:var(--teal); border-radius:20px; padding:0.15rem 0.6rem; }
+
+  .try-again { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:8px; padding:0.75rem 1.5rem; font-family:'Noto Sans',sans-serif; font-size:0.85rem; cursor:pointer; transition:all 0.2s; }
+  .try-again:hover { border-color:var(--teal); color:var(--teal); }
+
+  /* ERROR */
+  .error-box { background:var(--burnt-faint); border:1px solid #daa090; border-radius:10px; padding:1.25rem; margin-bottom:1.5rem; display:none; font-size:0.85rem; color:var(--burnt); font-family:'Noto Serif',serif; font-style:italic; }
+  .error-box.show { display:block; }
+
+  /* BOOK LIST SUMMARY */
+  .book-summary { background:var(--parchment); border:1px solid var(--border); border-radius:8px; padding:1rem 1.25rem; margin-bottom:1.5rem; display:none; }
+  .book-summary.show { display:block; }
+  .book-summary-title { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--faint); margin-bottom:0.5rem; }
+  .book-summary-text { font-size:0.83rem; color:var(--muted); line-height:1.6; }
+</style>
+</head>
+<body>
+
+<a class="home-btn" href="index.html">← Home</a>
+
+<div class="header">
+  <div class="header-label">Reading</div>
+  <h1>Book Recommender</h1>
+  <div class="header-sub">Upload your Goodreads export for personalised recommendations</div>
+</div>
+
+<main>
+
+  <!-- UPLOAD -->
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" accept=".csv" onchange="handleFile(this.files[0])" id="fileInput">
+    <div class="upload-icon">📚</div>
+    <div class="upload-title">Drop your Goodreads CSV here</div>
+    <div class="upload-hint">Export from Goodreads → My Books → Import/Export → Export Library</div>
+    <div class="file-name" id="fileName"></div>
+  </div>
+
+  <div class="book-summary" id="bookSummary">
+    <div class="book-summary-title">Library loaded</div>
+    <div class="book-summary-text" id="bookSummaryText"></div>
+  </div>
+
+  <!-- PREFERENCES -->
+  <div class="prefs-card">
+    <div class="prefs-title">What are you after?</div>
+
+    <div class="pref-row">
+      <label class="pref-label">Mood / what you want from reading right now</label>
+      <textarea class="pref-textarea" id="prefMood" placeholder="e.g. Something gripping I can't put down, or something quiet and reflective for late nights…"></textarea>
+    </div>
+
+    <div class="pref-row">
+      <label class="pref-label">Genres you're open to</label>
+      <div class="chip-group" id="genreChips">
+        <div class="chip active" data-val="thriller">Thriller</div>
+        <div class="chip active" data-val="horror">Horror</div>
+        <div class="chip active" data-val="literary fiction">Literary fiction</div>
+        <div class="chip" data-val="sci-fi">Sci-fi</div>
+        <div class="chip" data-val="fantasy">Fantasy</div>
+        <div class="chip active" data-val="australian fiction">Australian fiction</div>
+        <div class="chip" data-val="historical fiction">Historical fiction</div>
+        <div class="chip" data-val="non-fiction">Non-fiction</div>
+        <div class="chip active" data-val="stoicism / philosophy">Stoicism / philosophy</div>
+        <div class="chip" data-val="biography">Biography</div>
+        <div class="chip" data-val="crime">Crime</div>
+        <div class="chip" data-val="adventure">Adventure</div>
+      </div>
+    </div>
+
+    <div class="pref-row">
+      <label class="pref-label">Favourite authors (helps calibrate the recommendations)</label>
+      <input type="text" class="pref-input" id="prefAuthors" placeholder="e.g. Stephen King, Cormac McCarthy, Tim Winton…" value="Stephen King">
+    </div>
+
+    <div class="pref-row">
+      <label class="pref-label">Anything to avoid</label>
+      <input type="text" class="pref-input" id="prefAvoid" placeholder="e.g. Romance, slow burn literary, anything over 600 pages…">
+    </div>
+
+    <div class="pref-row">
+      <label class="pref-label">How many recommendations?</label>
+      <select class="pref-select" id="prefCount">
+        <option value="5">5 books</option>
+        <option value="8" selected>8 books</option>
+        <option value="12">12 books</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <button class="gen-btn" onclick="getRecommendations()" id="genBtn">Get Recommendations</button>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Analysing your reading history…</div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="results-header" id="resultsHeader">Recommended for you</div>
+    <div class="rec-list" id="recList"></div>
+    <button class="try-again" onclick="resetResults()">Try different preferences</button>
+  </div>
+
+</main>
+
+<script>
+  let parsedBooks = [];
+  let csvRaw = '';
+
+  // ── FILE HANDLING ──
+
+  function handleFile(file) {
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      csvRaw = e.target.result;
+      parsedBooks = parseGoodreadsCSV(csvRaw);
+      const zone = document.getElementById('uploadZone');
+      zone.classList.add('has-file');
+      document.getElementById('fileName').textContent = '✓ ' + file.name;
+      showBookSummary();
+    };
+    reader.readAsText(file);
+  }
+
+  // Drag and drop
+  const zone = document.getElementById('uploadZone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+
+  function parseGoodreadsCSV(csv) {
+    const lines = csv.split('\n').filter(l => l.trim());
+    if(lines.length < 2) return [];
+    const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase().replace(/[^a-z0-9]/g,'_'));
+    const books = [];
+    for(let i = 1; i < lines.length; i++) {
+      const vals = parseCSVLine(lines[i]);
+      if(vals.length < 3) continue;
+      const obj = {};
+      headers.forEach((h,j) => obj[h] = (vals[j]||'').trim());
+      if(obj.title || obj.book_title) books.push(obj);
+    }
+    return books;
+  }
+
+  function parseCSVLine(line) {
+    const result = []; let current = ''; let inQuotes = false;
+    for(let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if(ch === '"') { inQuotes = !inQuotes; }
+      else if(ch === ',' && !inQuotes) { result.push(current); current = ''; }
+      else { current += ch; }
+    }
+    result.push(current);
+    return result;
+  }
+
+  function showBookSummary() {
+    const read = parsedBooks.filter(b => (b.exclusive_shelf||b.bookshelves||'').toLowerCase().includes('read'));
+    const toRead = parsedBooks.filter(b => (b.exclusive_shelf||b.bookshelves||'').toLowerCase().includes('to-read'));
+    const rated = parsedBooks.filter(b => b.my_rating && parseInt(b.my_rating) >= 4);
+    const summary = document.getElementById('bookSummary');
+    summary.classList.add('show');
+    document.getElementById('bookSummaryText').textContent =
+      `Found ${parsedBooks.length} books total — ${read.length} read, ${toRead.length} on to-read shelf, ${rated.length} rated 4-5 stars. Ready to find your next read.`;
+  }
+
+  // ── GENRE CHIPS ──
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('active'));
+  });
+
+  function getActiveGenres() {
+    return Array.from(document.querySelectorAll('.chip.active')).map(c => c.dataset.val).join(', ');
+  }
+
+  // ── RECOMMENDATIONS ──
+
+  async function getRecommendations() {
+    const genres = getActiveGenres();
+    const mood = document.getElementById('prefMood').value.trim();
+    const authors = document.getElementById('prefAuthors').value.trim();
+    const avoid = document.getElementById('prefAvoid').value.trim();
+    const count = document.getElementById('prefCount').value;
+
+    document.getElementById('errorBox').classList.remove('show');
+    document.getElementById('results').classList.remove('show');
+    document.getElementById('loading').classList.add('show');
+    document.getElementById('genBtn').disabled = true;
+
+    const loadingMessages = [
+      'Analysing your reading history…',
+      'Looking for patterns in your ratings…',
+      'Finding books you haven\'t read yet…',
+      'Curating your list…'
+    ];
+    let msgIdx = 0;
+    const msgInterval = setInterval(() => {
+      msgIdx = (msgIdx + 1) % loadingMessages.length;
+      document.getElementById('loadingText').textContent = loadingMessages[msgIdx];
+    }, 2500);
+
+    // Build context from CSV
+    let bookContext = '';
+    if(parsedBooks.length > 0) {
+      const read = parsedBooks
+        .filter(b => (b.exclusive_shelf||b.bookshelves||'').toLowerCase().includes('read'))
+        .slice(0, 80)
+        .map(b => {
+          const title = b.title || b.book_title || '';
+          const author = b.author || b.author_l_f || '';
+          const rating = b.my_rating ? ` (rated ${b.my_rating}/5)` : '';
+          return `${title} by ${author}${rating}`;
+        }).join('\n');
+      bookContext = `\n\nThe user's Goodreads reading history (books they have read):\n${read}`;
+
+      const toRead = parsedBooks
+        .filter(b => (b.exclusive_shelf||b.bookshelves||'').toLowerCase().includes('to-read'))
+        .slice(0, 30)
+        .map(b => (b.title || b.book_title || ''))
+        .join(', ');
+      if(toRead) bookContext += `\n\nAlready on their to-read list (do NOT recommend these): ${toRead}`;
+    } else {
+      bookContext = '\n\nNo Goodreads CSV was uploaded — make recommendations based on the stated preferences alone.';
+    }
+
+    const prompt = `You are a knowledgeable book recommender. Recommend exactly ${count} books for this reader.
+
+Reader preferences:
+- Favourite authors: ${authors || 'Stephen King'}
+- Genres open to: ${genres || 'thriller, horror, literary fiction'}
+- Current mood / what they want: ${mood || 'not specified'}
+- Things to avoid: ${avoid || 'not specified'}
+${bookContext}
+
+IMPORTANT: Do not recommend any books already in their read list or to-read list.
+Recommend books that match their taste based on their reading history and preferences.
+
+Respond ONLY with a JSON array, no markdown, no preamble. Format:
+[
+  {
+    "title": "Book Title",
+    "author": "Author Name",
+    "why": "2-3 sentence explanation of why this suits this specific reader, referencing their taste",
+    "tags": ["tag1", "tag2", "tag3"]
+  }
+]`;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      clearInterval(msgInterval);
+
+      if(!res.ok) throw new Error('API error ' + res.status);
+      const data = await res.json();
+      const text = data.content.map(c => c.text || '').join('');
+      const clean = text.replace(/```json|```/g, '').trim();
+      const recs = JSON.parse(clean);
+      showResults(recs);
+    } catch(err) {
+      clearInterval(msgInterval);
+      document.getElementById('loading').classList.remove('show');
+      document.getElementById('genBtn').disabled = false;
+      const errBox = document.getElementById('errorBox');
+      errBox.textContent = 'Something went wrong getting recommendations. Make sure you\'re connected and try again. (' + err.message + ')';
+      errBox.classList.add('show');
+    }
+  }
+
+  function showResults(recs) {
+    document.getElementById('loading').classList.remove('show');
+    document.getElementById('genBtn').disabled = false;
+    document.getElementById('results').classList.add('show');
+    document.getElementById('resultsHeader').textContent = recs.length + ' books picked for you';
+
+    const list = document.getElementById('recList');
+    list.innerHTML = recs.map((r, i) => `
+      <div class="rec-card">
+        <div class="rec-num">Pick ${i+1}</div>
+        <div class="rec-title">${r.title}</div>
+        <div class="rec-author">${r.author}</div>
+        <div class="rec-why">${r.why}</div>
+        ${r.tags && r.tags.length ? `<div class="rec-tags">${r.tags.map(t => `<span class="rec-tag">${t}</span>`).join('')}</div>` : ''}
+      </div>
+    `).join('');
+
+    document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function resetResults() {
+    document.getElementById('results').classList.remove('show');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+</script>
+</body>
+</html>

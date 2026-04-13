@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardiac Surgery Reference</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0a0d12;
+    --surface: #111520;
+    --border: #1e2535;
+    --accent-red: #c0392b;
+    --accent-amber: #d4a017;
+    --accent-blue: #2e86c1;
+    --text-primary: #e8ecf0;
+    --text-secondary: #8a95a3;
+    --text-muted: #4a5568;
+    --anaes: #1a3a4a;
+    --anaes-accent: #3fb0d8;
+    --surg: #2a1a1a;
+    --surg-accent: #e05252;
+    --tag-bg: #1a2235;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 2rem 2rem;
+    background: linear-gradient(180deg, #0d1118 0%, var(--bg) 100%);
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .header-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    max-width: 1100px;
+    margin: 2rem auto 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    padding: 0.75rem 1.75rem;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tab:hover { color: var(--text-secondary); }
+  .tab.active { color: var(--text-primary); border-bottom-color: var(--accent-amber); }
+
+  .tab.cabg.active { border-bottom-color: var(--accent-amber); }
+  .tab.bentall.active { border-bottom-color: var(--accent-red); }
+
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .procedure { display: none; }
+  .procedure.active { display: block; }
+
+  .procedure-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .procedure-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    margin-bottom: 0.4rem;
+  }
+
+  .procedure-title.cabg { color: var(--accent-amber); }
+  .procedure-title.bentall { color: var(--accent-red); }
+
+  .procedure-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    max-width: 700px;
+    line-height: 1.6;
+  }
+
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .legend-dot.anaes { background: var(--anaes-accent); }
+  .legend-dot.surg { background: var(--surg-accent); }
+
+  .stage {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface);
+    transition: border-color 0.2s;
+  }
+
+  .stage:hover { border-color: #2e3a50; }
+
+  .stage-header {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    user-select: none;
+  }
+
+  .stage-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    min-width: 2rem;
+    letter-spacing: 0.05em;
+  }
+
+  .stage-name {
+    font-weight: 500;
+    font-size: 14px;
+    flex: 1;
+    color: var(--text-primary);
+  }
+
+  .stage-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .tag.cpb { background: #1a2a3a; color: #5b9bd5; border: 1px solid #2a3d52; }
+  .tag.off { background: #1e2a1a; color: #6ab04c; border: 1px solid #2c3d22; }
+  .tag.critical { background: #2a1a1a; color: #e05252; border: 1px solid #3d2222; }
+  .tag.induction { background: #2a2a1a; color: #d4a017; border: 1px solid #3d3a1a; }
+
+  .chevron {
+    color: var(--text-muted);
+    font-size: 12px;
+    transition: transform 0.2s;
+  }
+
+  .stage.open .chevron { transform: rotate(90deg); }
+
+  .stage-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .stage.open .stage-body { display: block; }
+
+  .roles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  @media (max-width: 700px) {
+    .roles { grid-template-columns: 1fr; }
+  }
+
+  .role-panel {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .role-panel.anaes {
+    border-right: 1px solid var(--border);
+    background: rgba(26,58,74,0.15);
+  }
+
+  .role-panel.surg {
+    background: rgba(42,26,26,0.15);
+  }
+
+  .role-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .role-label.anaes { color: var(--anaes-accent); }
+  .role-label.surg { color: var(--surg-accent); }
+
+  .role-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .role-dot.anaes { background: var(--anaes-accent); }
+  .role-dot.surg { background: var(--surg-accent); }
+
+  ul.task-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  ul.task-list li {
+    padding: 0.35rem 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.55;
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+
+  ul.task-list li:last-child { border-bottom: none; }
+
+  ul.task-list li::before {
+    content: '–';
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-top: 0.05em;
+  }
+
+  .alert-box {
+    margin: 0 1.5rem 1.25rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  .alert-box.warning {
+    background: rgba(192,57,43,0.12);
+    border-left: 3px solid var(--accent-red);
+    color: #d9836e;
+  }
+
+  .alert-box.info {
+    background: rgba(46,134,193,0.1);
+    border-left: 3px solid var(--accent-blue);
+    color: #7ab8d9;
+  }
+
+  .alert-box strong {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .notes-section {
+    margin: 2rem 0 0;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .notes-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .drug-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .drug-card {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+  }
+
+  .drug-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--anaes-accent);
+    margin-bottom: 0.25rem;
+  }
+
+  .drug-use {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:1rem;left:1rem;z-index:9999;background:#2a7a6e;color:#f5f0e6;text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;border-radius:2px;opacity:0.85;">← Home</a>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-label">Cardiothoracic Surgery · Clinical Reference</div>
+    <h1>Operative Role Reference</h1>
+    <p class="subtitle">Staged breakdown of anaesthetic and surgical responsibilities — CABG and Bentall procedure</p>
+
+    <div class="tabs">
+      <button class="tab cabg active" onclick="showProcedure('cabg', this)">Coronary Artery Bypass Graft</button>
+      <button class="tab bentall" onclick="showProcedure('bentall', this)">Bentall Procedure</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ==================== CABG ==================== -->
+  <div class="procedure active" id="proc-cabg">
+
+    <div class="procedure-header">
+      <div class="procedure-title cabg">Coronary Artery Bypass Grafting (CABG)</div>
+      <p class="procedure-desc">On-pump CABG via median sternotomy. Cardiopulmonary bypass used for the anastomotic phase. Typically LIMA to LAD ± saphenous vein grafts to other vessels. Duration 3–5 hours.</p>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot anaes"></div> Anaesthetist</div>
+      <div class="legend-item"><div class="legend-dot surg"></div> Cardiac Surgeon</div>
+    </div>
+
+    <!-- Stage 1 -->
+    <div class="stage open" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">01</span>
+        <span class="stage-name">Pre-operative Assessment & Setup</span>
+        <div class="stage-tags"><span class="tag induction">PRE-OP</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Review echo, cath report, EF, LV function, valve pathology, coronary anatomy</li>
+              <li>Identify high-risk features: poor LV function, recent MI, LMS disease, renal/respiratory comorbidity</li>
+              <li>Discuss plan with surgeon: likely CPB duration, expected ischaemic time, anticipated haemodynamic challenges</li>
+              <li>Arterial line (radial — confirm Allen's test), large-bore IV access ×2, consider introducer/PAC in poor LV</li>
+              <li>TOE probe if planned (routine in most centres for CABG); baseline TOE pre-induction or post-intubation</li>
+              <li>Preoxygenate; prepare vasopressors (metaraminol, vasopressin), inotropes (adrenaline, milrinone), heparin drawn</li>
+              <li>Cell saver circuit primed and ready with perfusionist</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Mark LIMA harvest site; confirm bilateral IMA or single LIMA plan with patient and team</li>
+              <li>Confirm conduit strategy: LIMA, radial artery, long saphenous vein (LSV)</li>
+              <li>Discuss target vessels with perfusionist: CPB setup, cardioplegia strategy (antegrade, retrograde, del Nido vs blood)</li>
+              <li>Briefing to scrub nurse: suture types, clips, stabiliser if OPCAB option being considered</li>
+              <li>Confirm sterile field prep; patient positioned supine, chest rolls may be placed</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 2 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">02</span>
+        <span class="stage-name">Induction & Intubation</span>
+        <div class="stage-tags"><span class="tag induction">INDUCTION</span><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ High-risk moment</strong>In poor LV function, induction is the highest-risk phase for haemodynamic collapse. Vasopressors must be immediately available; consider low-dose noradrenaline infusion running prior to induction in EF &lt;30%.</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Cardiac induction: high-dose opioid technique (fentanyl 5–10 mcg/kg or sufentanil) to blunt sympathetic response; low-dose propofol or etomidate to avoid hypotension</li>
+              <li>Rocuronium for neuromuscular blockade; ketamine sometimes used as adjunct in low EF</li>
+              <li>Controlled, smooth laryngoscopy — avoid tachycardia and hypotension; grade haemodynamics as much as airway</li>
+              <li>Confirm ETCO2, SpO2, bilateral air entry; set ventilator for cardiac parameters (avoid high PEEP if compromised RV)</li>
+              <li>Insert TOE: baseline LV/RV function, RWMA, valves, check for aortic pathology before cannulation</li>
+              <li>Insert CVC (IJV or subclavian): CVP, infusion ports; consider PA catheter if EF &lt;25% or complex haemodynamics</li>
+              <li>Initiate infusions: propofol or volatile agent (usually sevoflurane via the CPB machine gas port), remifentanil, NMB infusion</li>
+              <li>Target: MAP 65–75, HR 55–75, avoid tachycardia (increases O2 demand), normothermia until CPB</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Not scrubbed yet — available if emergency is declared (e.g., arrest requiring emergency sternotomy)</li>
+              <li>Confirms consent signed, imaging available, perfusionist is primed and ready</li>
+              <li>In many centres, a second team begins leg or radial harvest simultaneously with induction</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">03</span>
+        <span class="stage-name">Sternotomy & LIMA Harvest</span>
+        <div class="stage-tags"></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Deepen anaesthesia prior to skin incision; anticipate haemodynamic response to sternotomy</li>
+              <li>During sternotomy: brief apnoea often requested (deflate lungs for saw pass) — communicate clearly with surgeon</li>
+              <li>Monitor for pneumothorax, haemorrhage; adjust ventilation during sternal retraction</li>
+              <li>During LIMA harvest: right lung ventilation usually maintained; may need to reduce tidal volume if visualisation is poor</li>
+              <li>Heparin administered (typically 300–400 IU/kg) prior to cannulation — confirm with surgeon; verify ACT &gt;480 seconds before CPB</li>
+              <li>Ensure vasopressors titrated: sternal retraction causes vagal response; MAP dips are common</li>
+              <li>Papaverine or topical vasodilators may be requested for LIMA — prepare on request</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Midline sternotomy with oscillating or gigli saw; retractor placed (Finochietto or sternal retractor)</li>
+              <li>Open pericardium; inspect heart: identify LV function, wall motion, coronary anatomy landmarks</li>
+              <li>LIMA takedown: skeletonised or pedicled harvest from left chest wall, IMA retractor used; care with pleural entry</li>
+              <li>Assess LIMA quality, flow, pulsatility — clip side branches; papaverine-soaked gauze applied</li>
+              <li>Vein harvesting (endoscopic or open LSV) proceeds simultaneously by second surgeon or assistant</li>
+              <li>Pericardial stay sutures placed; inspect aorta for calcification (cannulation site assessment)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 4 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">04</span>
+        <span class="stage-name">Cannulation & Initiation of CPB</span>
+        <div class="stage-tags"><span class="tag cpb">ON CPB</span><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ Critical transition</strong>Going on bypass involves significant haemodynamic shift — MAP usually drops at initiation. RV and LV both unload rapidly. Anaesthetist must be vigilant for air entrainment, ventricular distension, aortic dissection.</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Confirm ACT prior to cannulation (must be &gt;480 sec); re-check after heparin dosing</li>
+              <li>Communicate with perfusionist: flow targets (2.4 L/min/m²), MAP target on bypass (50–70 mmHg), temperature plan</li>
+              <li>Cease mechanical ventilation once full CPB flow established (lungs are bypassed); leave lungs partially inflated</li>
+              <li>Maintain anaesthesia via vapour delivery through CPB circuit (volatile via oxygenator) or TIVA via pump</li>
+              <li>Monitor: MAP via arterial line (now reflecting CPB circuit pressure), TOE for LV/RV distension and venting adequacy</li>
+              <li>If LV becomes distended on TOE → alert surgeon immediately (LV vent required)</li>
+              <li>Temperature monitoring: nasopharyngeal and bladder — target mild/moderate hypothermia (32–34°C) or normothermia depending on case plan</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Aortic cannulation: purse-string sutures, Seldinger or direct cannulation of ascending aorta; confirm position with perfusionist</li>
+              <li>Venous cannulation: single two-stage cannula (RA/IVC) or bicaval cannulation; snares applied</li>
+              <li>Signal perfusionist to go on bypass — gradual flow increase to full support; confirm venous drainage, de-air circuit</li>
+              <li>Cross-clamp the aorta (Satinsky or DeBakey); signal perfusionist to deliver cardioplegia</li>
+              <li>Cardioplegia delivery: antegrade via aortic root or directly into coronary ostia; retrograde via coronary sinus catheter if needed</li>
+              <li>Confirm cardiac arrest — confirm flatline on ECG; temperature of heart should drop to ~15–20°C with cold cardioplegia</li>
+              <li>Place LV vent (via RSPV or aortic root) to decompress and maintain clear operative field</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 5 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">05</span>
+        <span class="stage-name">Distal Anastomoses (Arrested Heart)</span>
+        <div class="stage-tags"><span class="tag cpb">ON CPB</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Vigilant monitoring of CPB circuit: MAP, flows, gases, ACT — dose additional heparin if ACT drifts below target</li>
+              <li>Repeat cardioplegia deliveries coordinated with surgeon (typically every 15–20 mins, or when surgeon requests)</li>
+              <li>Monitor temperature: ensure adequate cooling maintained; begin rewarming per surgeon plan</li>
+              <li>Blood gases from perfusionist circuit — correct pH, electrolytes (especially K⁺ — cardioplegia loads potassium), glucose</li>
+              <li>Haematocrit management: maintain Hct &gt;21% on CPB; transfuse PRBCs or use ultrafiltration if diluted excessively</li>
+              <li>TOE: monitor LV vent function; ensure no air accumulation in cardiac chambers</li>
+              <li>Minimal intervention otherwise — heart is arrested; anaesthetist primarily monitors and maintains bypass conditions</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Identify target coronary vessel (LAD, diagonal, OM, RCA, PDA) — correlate with pre-op cath findings</li>
+              <li>Arteriotomy on target vessel: longitudinal incision ~5mm; vessel dilator used; avoid damaging intima</li>
+              <li>LIMA-to-LAD anastomosis: end-to-side with running 7-0 or 8-0 prolene; loupe magnification ×3.5 or microscope</li>
+              <li>Vein graft distal anastomoses to remaining targets: same technique, 7-0 prolene, precise placement avoiding tension</li>
+              <li>Graft flushed and clamped; assess quality under magnification — no kinks, no significant suture line defects</li>
+              <li>Request repeat cardioplegia before moving to next anastomosis if ischaemic time is extending</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 6 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">06</span>
+        <span class="stage-name">Proximal Anastomoses & Weaning from CPB</span>
+        <div class="stage-tags"><span class="tag cpb">CPB WEAN</span><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ Critical transition</strong>Weaning from bypass is the second highest-risk period. LV function must be reassessed with TOE. Inotropes and vasopressors must be ready; RV failure is common and can be sudden.</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Confirm rewarming complete: nasopharyngeal temp &gt;36.5°C, bladder &gt;35°C before wean attempted</li>
+              <li>Recommence mechanical ventilation prior to wean; confirm bilateral air entry, adequate tidal volumes</li>
+              <li>De-air protocol with surgeon: ensure no air in LV or aortic root on TOE (critical for neurological outcomes)</li>
+              <li>Pre-wean checklist: rhythm (defibrillation if VF/AF), pacing available, electrolytes corrected, Hct adequate</li>
+              <li>Commence inotropes if poor LV function anticipated: adrenaline 0.01–0.1 mcg/kg/min ± milrinone for RV dysfunction</li>
+              <li>Wean CPB gradually — perfusionist reduces flow in stepwise fashion; anaesthetist monitors MAP, CVP, TOE continuously</li>
+              <li>Post-wean TOE: confirm new RWMA in grafted territories (should improve vs pre-bypass); assess LV/RV function, valves</li>
+              <li>Protamine reversal of heparin (1 mg per 100 IU heparin given) — administer slowly; watch for anaphylaxis, pulmonary hypertension</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Proximal anastomoses to ascending aorta: partial side-biting clamp (Satinsky); aortotomy with punch device; vein grafts anastomosed end-to-side with 6-0 prolene</li>
+              <li>Cross-clamp removed — heart reperfuses; may fibrillate (expect and prepare for internal defibrillation if needed)</li>
+              <li>Assess graft function: Doppler flow probe on each graft; confirm pulsatile high flow through each conduit</li>
+              <li>Transit-time flow measurement (TTFM) on all grafts — values documented; inadequate flow requires investigation</li>
+              <li>De-air ascending aorta via aortic root vent before coming off bypass</li>
+              <li>Once off CPB: assess haemostasis from anastomotic sites, cannulation sites, LIMA bed</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 7 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">07</span>
+        <span class="stage-name">Decannulation, Haemostasis & Closure</span>
+        <div class="stage-tags"></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Monitor coagulation: TEG/ROTEM or conventional (PT, APTT, fibrinogen, platelets); treat coagulopathy guided by results</li>
+              <li>Transfuse: PRBCs if Hct &lt;24, FFP if coagulopathy, cryoprecipitate if fibrinogen &lt;1.5, platelets if &lt;80 or dysfunctional (post-bypass)</li>
+              <li>Antifibrinolytic administration if not given pre-bypass (TXA — usually given pre-CPB; re-dose if significant bleeding)</li>
+              <li>Maintain MAP 65–75 with vasopressors; avoid hypertension (suture line tension) and hypotension</li>
+              <li>Chest drain monitoring: &gt;200 mL/hr for 2+ consecutive hours = surgical re-exploration threshold</li>
+              <li>Analgesia planning: intrathecal morphine if given pre-op, epidural if placed, systemic opioid + paracetamol + NSAID if applicable</li>
+              <li>Prepare for transfer: ICU notification with handover details including bypass time, cross-clamp time, graft function, current infusions</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Remove venous cannula; close RA purse-strings; decannulate aorta; close aortic purse-strings</li>
+              <li>Temporary pacing wires placed (epicardial, atrial ± ventricular) in all patients — sutured to myocardium</li>
+              <li>Mediastinal and pleural drains placed (28–32 Fr); positioned to drain pericardium and left pleura if entered</li>
+              <li>Meticulous haemostasis: cautery, prolene sutures to bleeding points, topical haemostatic agents (Surgicel, Floseal)</li>
+              <li>Sternal closure: stainless steel wires (typically 6–8) through or around sternum; figure-of-eight or single loop technique</li>
+              <li>Layered soft tissue closure: sternal fascia, subcutaneous, skin (staples or subcuticular suture)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <div class="notes-title">Key Anaesthetic Pharmacology — CABG</div>
+      <div class="drug-grid">
+        <div class="drug-card">
+          <div class="drug-name">Heparin</div>
+          <div class="drug-use">300–400 IU/kg IV before cannulation; ACT target &gt;480 sec on CPB; reversed with protamine post-CPB</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Tranexamic Acid</div>
+          <div class="drug-use">1g IV loading dose + 1g infusion; reduces fibrinolysis and transfusion requirement; give before incision</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Cardioplegia</div>
+          <div class="drug-use">High K⁺ solution (St Thomas', del Nido, Custodiol) to arrest heart; cold or tepid; antegrade ± retrograde</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Milrinone</div>
+          <div class="drug-use">PDE3 inhibitor; inodilator — improves RV function, reduces pulmonary vascular resistance; 0.375–0.75 mcg/kg/min</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Adrenaline</div>
+          <div class="drug-use">First-line inotrope post-CPB; 0.01–0.1 mcg/kg/min; titrated to CO and MAP</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Vasopressin</div>
+          <div class="drug-use">0.03–0.04 units/min; vasopressor of choice when systemic vasodilation is prominent (post-CPB vasoplegia)</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end CABG -->
+
+
+  <!-- ==================== BENTALL ==================== -->
+  <div class="procedure" id="proc-bentall">
+
+    <div class="procedure-header">
+      <div class="procedure-title bentall">Bentall Procedure</div>
+      <p class="procedure-desc">Composite replacement of the aortic valve, aortic root, and ascending aorta using a valved conduit graft, with reimplantation of coronary ostia. Indicated for aortic root aneurysm ± aortic regurgitation. Duration 4–7 hours. Significantly higher complexity than isolated CABG.</p>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot anaes"></div> Anaesthetist</div>
+      <div class="legend-item"><div class="legend-dot surg"></div> Cardiac Surgeon</div>
+    </div>
+
+    <div class="alert-box info" style="margin-bottom:1.5rem;border-radius:6px;">
+      <strong>Clinical Context</strong>The Bentall is typically performed for: Marfan syndrome root aneurysm, bicuspid aortic valve with root dilatation, aortic dissection involving the root (Type A), or isolated root aneurysm with or without AR. The haemodynamic and technical challenges substantially exceed an isolated CABG.
+    </div>
+
+    <!-- Stage 1 -->
+    <div class="stage open" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">01</span>
+        <span class="stage-name">Pre-operative Assessment & Preparation</span>
+        <div class="stage-tags"><span class="tag induction">PRE-OP</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Review CT aorta (root diameter, extent of aneurysm, coronary ostia heights, arch involvement) and echo (AR severity, LV function, aortic stenosis if bicuspid)</li>
+              <li>Identify AR-related physiology: dilated LV, eccentric LV hypertrophy, preserved or depressed EF — adapt haemodynamic targets accordingly</li>
+              <li>In severe chronic AR: LV is volume-loaded and often dilated; may handle hypotension poorly; avoid bradycardia (increases regurgitant fraction)</li>
+              <li>In acute Type A dissection: dramatically higher haemodynamic instability; may have tamponade, coronary malperfusion — true emergency</li>
+              <li>Bilateral radial arterial lines (left arm and right arm): required if the aneurysm or dissection may compromise the innominate artery; radial pressures may diverge</li>
+              <li>Right femoral arterial line as backup in complex dissections; femoral venous access if bilateral upper limb compromised</li>
+              <li>Advanced neuromonitoring if circulatory arrest planned: cerebral NIRS (bilateral), EEG, consider retrograde or antegrade cerebral perfusion plan</li>
+              <li>Deep hypothermic circulatory arrest (DHCA) may be needed if arch is involved — discuss with surgeon; temps target 15–20°C; neuroprotection: steroids, mannitol, ice packs to head, thiopentone</li>
+              <li>Large bore access (8Fr introducer), consider femoral venous for CPB venous drainage if emergency</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Detailed review of CT: root diameter, sinotubular junction, coronary ostia position, extent of dilation (need for hemiarch or arch replacement?)</li>
+              <li>Select conduit: mechanical valved conduit (St Jude, ATS), bioprosthetic conduit (Freestyle, Hancock), or valve-sparing root replacement (David or Yacoub) if AR is functional with preserved leaflets</li>
+              <li>Plan coronary reimplantation strategy: standard button technique (Cabrol reserved for low ostia or redo)</li>
+              <li>Discuss CPB and circulatory arrest plan with perfusionist: cannulation strategy, cooling targets, cerebral protection method</li>
+              <li>In Type A dissection: urgent — consent on table, may bypass imaging; plan for femoral or axillary cannulation if ascending aorta unsafe</li>
+              <li>Ensure hybrid room or have availability of aortic stent grafts if arch involvement is suspected</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 2 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">02</span>
+        <span class="stage-name">Induction & Intubation</span>
+        <div class="stage-tags"><span class="tag induction">INDUCTION</span><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ Extreme haemodynamic sensitivity</strong>In significant AR, diastolic blood pressure is already low. MAP drops during induction can precipitate coronary ischaemia (coronary filling occurs in diastole — already compromised). In aneurysm patients, avoid hypertension and tachycardia which increase wall stress (law of Laplace).</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Maintain HR 80–90 in severe AR (faster HR reduces diastolic time and regurgitant fraction) — contrast with CABG where slow HR is preferred</li>
+              <li>Vasodilator infusion running: SNP or GTN to offload LV if hypertensive; avoid afterload increases</li>
+              <li>Induction: high-dose opioid (fentanyl 10–15 mcg/kg), etomidate (haemodynamically stable) or careful ketamine — avoid propofol boluses in severely dilated LV</li>
+              <li>Intraaortic balloon pump (IABP) contraindicated in significant AR — augments diastole and worsens regurgitation</li>
+              <li>TOE immediately post-intubation: quantify AR, measure root, assess LV size and function, confirm no new RWMA, look for dissection flap extension</li>
+              <li>Target MAP: 65–80 mmHg; avoid hypertension (&gt;100 MAP) prior to aortic clamping — risks propagation of dissection or rupture</li>
+              <li>Bilateral NIRS probes confirmed and baseline recorded</li>
+              <li>In dissection: femoral arterial line pressure may reflect true lumen vs false lumen — correlate bilateral readings</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Present and immediately available — any arrest requires emergent sternotomy; in dissection, patient may deteriorate rapidly</li>
+              <li>Confirms imaging on screen, conduit selected, perfusionist primed</li>
+              <li>In acute dissection: team may scrub during induction to save time</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">03</span>
+        <span class="stage-name">Sternotomy & Pericardiotomy</span>
+        <div class="stage-tags"><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ Dissection-specific risk</strong>In Type A dissection, opening the pericardium may release tamponade suddenly — blood floods out, cardiac output may temporarily improve then collapse. Have perfusionist ready to go immediately on CPB upon pericardial entry. Volume bolus ready.</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Brief apnoea for sternal saw; vigilant at sternotomy for haemopericardium in dissection cases</li>
+              <li>In haemopericardium/tamponade: prepare for immediate haemodynamic decompensation and rapid CPB institution</li>
+              <li>Vasopressors running; blood products immediately available if dissection patient</li>
+              <li>Maintain communication with surgeon regarding aortic size and fragility — manipulations can precipitate rupture</li>
+              <li>Cell saver circuit active — expect significant blood loss</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Sternotomy with particular caution: aneurysm may be adherent to the sternum — oscillating saw used carefully; hand on sternum for vibration feedback</li>
+              <li>In redo: even higher risk of cardiac adherence; consider femoral cannulation before sternotomy</li>
+              <li>Pericardium opened carefully: assess for haemopericardium, size of aneurysm, degree of root involvement</li>
+              <li>Identify and protect phrenic nerves (both sides); note RV anatomy and adhesions</li>
+              <li>Assess aortic anatomy under direct vision: confirm extent of repair needed, whether arch is involved</li>
+              <li>Decision: if hemiarch replacement needed → plan for DHCA and circulatory arrest</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 4 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">04</span>
+        <span class="stage-name">Cannulation & CPB — Cooling for DHCA if Required</span>
+        <div class="stage-tags"><span class="tag cpb">ON CPB</span><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Confirm ACT &gt;480 before cannulation; repeat heparin dosing as needed</li>
+              <li>Cannulation strategy (with surgeon): arterial may be femoral (if ascending unsafe), right axillary (preferred in dissection — provides true lumen perfusion and antegrade cerebral perfusion potential), or distal ascending if safe</li>
+              <li>Cease ventilation once full CPB flow; communicate with perfusionist regarding flow targets</li>
+              <li>If DHCA planned: begin active cooling to 15–18°C nasopharyngeal; minimum 20–30 min cooling before arrest</li>
+              <li>Neuroprotection protocol for circulatory arrest: methylprednisolone 500mg–1g IV, mannitol 0.5 g/kg, ice packs to head, thiopentone 3–5 mg/kg (burst suppression on EEG)</li>
+              <li>NIRS monitoring: bilateral NIRS must remain &gt;50% and not drop &gt;20% from baseline; if falls, alert surgeon — adjust cannula, consider antegrade cerebral perfusion (ACP)</li>
+              <li>Cerebral oximetry and EEG correlate reasonably well; burst suppression confirms adequate barbiturate loading before circulatory arrest</li>
+              <li>Coordinate temperature targets precisely with perfusionist: gradients between nasopharyngeal and bladder must equilibrate before arrest</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Arterial cannulation: femoral or axillary (purse-strings, Seldinger, confirm position with TEE in false/true lumen) or distal ascending aorta</li>
+              <li>Venous cannulation: bicaval or single two-stage RA cannula</li>
+              <li>Full CPB initiated; confirm adequate decompression of heart</li>
+              <li>Aortic cross-clamp: placed as distal as possible on ascending aorta proximal to aneurysm; some cases the cross-clamp is applied at the arch</li>
+              <li>Cardioplegia: cold blood or del Nido delivered directly into coronary ostia (aortic root cannot be used for antegrade cardioplegia as it will be excised); retrograde via coronary sinus is standard</li>
+              <li>Cooling phase used to mobilise structures, identify coronary buttons (especially left coronary which can be in awkward position in root aneurysm)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 5 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">05</span>
+        <span class="stage-name">Aortic Root Excision & Coronary Button Mobilisation</span>
+        <div class="stage-tags"><span class="tag cpb">ON CPB</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Maintain cardiac arrest conditions; coordinate cardioplegia delivery every 15–20 min (into coronary ostia directly once root is open)</li>
+              <li>Monitor and maintain MAP 50–65 on CPB; adjust vasodilators/vasopressors with perfusionist</li>
+              <li>Ongoing blood gas and ACT monitoring; haematological support as needed</li>
+              <li>Minimal direct intervention during root work; main role is maintaining stable bypass conditions and vigilance for circuit issues</li>
+              <li>Ensure TOE probe is not impeding surgical access — may temporarily retract to neutral</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Aortotomy: transverse incision at or just above the sinotubular junction; opened circumferentially to expose valve and sinuses of Valsalva</li>
+              <li>Aortic valve excised: leaflets removed; annulus sized with valve sizer</li>
+              <li>Coronary ostia mobilised as "buttons": careful full-thickness circular buttons of aortic wall taken around each coronary ostium (left and right), maintaining 5–10mm of surrounding tissue; meticulous technique to avoid injury to the LCA or RCA</li>
+              <li>Root excision: aneurysmal sinuses of Valsalva excised, leaving only coronary buttons and the aortic annulus; care with left coronary which is immediately adjacent to the pulmonary artery</li>
+              <li>Annulus inspected and cleared; haemostatic sutures placed if needed around annulus for bleeding points</li>
+              <li>Measure distance from annulus to coronary ostia — critical for conduit sizing and positioning</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 6 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">06</span>
+        <span class="stage-name">Conduit Implantation & Coronary Reimplantation</span>
+        <div class="stage-tags"><span class="tag cpb">ON CPB</span><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ Most technically demanding phase</strong>Coronary button reimplantation is the most technically exacting part of the Bentall. Tension, kinking, or torsion of a coronary button = perioperative MI. The right coronary button is particularly at risk given the geometry required.</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Maintain cardiac arrest; coordinate cardioplegia delivery into coronary buttons as instructed by surgeon</li>
+              <li>After button reimplantation, surgeon will test each coronary for haemostasis — prepare for protracted cross-clamp time; communicate with perfusionist regarding time and temperature</li>
+              <li>Anticipate higher transfusion requirements: large anastomotic surface area, coagulopathy from prolonged CPB</li>
+              <li>TEG/ROTEM drawn before coming off bypass — get ahead of coagulopathy</li>
+              <li>Begin preparation for coming off bypass: inotropes drawn (adrenaline, milrinone), vasopressors, pacing discussed with surgeon</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Conduit seated at aortic annulus: horizontal mattress sutures (braided 2-0 Ethibond ± pledgets) circumferentially through annulus and into sewing ring of conduit; tied sequentially</li>
+              <li>Conduit oriented correctly: mechanical valve orientation must allow for leaflet opening without coronary ostial obstruction</li>
+              <li>Left coronary button anastomosis: hole punched in conduit at appropriate level and position; end-to-side anastomosis with continuous 5-0 prolene; tension-free, no rotation</li>
+              <li>Right coronary button: more technically challenging due to distance and geometry; may require creative positioning; extension using saphenous vein segment occasionally needed (Cabrol-like modification)</li>
+              <li>Inspect both coronary anastomoses under magnification: confirm no narrowing, no tension, no twist</li>
+              <li>Distal aortic anastomosis: conduit sutured to distal ascending aorta (or arch if hemiarch replacement performed) with running 4-0 prolene; Teflon felt reinforcement of aortic wall if fragile (dissection, Marfan)</li>
+              <li>If DHCA required for arch: circulatory arrest declared at this point — co-ordinate with anaesthetist and perfusionist</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 7 — DHCA -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">07</span>
+        <span class="stage-name">Deep Hypothermic Circulatory Arrest (if hemiarch/arch)</span>
+        <div class="stage-tags"><span class="tag critical">DHCA</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ Maximum risk period</strong>DHCA &gt;30 minutes dramatically increases stroke, cognitive dysfunction, and multi-organ failure risk. Every minute counts. Safe DHCA window at 18°C nasopharyngeal is approximately 30 mins. ACP extends this to 40–60 mins.</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Confirm all neuroprotection agents administered (thiopentone burst suppression confirmed on EEG, steroids given, mannitol given, ice to head)</li>
+              <li>Confirm nasopharyngeal ≤18°C and temperature equilibration between nasopharyngeal and bladder probes</li>
+              <li>Communicate arrest time to perfusionist and surgeon; start the clock</li>
+              <li>During DHCA: no ventilation, no CPB flow; monitor NIRS continuously — values should remain stable or improve (circulatory demand is near zero at this temperature)</li>
+              <li>Antegrade cerebral perfusion (ACP) if planned: 10 mL/kg/min via axillary artery or direct cannulation of innominate + left carotid; NIRS must remain &gt;50%</li>
+              <li>Time updates to surgeon every 5 minutes from start of arrest</li>
+              <li>Resume CPB immediately when surgeon signals — confirm flow, re-commence cooling or rewarming as appropriate</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Venous drainage cannula removed from RA; head of table slightly elevated to reduce cerebral venous engorgement</li>
+              <li>Opened aortic arch: transverse arch opened; identify arch vessels (innominate, left carotid, left subclavian) from inside</li>
+              <li>Hemiarch or total arch repair: felt-reinforced anastomosis of conduit or graft to arch/hemiarch using continuous prolene; island or branched graft technique for total arch</li>
+              <li>Speed is paramount: every minute in arrest is brain ischaemia (even with ACP, deep hypothermia is a limited resource)</li>
+              <li>De-air aortic arch before reperfusion — pack with CO₂ (heavier, displaces air from open aorta), direct suction of air through vent</li>
+              <li>Signal to resume CPB when arch repair completed</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 8 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">08</span>
+        <span class="stage-name">Rewarming, Weaning from CPB & De-airing</span>
+        <div class="stage-tags"><span class="tag cpb">CPB WEAN</span><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Active rewarming from perfusionist: slow rewarming (avoid rapid rewarming — neurological injury from temperature gradients); no more than 10°C gradient between perfusate and nasopharyngeal</li>
+              <li>Rewarming from DHCA requires longer time than elective CABG — 30–60 min to reach normothermia</li>
+              <li>Recommence ventilation once heart begins to move; confirm bilateral air entry</li>
+              <li>Aggressive de-airing on TOE: visualise all cardiac chambers; air in ascending aorta, LV apex, pulmonary veins — alert surgeon to de-air accordingly (vents, needle venting of aorta)</li>
+              <li>Inotropes: likely need higher doses than CABG; adrenaline ± milrinone; consider vasopressin for vasoplegia (common after prolonged CPB/DHCA)</li>
+              <li>Post-CPB TOE: carefully assess valve function (mechanical valve: confirm leaflet opening, no perivalvular leak, LVOT obstruction); coronary button flows (new RWMA in LAD or RCA territory = coronary compromise); RV function (often impaired after DHCA)</li>
+              <li>Protamine administration: same dosing; extra caution — watch for pulmonary hypertension (common after prolonged CPB)</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Cross-clamp removal: heart reperfuses through reimplanted coronary buttons — this is the test of button integrity</li>
+              <li>Observe: ECG for ST changes (coronary compromise), heart rhythm (VF expected and acceptable transiently), LV wall motion on TOE</li>
+              <li>Internal defibrillation if required: 20J internal paddles directly on ventricles</li>
+              <li>Inspect all anastomotic suture lines for haemostasis while on CPB (identifies problems before protamine)</li>
+              <li>Aortic root filled with blood — de-air via needle venting of distal aorta and conduit; coordinate with anaesthetist</li>
+              <li>Temporary epicardial pacing wires (atrial and ventricular): essential post-Bentall as AV node is at risk from root work and oedema</li>
+              <li>Heart rate management: pacing backup essential; complete heart block can occur after root replacement</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 9 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">09</span>
+        <span class="stage-name">Decannulation, Haemostasis & Closure</span>
+        <div class="stage-tags"></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ Coagulopathy risk</strong>After prolonged CPB ± DHCA, coagulopathy is almost universal. The anastomotic surface of a Bentall is extensive. Expect surgical re-exploration rates of 5–10%. ROTEM/TEG-guided product replacement is mandatory.</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>ROTEM/TEG-guided transfusion: treat each defect specifically — FFP for clotting factor deficiency (EXTEM CT prolonged), cryoprecipitate for fibrinogen &lt;1.5 (FIBTEM A10 &lt;8mm), platelets for thrombocytopenia (&lt;80) or dysfunction (ROTEM amplitude low)</li>
+              <li>PCC (prothrombin complex concentrate) if massive coagulopathy and FFP inadequate; factor VIIa as last resort</li>
+              <li>Protamine: given slowly; especially careful after DHCA — pulmonary vasoreactivity is high; have vasodilator (GTN) and vasopressor (vasopressin) ready</li>
+              <li>Mechanical valve: confirm anticoagulation plan; heparin infusion commenced in ICU within hours of surgery; target INR 2.5–3.5 with warfarin long term</li>
+              <li>TOE final sweep: valve function, no perivalvular leak, LV/RV function, no pericardial effusion</li>
+              <li>ICU handover: CPB/DHCA total time, cross-clamp time, coronary button reimplantation, valve type and size, current haemodynamic support, anticoagulation plan, pacing requirements, neurological monitoring baseline</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Systematic haemostasis: all suture lines inspected — conduit-to-annulus, coronary buttons (right then left), distal anastomosis, felt reinforcement lines</li>
+              <li>Haemostatic agents liberally applied: Floseal at root, Surgicel at felt margins, BioGlue occasionally at felt-reinforced suture lines in dissection</li>
+              <li>Pericardial wrap of conduit: some surgeons wrap the conduit with pericardium to reduce pseudoaneurysm risk at coronary button sites; others leave open</li>
+              <li>Generous drain placement: mediastinal drains ×2, bilateral pleural if opened; atrial and ventricular pacing leads</li>
+              <li>Sternal closure: standard wire technique; extra care in Marfan (sternal quality may be poor) — may use Robicsek technique (figure-of-eight cross-wires) for added security</li>
+              <li>Layered wound closure; subcutaneous drain if desired</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <div class="notes-title">Key Bentall-Specific Considerations</div>
+      <div class="drug-grid">
+        <div class="drug-card">
+          <div class="drug-name">Neuroprotection (DHCA)</div>
+          <div class="drug-use">Thiopentone (burst suppression), methylprednisolone, mannitol 0.5g/kg, ice packs to head, NIRS monitoring, ACP if available</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">DHCA Temperature</div>
+          <div class="drug-use">Target nasopharyngeal 15–18°C; bladder equilibration; safe window ~30 mins without ACP, ~60 mins with selective ACP</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Coronary Button Risk</div>
+          <div class="drug-use">New RWMA on TOE post-wean = coronary compromise; RCA button most vulnerable; requires immediate return on CPB and revision</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Complete Heart Block</div>
+          <div class="drug-use">Root work may injure AV node; pacing wires essential; temporary transvenous pacing via introducer as backup; permanent PPM if persistent post-op</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Anticoagulation (Mechanical)</div>
+          <div class="drug-use">Commence heparin infusion 4–6h post-op; bridge to warfarin (INR 2.5–3.5); aspirin 100mg ongoing; high-risk of valve thrombosis if anticoagulation delayed</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Vasoplegic Syndrome</div>
+          <div class="drug-use">Common after prolonged CPB; vasopressin 0.03–0.04 u/min + methylene blue 1.5mg/kg IV if refractory; noradrenaline adjunct; consider hydrocortisone</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end Bentall -->
+
+</div><!-- end main -->
+
+<script>
+  function showProcedure(id, tabEl) {
+    document.querySelectorAll('.procedure').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('proc-' + id).classList.add('active');
+    tabEl.classList.add('active');
+  }
+
+  function toggleStage(el) {
+    el.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

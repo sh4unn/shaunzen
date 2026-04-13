@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Lean Season</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400&family=Noto+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#f4efe4; --parchment:#ede6d6; --warm:#e4dbc8;
+    --teal:#2a6b5e; --teal-light:#3a8a7c; --teal-faint:#e8f4f2;
+    --burnt:#b8511e; --burnt-faint:#faf0ea; --burnt-light:#d4703a;
+    --gold:#9a7820; --ink:#1a1410; --muted:#7a6a5a;
+    --faint:#c4b89e; --border:#d5c9b2;
+    --green:#3a6b3a; --green-faint:#eaf2ea;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--cream); color:var(--ink); font-family:'Noto Sans',sans-serif; min-height:100vh; padding-bottom:4rem; }
+
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--teal); color:var(--cream); text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; opacity:0.85; }
+  .home-btn:hover { background:var(--teal-light); opacity:1; }
+
+  .header { background:var(--burnt); color:var(--cream); padding:2.5rem 2rem 2rem; text-align:center; position:relative; overflow:hidden; }
+  .header::before { content:''; position:absolute; top:-60px; right:-60px; width:300px; height:300px; background:radial-gradient(circle,rgba(244,239,228,0.08),transparent 70%); pointer-events:none; }
+  .header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(244,239,228,0.5); margin-bottom:0.6rem; }
+  .header h1 { font-family:'Noto Serif',serif; font-size:clamp(2rem,6vw,3rem); font-weight:300; letter-spacing:0.05em; margin-bottom:0.3rem; }
+  .header-sub { font-size:0.82rem; color:rgba(244,239,228,0.55); font-style:italic; font-family:'Noto Serif',serif; }
+
+  /* TABS */
+  .tabs { background:var(--burnt-light); display:flex; }
+  .tab { flex:1; padding:0.75rem; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(244,239,228,0.55); cursor:pointer; text-align:center; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; }
+  .tab.active { color:var(--cream); border-bottom-color:var(--cream); }
+  .tab:hover { color:rgba(244,239,228,0.85); }
+
+  main { max-width:640px; margin:0 auto; padding:2rem 1.25rem; }
+  .panel { display:none; } .panel.active { display:block; }
+
+  /* PRESETS */
+  .preset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.6rem; margin-bottom:1.5rem; }
+  .preset-btn { background:var(--parchment); border:1.5px solid var(--border); border-radius:8px; padding:0.85rem 1rem; cursor:pointer; transition:all 0.2s; text-align:center; }
+  .preset-btn:hover { border-color:var(--burnt); background:var(--burnt-faint); }
+  .preset-btn.active { border-color:var(--burnt); background:var(--burnt-faint); }
+  .preset-name { font-size:0.85rem; font-weight:600; color:var(--ink); margin-bottom:0.15rem; }
+  .preset-detail { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); }
+
+  /* SETTINGS */
+  .setup-card { background:var(--parchment); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+  .setup-title { font-family:'Noto Serif',serif; font-size:1rem; color:var(--burnt); margin-bottom:1.25rem; font-weight:400; }
+  .setup-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .setup-item { display:flex; flex-direction:column; gap:0.4rem; }
+  .setup-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); }
+  .stepper { display:flex; align-items:center; }
+  .step-btn { width:44px; height:44px; border:1px solid var(--border); background:var(--cream); color:var(--ink); font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.15s; flex-shrink:0; }
+  .step-btn:first-child { border-radius:6px 0 0 6px; }
+  .step-btn:last-child { border-radius:0 6px 6px 0; }
+  .step-btn:hover { background:var(--warm); }
+  .step-val { flex:1; height:44px; border:1px solid var(--border); border-left:0; border-right:0; background:white; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:1rem; color:var(--ink); display:flex; align-items:center; justify-content:center; min-width:48px; user-select:none; }
+
+  /* TIMER */
+  .timer-card { background:var(--parchment); border:1px solid var(--border); border-radius:12px; padding:2rem 1.5rem; margin-bottom:1.5rem; text-align:center; transition:background 0.4s, border-color 0.4s; }
+  .timer-card.working { background:var(--burnt-faint); border-color:#daa090; }
+  .timer-card.resting { background:var(--teal-faint); border-color:#90c0b8; }
+  .timer-card.done { background:var(--green-faint); border-color:#90c090; }
+  .timer-phase { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:var(--faint); margin-bottom:0.5rem; transition:color 0.3s; }
+  .timer-card.working .timer-phase { color:var(--burnt); }
+  .timer-card.resting .timer-phase { color:var(--teal); }
+  .timer-card.done .timer-phase { color:var(--green); }
+  .timer-display { font-family:'IBM Plex Mono',monospace; font-size:clamp(4rem,18vw,7rem); font-weight:400; line-height:1; color:var(--ink); letter-spacing:-0.02em; margin-bottom:0.5rem; transition:color 0.3s; }
+  .timer-card.working .timer-display { color:var(--burnt); }
+  .timer-card.resting .timer-display { color:var(--teal); }
+  .timer-card.done .timer-display { color:var(--green); }
+  .progress-wrap { background:var(--border); border-radius:4px; height:5px; margin-bottom:1rem; overflow:hidden; }
+  .progress-bar { height:100%; border-radius:4px; background:var(--burnt); transition:width 0.9s linear, background 0.3s; }
+  .timer-card.resting .progress-bar { background:var(--teal); }
+  .round-info { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:0.1em; margin-bottom:0.3rem; }
+
+  /* CURRENT EXERCISE DISPLAY */
+  .current-ex { background:var(--burnt-faint); border:1px solid #daa090; border-radius:8px; padding:0.9rem 1rem; margin-bottom:1.5rem; display:none; }
+  .current-ex.show { display:block; }
+  .current-ex.resting { background:var(--teal-faint); border-color:#90c0b8; }
+  .current-ex-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--faint); margin-bottom:0.3rem; }
+  .current-ex-name { font-family:'Noto Serif',serif; font-size:1.2rem; font-weight:400; color:var(--burnt); margin-bottom:0.2rem; }
+  .current-ex.resting .current-ex-name { color:var(--teal); }
+  .current-ex-hint { font-size:0.8rem; color:var(--muted); font-style:italic; font-family:'Noto Serif',serif; line-height:1.5; }
+
+  /* BIG BUTTONS */
+  .btn-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.85rem; margin-bottom:1.5rem; }
+  .big-btn { border:none; border-radius:10px; padding:1.25rem 0.5rem; font-family:'Noto Sans',sans-serif; font-size:1rem; font-weight:600; cursor:pointer; transition:transform 0.1s, background 0.2s, opacity 0.2s; letter-spacing:0.02em; -webkit-tap-highlight-color:transparent; }
+  .big-btn:active { transform:scale(0.96); }
+  .big-btn:disabled { opacity:0.35; cursor:not-allowed; }
+  .btn-start { background:var(--teal); color:var(--cream); }
+  .btn-start:hover:not(:disabled) { background:var(--teal-light); }
+  .btn-pause { background:var(--gold); color:var(--cream); }
+  .btn-pause:hover:not(:disabled) { background:#b89028; }
+  .btn-reset { background:var(--warm); color:var(--ink); border:1px solid var(--border); }
+  .btn-reset:hover:not(:disabled) { background:var(--border); }
+  .btn-skip { background:var(--burnt); color:var(--cream); }
+  .btn-skip:hover:not(:disabled) { background:var(--burnt-light); }
+  .full-col { grid-column:1/-1; }
+
+  /* EXERCISE LIST TAB */
+  .ex-list-wrap { display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1.25rem; }
+
+  .ex-card { background:var(--parchment); border:1px solid var(--border); border-radius:8px; overflow:hidden; transition:border-color 0.2s; }
+  .ex-card.active-ex { border-color:var(--burnt); }
+  .ex-card.checked .ex-header { opacity:0.55; }
+
+  .ex-header { display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem; cursor:pointer; user-select:none; transition:background 0.15s; }
+  .ex-header:hover { background:var(--warm); }
+
+  .ex-num { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); width:18px; flex-shrink:0; }
+  .ex-name { font-size:0.9rem; font-weight:500; flex:1; color:var(--ink); }
+  .ex-card.active-ex .ex-name { color:var(--burnt); }
+  .ex-chevron { font-size:0.7rem; color:var(--faint); transition:transform 0.25s; }
+  .ex-card.open .ex-chevron { transform:rotate(180deg); }
+
+  .ex-body { display:none; padding:0.75rem 1rem 1rem 2.75rem; border-top:1px solid var(--border); }
+  .ex-card.open .ex-body { display:block; }
+  .ex-desc { font-family:'Noto Serif',serif; font-style:italic; font-size:0.83rem; color:var(--muted); line-height:1.65; margin-bottom:0.5rem; }
+  .ex-cues { list-style:none; display:flex; flex-direction:column; gap:0.3rem; }
+  .ex-cues li { font-size:0.8rem; color:var(--muted); padding-left:0.75rem; position:relative; }
+  .ex-cues li::before { content:'—'; position:absolute; left:0; color:var(--border); }
+  .ex-del { margin-top:0.6rem; background:none; border:1px solid var(--border); color:var(--faint); border-radius:4px; padding:0.2rem 0.6rem; font-size:0.75rem; cursor:pointer; font-family:'IBM Plex Mono',monospace; transition:all 0.2s; }
+  .ex-del:hover { border-color:var(--burnt); color:var(--burnt); }
+
+  .add-ex-row { display:flex; gap:0.5rem; }
+  .add-ex-input { flex:1; background:white; border:1px solid var(--border); border-radius:6px; padding:0.6rem 0.85rem; font-family:'Noto Sans',sans-serif; font-size:0.85rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .add-ex-input:focus { border-color:var(--burnt); }
+  .add-ex-input::placeholder { color:var(--faint); }
+  .btn-sm { background:var(--burnt); color:var(--cream); border:none; border-radius:6px; padding:0.6rem 1rem; font-family:'Noto Sans',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; transition:background 0.2s; }
+  .btn-sm:hover { background:var(--burnt-light); }
+
+  .section-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--faint); margin-bottom:0.85rem; }
+</style>
+</head>
+<body>
+
+<a class="home-btn" href="index.html">← Home</a>
+
+<div class="header">
+  <div class="header-label">Interval Timer</div>
+  <h1>Lean Season</h1>
+  <div class="header-sub">Kettlebell & bodyweight interval training</div>
+</div>
+
+<nav class="tabs">
+  <div class="tab active" onclick="showTab('timer',this)">Timer</div>
+  <div class="tab" onclick="showTab('exercises',this)">Exercises</div>
+</nav>
+
+<main>
+
+  <!-- TIMER TAB -->
+  <div class="panel active" id="panel-timer">
+
+    <div class="preset-grid">
+      <div class="preset-btn active" onclick="loadPreset(this,40,20,6,60)"><div class="preset-name">Kettlebell</div><div class="preset-detail">40s / 20s · 6 rounds</div></div>
+      <div class="preset-btn" onclick="loadPreset(this,20,10,8,60)"><div class="preset-name">Tabata</div><div class="preset-detail">20s / 10s · 8 rounds</div></div>
+      <div class="preset-btn" onclick="loadPreset(this,45,15,5,90)"><div class="preset-name">Bodyweight</div><div class="preset-detail">45s / 15s · 5 rounds</div></div>
+      <div class="preset-btn" onclick="loadPreset(this,30,30,4,60)"><div class="preset-name">Easy Pace</div><div class="preset-detail">30s / 30s · 4 rounds</div></div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-title">Settings</div>
+      <div class="setup-grid">
+        <div class="setup-item">
+          <div class="setup-label">Work (sec)</div>
+          <div class="stepper">
+            <button class="step-btn" onclick="adj('work',-5)">−</button>
+            <div class="step-val" id="workVal">40</div>
+            <button class="step-btn" onclick="adj('work',5)">+</button>
+          </div>
+        </div>
+        <div class="setup-item">
+          <div class="setup-label">Rest (sec)</div>
+          <div class="stepper">
+            <button class="step-btn" onclick="adj('rest',-5)">−</button>
+            <div class="step-val" id="restVal">20</div>
+            <button class="step-btn" onclick="adj('rest',5)">+</button>
+          </div>
+        </div>
+        <div class="setup-item">
+          <div class="setup-label">Rounds</div>
+          <div class="stepper">
+            <button class="step-btn" onclick="adj('rounds',-1)">−</button>
+            <div class="step-val" id="roundsVal">6</div>
+            <button class="step-btn" onclick="adj('rounds',1)">+</button>
+          </div>
+        </div>
+        <div class="setup-item">
+          <div class="setup-label">Between rounds</div>
+          <div class="stepper">
+            <button class="step-btn" onclick="adj('roundRest',-5)">−</button>
+            <div class="step-val" id="roundRestVal">60</div>
+            <button class="step-btn" onclick="adj('roundRest',5)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timer-card" id="timerCard">
+      <div class="timer-phase" id="timerPhase">Ready</div>
+      <div class="timer-display" id="timerDisplay">00:40</div>
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:100%"></div></div>
+      <div class="round-info" id="roundInfo">Round 1 of 6</div>
+    </div>
+
+    <!-- CURRENT EXERCISE POPUP -->
+    <div class="current-ex" id="currentEx">
+      <div class="current-ex-label" id="currentExLabel">Now</div>
+      <div class="current-ex-name" id="currentExName"></div>
+      <div class="current-ex-hint" id="currentExHint"></div>
+    </div>
+
+    <div class="btn-grid" id="btnGrid">
+      <button class="big-btn btn-start full-col" onclick="startTimer()">Start</button>
+    </div>
+
+  </div>
+
+  <!-- EXERCISES TAB -->
+  <div class="panel" id="panel-exercises">
+    <div class="section-label" id="exCount"></div>
+    <div class="ex-list-wrap" id="exListWrap"></div>
+    <div class="add-ex-row">
+      <input type="text" class="add-ex-input" id="newExName" placeholder="Add exercise name…" onkeydown="if(event.key==='Enter')addExercise()">
+      <button class="btn-sm" onclick="addExercise()">Add</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  let settings = { work:40, rest:20, rounds:6, roundRest:60 };
+  let timer = { running:false, paused:false, phase:'idle', round:1, setIdx:0, timeLeft:0, totalTime:0, iv:null };
+  let currentExIdx = 0;
+
+  const EXERCISES = [
+    { name:'Kettlebell Swing', desc:'The foundation of kettlebell training. Hinge at the hips, drive with the glutes.', cues:['Hinge deep at hips, not a squat','Drive hips forward explosively to start the swing','Arms stay loose — let the bell float to chest height','Snap hips and brace abs at the top','Control the descent back between the legs'] },
+    { name:'Goblet Squat', desc:'A quad and glute builder that teaches perfect squat mechanics.', cues:['Hold bell at chest with both hands','Feet shoulder-width, toes slightly out','Squat deep, elbows track inside knees','Chest stays tall, don\'t round the back','Drive through heels to stand'] },
+    { name:'Push Press', desc:'An overhead press with a hip dip to move more weight overhead.', cues:['Bell in rack position at shoulder','Slight dip at the knees — not a full squat','Drive hips up fast to launch the bell','Lock out arm overhead, ear by bicep','Lower under control back to rack'] },
+    { name:'Turkish Get-Up', desc:'A slow, full-body movement that builds shoulder stability and total-body coordination.', cues:['Start lying down, bell pressed above shoulder','Keep eyes on the bell the entire time','Push to elbow, then to hand, then sweep leg through','Stand fully, then reverse each step','Move slowly — this is skill work, not cardio'] },
+    { name:'Renegade Row', desc:'A plank-based row that builds back and core simultaneously.', cues:['Plank position with hands on bells','Feet wide for stability','Row one bell to hip, elbow tight to body','Don\'t rotate the hips — stay square','Alternate sides each rep'] },
+    { name:'Clean to Rack', desc:'Moves the bell from the floor to the rack position in one smooth arc.', cues:['Start in hinge, bell between feet','Drive hips, guide bell close to body','Punch hand through at the top — don\'t flip the bell','Bell lands softly in rack on forearm','No bruised wrists — keep it close'] },
+    { name:'Burpees', desc:'Full body conditioning. No equipment needed, maximum output.', cues:['From standing, drop hands to floor','Jump or step feet back to plank','Chest to floor optional for harder variation','Jump feet forward between hands','Explode up and clap overhead'] },
+    { name:'Single-Leg Deadlift', desc:'A balance and posterior chain challenge in one movement.', cues:['Hinge at hip on one leg, bell in opposite hand','Keep hips square — don\'t let them open','Back leg lifts as chest lowers','Spine stays neutral throughout','Drive standing heel into floor to return'] },
+    { name:'Push-Up', desc:'The classic. Full range of motion, no shortcuts.', cues:['Hands slightly wider than shoulders','Body forms a straight plank line','Lower chest to floor — no sagging hips','Elbows at 45 degrees, not flared wide','Breathe out on the push'] },
+    { name:'Squat Jump', desc:'Explosive lower body conditioning. Gets the heart rate up fast.', cues:['Feet shoulder-width, squat to parallel','Explode up and leave the ground','Fully extend hips, knees, ankles at the top','Land softly with bent knees','Absorb the landing — don\'t crash down'] },
+    { name:'Hollow Body Hold', desc:'A gymnastic core drill that builds anti-extension strength.', cues:['Lie on back, lower back pressed flat','Arms reach overhead, legs lifted','The lower your legs, the harder it is','Do not let your lower back arch off the floor','Breathe slowly — this is an isometric hold'] },
+    { name:'Alternating Lunge', desc:'Single-leg strength and balance with a full hip extension.', cues:['Step forward into a long stride','Back knee hovers just off the floor','Front shin stays vertical over ankle','Drive through the front heel to return','Keep torso tall and upright throughout'] },
+    { name:'Dead Clean', desc:'Bell starts from a dead stop on the floor each rep. More demanding than a swing clean.', cues:['Bell on floor between feet','Hinge, grip, take the slack out','Lat tension before you pull — don\'t yank','Bell travels close to body in an arc','Land softly in rack, reset each rep'] },
+    { name:'Mountain Climbers', desc:'A dynamic core and cardio movement in a plank.', cues:['Start in a solid plank position','Drive one knee toward chest','Alternate fast or slow for different stimulus','Hips stay down — don\'t pike up','Breathe rhythmically, keep pace consistent'] },
+    { name:'Windmill', desc:'A lateral flexion movement that builds shoulder stability and hip flexibility.', cues:['Bell pressed overhead in one hand','Feet at 45 degrees to that arm','Push hip out to the side as you hinge','Eyes on the bell at all times','Lower hand slides down the inner leg — don\'t reach for the floor'] },
+  ];
+
+  let exercises = EXERCISES.map(e => ({...e}));
+
+  // ── TIMER ──
+
+  function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+  function adj(key, delta) {
+    const mins = {work:5, rest:5, rounds:1, roundRest:5};
+    settings[key] = Math.max(mins[key], settings[key]+delta);
+    document.getElementById(key+'Val').textContent = settings[key];
+    if(timer.phase==='idle') {
+      document.getElementById('timerDisplay').textContent = fmt(settings.work);
+      document.getElementById('roundInfo').textContent = 'Round 1 of ' + settings.rounds;
+    }
+  }
+
+  function loadPreset(el, work, rest, rounds, roundRest) {
+    document.querySelectorAll('.preset-btn').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    settings = {work, rest, rounds, roundRest};
+    ['work','rest','rounds','roundRest'].forEach(k => document.getElementById(k+'Val').textContent = settings[k]);
+    if(timer.phase==='idle') {
+      document.getElementById('timerDisplay').textContent = fmt(work);
+      document.getElementById('roundInfo').textContent = 'Round 1 of ' + rounds;
+    }
+  }
+
+  function beep(freq, dur) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.25, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      o.start(ctx.currentTime); o.stop(ctx.currentTime + dur);
+    } catch(e) {}
+  }
+
+  function setPhaseUI(phase) {
+    const card = document.getElementById('timerCard');
+    const phaseEl = document.getElementById('timerPhase');
+    const exBox = document.getElementById('currentEx');
+    const exName = document.getElementById('currentExName');
+    const exHint = document.getElementById('currentExHint');
+    const exLabel = document.getElementById('currentExLabel');
+    card.className = 'timer-card';
+
+    if(phase === 'work') {
+      card.classList.add('working');
+      phaseEl.textContent = 'Work';
+      beep(880, 0.15);
+      if(exercises.length > 0) {
+        const ex = exercises[currentExIdx % exercises.length];
+        exLabel.textContent = 'Now — ' + (currentExIdx % exercises.length + 1) + ' of ' + exercises.length;
+        exName.textContent = ex.name;
+        exHint.textContent = ex.cues[0];
+        exBox.className = 'current-ex show';
+      }
+      renderExList();
+    } else if(phase === 'rest') {
+      card.classList.add('resting');
+      phaseEl.textContent = 'Rest';
+      beep(440, 0.15);
+      const next = exercises.length > 0 ? exercises[(currentExIdx+1) % exercises.length] : null;
+      exLabel.textContent = next ? 'Coming up next' : 'Rest';
+      exName.textContent = next ? next.name : '';
+      exHint.textContent = next ? next.desc : '';
+      exBox.className = 'current-ex show resting';
+    } else if(phase === 'roundRest') {
+      card.classList.add('resting');
+      phaseEl.textContent = 'Round Rest';
+      beep(330, 0.3);
+      exLabel.textContent = 'Round complete';
+      exName.textContent = 'Catch your breath';
+      exHint.textContent = '';
+      exBox.className = 'current-ex show resting';
+    }
+
+    document.getElementById('roundInfo').textContent = 'Round ' + timer.round + ' of ' + settings.rounds;
+    document.getElementById('progressBar').style.background = phase === 'work' ? 'var(--burnt)' : 'var(--teal)';
+  }
+
+  function tick() {
+    if(timer.timeLeft <= 0) { nextPhase(); return; }
+    document.getElementById('timerDisplay').textContent = fmt(timer.timeLeft);
+    const pct = (timer.timeLeft / timer.totalTime) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+    timer.timeLeft--;
+  }
+
+  function nextPhase() {
+    if(timer.phase === 'work') {
+      currentExIdx++;
+      if(currentExIdx < exercises.length || exercises.length === 0) {
+        timer.phase = 'rest'; timer.timeLeft = settings.rest; timer.totalTime = settings.rest;
+        setPhaseUI('rest');
+      } else {
+        if(timer.round >= settings.rounds) { finishWorkout(); return; }
+        timer.round++; currentExIdx = 0;
+        timer.phase = 'roundRest'; timer.timeLeft = settings.roundRest; timer.totalTime = settings.roundRest;
+        setPhaseUI('roundRest');
+      }
+    } else {
+      if(timer.phase === 'roundRest') currentExIdx = 0;
+      timer.phase = 'work'; timer.timeLeft = settings.work; timer.totalTime = settings.work;
+      setPhaseUI('work');
+    }
+  }
+
+  function startTimer() {
+    timer = {running:true, paused:false, phase:'work', round:1, setIdx:0, timeLeft:settings.work, totalTime:settings.work, iv:null};
+    currentExIdx = 0;
+    setPhaseUI('work');
+    timer.iv = setInterval(tick, 1000);
+    document.getElementById('btnGrid').innerHTML = `
+      <button class="big-btn btn-pause" onclick="pauseResume()">Pause</button>
+      <button class="big-btn btn-skip" onclick="skipPhase()">Skip →</button>
+      <button class="big-btn btn-reset full-col" onclick="resetTimer()">Reset</button>`;
+  }
+
+  function pauseResume() {
+    if(timer.running) {
+      clearInterval(timer.iv); timer.running = false; timer.paused = true;
+      document.querySelector('.btn-pause').textContent = 'Resume';
+      document.querySelector('.btn-pause').className = 'big-btn btn-start';
+    } else {
+      timer.running = true; timer.paused = false;
+      timer.iv = setInterval(tick, 1000);
+      document.querySelector('.btn-start').textContent = 'Pause';
+      document.querySelector('.btn-start').className = 'big-btn btn-pause';
+    }
+  }
+
+  function skipPhase() {
+    clearInterval(timer.iv);
+    timer.timeLeft = 0;
+    nextPhase();
+    if(timer.running) timer.iv = setInterval(tick, 1000);
+  }
+
+  function resetTimer() {
+    clearInterval(timer.iv);
+    timer = {running:false, paused:false, phase:'idle', round:1, setIdx:0, timeLeft:0, totalTime:0, iv:null};
+    currentExIdx = 0;
+    document.getElementById('timerCard').className = 'timer-card';
+    document.getElementById('timerPhase').textContent = 'Ready';
+    document.getElementById('timerDisplay').textContent = fmt(settings.work);
+    document.getElementById('progressBar').style.width = '100%';
+    document.getElementById('progressBar').style.background = 'var(--burnt)';
+    document.getElementById('roundInfo').textContent = 'Round 1 of ' + settings.rounds;
+    document.getElementById('currentEx').className = 'current-ex';
+    document.getElementById('btnGrid').innerHTML = `<button class="big-btn btn-start full-col" onclick="startTimer()">Start</button>`;
+    renderExList();
+  }
+
+  function finishWorkout() {
+    clearInterval(timer.iv);
+    timer.phase = 'idle'; timer.running = false;
+    document.getElementById('timerCard').className = 'timer-card done';
+    document.getElementById('timerPhase').textContent = 'Complete!';
+    document.getElementById('timerDisplay').textContent = '✓';
+    document.getElementById('progressBar').style.width = '100%';
+    document.getElementById('progressBar').style.background = 'var(--green)';
+    document.getElementById('currentEx').className = 'current-ex';
+    beep(660, 0.2); setTimeout(() => beep(880, 0.3), 250);
+    document.getElementById('btnGrid').innerHTML = `<button class="big-btn btn-start full-col" onclick="resetTimer()">New Session</button>`;
+  }
+
+  // ── EXERCISES TAB ──
+
+  function toggleEx(i) {
+    const card = document.getElementById('ex-' + i);
+    card.classList.toggle('open');
+  }
+
+  function removeExercise(i) {
+    exercises.splice(i, 1);
+    renderExList();
+  }
+
+  function addExercise() {
+    const v = document.getElementById('newExName').value.trim();
+    if(!v) return;
+    exercises.push({ name:v, desc:'Custom exercise.', cues:['Focus on good form','Control the movement throughout'] });
+    document.getElementById('newExName').value = '';
+    renderExList();
+  }
+
+  function renderExList() {
+    const wrap = document.getElementById('exListWrap');
+    const countEl = document.getElementById('exCount');
+    if(!wrap) return;
+    countEl.textContent = '— ' + exercises.length + ' exercises in rotation';
+    wrap.innerHTML = exercises.map((ex, i) => {
+      const isActive = timer.phase === 'work' && (currentExIdx % exercises.length) === i;
+      return `
+        <div class="ex-card${isActive ? ' active-ex' : ''}" id="ex-${i}">
+          <div class="ex-header" onclick="toggleEx(${i})">
+            <span class="ex-num">${i+1}</span>
+            <span class="ex-name">${ex.name}</span>
+            <span class="ex-chevron">▼</span>
+          </div>
+          <div class="ex-body">
+            <div class="ex-desc">${ex.desc}</div>
+            <ul class="ex-cues">${ex.cues.map(c => `<li>${c}</li>`).join('')}</ul>
+            <button class="ex-del" onclick="removeExercise(${i})">Remove</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function showTab(id, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    el.classList.add('active');
+    if(id === 'exercises') renderExList();
+  }
+
+  // Init
+  document.getElementById('timerDisplay').textContent = fmt(settings.work);
+  renderExList();
+</script>
+</body>
+</html>
