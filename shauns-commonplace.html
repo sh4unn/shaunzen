@@ -197,15 +197,30 @@
     return { token: localStorage.getItem('gh_token') || '', repo: localStorage.getItem('gh_repo') || 'sh4unn/shaunzen' };
   }
 
+  async function getSHA(token, repo, path) {
+    try {
+      const r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' } });
+      if (r.ok) return (await r.json()).sha;
+    } catch(e) {}
+    return null;
+  }
+
   async function ghSave(path, content) {
     const { token, repo } = getConfig();
     if (!token) throw new Error('No token — go to Settings first');
-    let sha = null;
-    try { const r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' } }); if (r.ok) sha = (await r.json()).sha; } catch(e) {}
-    const body = { message: `Commonplace: save ${path}`, content: btoa(unescape(encodeURIComponent(content))) };
+    const encoded = btoa(unescape(encodeURIComponent(content)));
+    const sha = await getSHA(token, repo, path);
+    const body = { message: `Commonplace: save ${path}`, content: encoded };
     if (sha) body.sha = sha;
-    const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { method:'PUT', headers: { Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' }, body: JSON.stringify(body) });
-    if (!res.ok) throw new Error('Save failed (' + res.status + ')');
+    let res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { method:'PUT', headers: { Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+    // 409 = SHA conflict — re-fetch and retry once
+    if (res.status === 409) {
+      const freshSha = await getSHA(token, repo, path);
+      const retryBody = { message: `Commonplace: save ${path}`, content: encoded };
+      if (freshSha) retryBody.sha = freshSha;
+      res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { method:'PUT', headers: { Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' }, body: JSON.stringify(retryBody) });
+    }
+    if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error('Save failed (' + res.status + ')' + (err.message ? ': ' + err.message : '')); }
   }
 
   async function ghLoad(path) {
