@@ -49,16 +49,16 @@
 
   .section-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--faint); margin-bottom:1rem; }
 
-  .skills-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:1.5rem; }
-  .skill-cell { background:var(--bg); padding:0.8rem 1rem; display:flex; align-items:center; gap:0.65rem; transition:background 0.2s; }
+  .skills-list { border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:1.5rem; }
+  .skill-cell { background:var(--bg); padding:0.65rem 1rem; display:flex; align-items:center; gap:0.75rem; border-bottom:1px solid var(--border); transition:background 0.2s; }
+  .skill-cell:last-child { border-bottom:none; }
   .skill-cell:hover { background:var(--surface); }
   .skill-icon { font-size:1rem; width:22px; text-align:center; flex-shrink:0; opacity:0.7; }
-  .skill-info { flex:1; min-width:0; }
-  .skill-name { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.06em; text-transform:uppercase; color:var(--faint); margin-bottom:0.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .skill-level { font-family:'IBM Plex Mono',monospace; font-size:1rem; color:var(--ink); line-height:1; }
-  .skill-level.maxed { color:var(--accent); font-weight:500; }
-  .skill-xp { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); margin-top:0.1rem; }
-  .skill-rank { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); flex-shrink:0; }
+  .skill-name { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); width:130px; flex-shrink:0; }
+  .skill-level { font-family:'IBM Plex Mono',monospace; font-size:1.05rem; color:var(--ink); line-height:1; width:50px; }
+  .skill-level.maxed { color:var(--accent); }
+  .skill-xp { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); flex:1; }
+  .skill-rank { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); text-align:right; }
 
   .activities-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
   .activity-cell { background:var(--bg); padding:0.7rem 1rem; display:flex; justify-content:space-between; align-items:center; transition:background 0.2s; }
@@ -208,7 +208,7 @@
         </div>
       </div>
       <div class="section-label">— Skills</div>
-      <div class="skills-grid">`;
+      <div class="skills-list">`;
 
     skills.slice(1).forEach((sk, i) => {
       const skill = SKILLS[i+1] || { name:'Skill '+(i+1), icon:'⚡' };
@@ -217,11 +217,9 @@
       html += `
         <div class="skill-cell">
           <div class="skill-icon">${skill.icon}</div>
-          <div class="skill-info">
-            <div class="skill-name">${skill.name}</div>
-            <div class="skill-level${level>=trueMax?' maxed':''}">${level||'—'}</div>
-            ${sk.xp&&parseInt(sk.xp)>0?`<div class="skill-xp">${fmtNum(parseInt(sk.xp))} xp</div>`:''}
-          </div>
+          <div class="skill-name">${skill.name}</div>
+          <div class="skill-level${level>=trueMax?' maxed':''}">${level||'—'}</div>
+          <div class="skill-xp">${sk.xp&&parseInt(sk.xp)>0?fmtNum(parseInt(sk.xp))+' xp':''}</div>
           <div class="skill-rank">${fmtRank(sk.rank)}</div>
         </div>`;
     });

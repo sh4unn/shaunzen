@@ -118,32 +118,6 @@
         <input type="text" class="search-input" id="drugInput" placeholder="Drug name (e.g. metoprolol, vancomycin, propofol)…" onkeydown="if(event.key==='Enter')searchDrug()">
         <button class="search-btn" onclick="searchDrug()" id="searchBtn">Look up</button>
       </div>
-      <div class="ctx-row">
-        <div class="ctx-chip active" data-val="ICU / Critical Care">ICU</div>
-        <div class="ctx-chip active" data-val="Cardiac / Perioperative">Cardiac</div>
-        <div class="ctx-chip active" data-val="Endoscopy / GI">Endoscopy</div>
-        <div class="ctx-chip" data-val="Emergency">Emergency</div>
-        <div class="ctx-chip" data-val="General Ward">General Ward</div>
-      </div>
-    </div>
-    <div class="section-label">— Common lookups</div>
-    <div class="quick-grid">
-      <button class="quick-btn" onclick="quickSearch('Propofol')">Propofol</button>
-      <button class="quick-btn" onclick="quickSearch('Midazolam')">Midazolam</button>
-      <button class="quick-btn" onclick="quickSearch('Fentanyl')">Fentanyl</button>
-      <button class="quick-btn" onclick="quickSearch('Noradrenaline')">Noradrenaline</button>
-      <button class="quick-btn" onclick="quickSearch('Metoprolol')">Metoprolol</button>
-      <button class="quick-btn" onclick="quickSearch('Vancomycin')">Vancomycin</button>
-      <button class="quick-btn" onclick="quickSearch('Heparin')">Heparin</button>
-      <button class="quick-btn" onclick="quickSearch('Amiodarone')">Amiodarone</button>
-      <button class="quick-btn" onclick="quickSearch('Ketamine')">Ketamine</button>
-      <button class="quick-btn" onclick="quickSearch('Pantoprazole')">Pantoprazole</button>
-      <button class="quick-btn" onclick="quickSearch('Metoclopramide')">Metoclopramide</button>
-      <button class="quick-btn" onclick="quickSearch('Enoxaparin')">Enoxaparin</button>
-      <button class="quick-btn" onclick="quickSearch('Dexamethasone')">Dexamethasone</button>
-      <button class="quick-btn" onclick="quickSearch('Adenosine')">Adenosine</button>
-      <button class="quick-btn" onclick="quickSearch('Naloxone')">Naloxone</button>
-      <button class="quick-btn" onclick="quickSearch('Hyoscine')">Hyoscine</button>
     </div>
     <div class="error-box" id="errorBox"></div>
     <div class="loading" id="loading"><div class="spinner"></div><div class="loading-text" id="loadingText">Looking up drug information…</div></div>
@@ -190,16 +164,7 @@
 
   function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  let activeContexts = ['ICU / Critical Care','Cardiac / Perioperative','Endoscopy / GI'];
   let searchHistory = JSON.parse(localStorage.getItem('drugHistory') || '[]');
-
-  document.querySelectorAll('.ctx-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      chip.classList.toggle('active');
-      const val = chip.dataset.val;
-      chip.classList.contains('active') ? activeContexts.push(val) : (activeContexts = activeContexts.filter(c => c !== val));
-    });
-  });
 
   function quickSearch(name) { document.getElementById('drugInput').value = name; searchDrug(); }
 
@@ -247,24 +212,27 @@
       const genericName = (ofd.generic_name?.[0] || raw).toUpperCase();
       const brands = ofd.brand_name ? ofd.brand_name.slice(0,3).join(', ') : '';
       const displayName = brands ? `${genericName} (${brands})` : genericName;
-      const drugClass = ofd.pharm_class_epc?.[0] || ofd.pharm_class_moa?.[0] || ofd.pharm_class_cs?.[0] || 'See prescribing information';
+      const drugClass = ofd.pharm_class_epc?.[0] || ofd.pharm_class_moa?.[0] || ofd.pharm_class_cs?.[0] || '';
       const routes = (ofd.route || []).map(r => r.toLowerCase());
 
-      const dosingRaw = trunc(result.dosage_and_administration?.[0] || '', 350);
-      const dosing = dosingRaw ? [{ route: 'Dosing', dose: dosingRaw, notes: '' }] : [];
+      const dosingRaw = trunc(result.dosage_and_administration?.[0] || '', 500);
+      const dosing = dosingRaw ? [{ route: 'Dosing & Administration', dose: dosingRaw, notes: '' }] : [];
+
+      // clinical_pharmacology is often the richest field — use as fallback for mechanism and PK
+      const clinPharm = result.clinical_pharmacology?.[0] || '';
 
       const drug = {
         name: displayName,
         drug_class: drugClass,
-        indication: trunc(result.indications_and_usage?.[0] || 'See product label'),
-        mechanism: trunc(result.mechanism_of_action?.[0] || result.pharmacodynamics?.[0] || 'See prescribing information', 320),
+        indication: trunc(result.indications_and_usage?.[0] || result.purpose?.[0] || ''),
+        mechanism: trunc(result.mechanism_of_action?.[0] || result.pharmacodynamics?.[0] || clinPharm, 420),
         dosing,
-        onset_duration: trunc(result.pharmacokinetics?.[0] || 'See prescribing information', 280),
-        monitoring: trunc(result.warnings_and_precautions?.[0] || result.precautions?.[0] || 'Monitor as clinically indicated', 320),
-        contraindications: trunc(result.contraindications?.[0] || 'See prescribing information', 320),
-        interactions: trunc(result.drug_interactions?.[0] || 'See prescribing information', 320),
-        nursing_notes: trunc(result.information_for_patients?.[0] || 'Refer to current clinical guidelines.', 320),
-        warnings: result.boxed_warning?.[0] ? trunc(result.boxed_warning[0], 320) : '',
+        onset_duration: trunc(result.pharmacokinetics?.[0] || clinPharm, 420),
+        monitoring: trunc(result.warnings_and_precautions?.[0] || result.precautions?.[0] || result.warnings?.[0] || '', 420),
+        contraindications: trunc(result.contraindications?.[0] || '', 420),
+        interactions: trunc(result.drug_interactions?.[0] || '', 420),
+        nursing_notes: trunc(result.information_for_patients?.[0] || result.patient_medication_information?.[0] || '', 420),
+        warnings: result.boxed_warning?.[0] ? trunc(result.boxed_warning[0], 420) : '',
         tags: [...routes, ...(ofd.pharm_class_epc || []).map(c => c.toLowerCase())].slice(0, 5)
       };
 
@@ -285,17 +253,18 @@
     const dosing = (d.dosing || []).map(r =>
       `<div class="info-box"><div class="info-box-label">${esc(r.route)}</div><div class="info-box-val">${esc(r.dose)}</div>${r.notes ? `<div class="info-box-note">${esc(r.notes)}</div>` : ''}</div>`
     ).join('');
+    const sec = (title, content) => content ? `<div class="drug-section"><div class="section-title">${title}</div><div class="section-content">${esc(content)}</div></div>` : '';
     document.getElementById('result').innerHTML = `
-      <div class="drug-header"><div class="drug-name">${esc(d.name)}</div><div class="drug-class">${esc(d.drug_class)}</div></div>
+      <div class="drug-header"><div class="drug-name">${esc(d.name)}</div>${d.drug_class?`<div class="drug-class">${esc(d.drug_class)}</div>`:''}</div>
       <div class="drug-body">
-        <div class="drug-section"><div class="section-title">Indication</div><div class="section-content">${esc(d.indication)}</div>${d.tags&&d.tags.length?`<div class="tag-row">${d.tags.map(t=>`<span class="drug-tag">${esc(t)}</span>`).join('')}</div>`:''}</div>
-        <div class="drug-section"><div class="section-title">Mechanism</div><div class="section-content">${esc(d.mechanism)}</div></div>
-        ${dosing?`<div class="drug-section"><div class="section-title">Dosing</div><div class="info-grid">${dosing}</div></div>`:''}
-        <div class="drug-section"><div class="section-title">Pharmacokinetics</div><div class="section-content">${esc(d.onset_duration)}</div></div>
-        <div class="drug-section"><div class="section-title">Monitoring</div><div class="section-content">${esc(d.monitoring)}</div></div>
-        <div class="drug-section"><div class="section-title">Contraindications</div><div class="section-content">${esc(d.contraindications)}</div></div>
-        <div class="drug-section"><div class="section-title">Key Interactions</div><div class="section-content">${esc(d.interactions)}</div></div>
-        <div class="drug-section"><div class="section-title">Patient / Nursing Notes</div><div class="section-content">${esc(d.nursing_notes)}</div></div>
+        ${d.indication||d.tags?.length ? `<div class="drug-section">${d.indication?`<div class="section-title">Indication</div><div class="section-content">${esc(d.indication)}</div>`:''}${d.tags&&d.tags.length?`<div class="tag-row">${d.tags.map(t=>`<span class="drug-tag">${esc(t)}</span>`).join('')}</div>`:''}</div>` : ''}
+        ${sec('Mechanism of Action', d.mechanism)}
+        ${dosing?`<div class="drug-section"><div class="section-title">Dosing &amp; Administration</div><div class="info-grid">${dosing}</div></div>`:''}
+        ${sec('Pharmacokinetics', d.onset_duration)}
+        ${sec('Warnings &amp; Precautions', d.monitoring)}
+        ${sec('Contraindications', d.contraindications)}
+        ${sec('Drug Interactions', d.interactions)}
+        ${sec('Patient Information', d.nursing_notes)}
         ${d.warnings?`<div class="drug-section"><div class="warning-box"><div class="warning-title">⚠ Boxed Warning</div><div class="warning-content">${esc(d.warnings)}</div></div></div>`:''}
       </div>`;
     document.getElementById('result').classList.add('show');

@@ -49,9 +49,14 @@
 
   main { position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:2.5rem 1.5rem; }
 
-  .grid-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--faint); margin-bottom:1.25rem; opacity:0; animation:up 0.7s ease forwards 1s; }
+  .section-block { margin-bottom:2.5rem; opacity:0; animation:up 0.7s ease forwards 1s; }
+  .section-block:nth-child(2) { animation-delay:1.05s; }
+  .section-block:nth-child(3) { animation-delay:1.1s; }
+  .section-block:nth-child(4) { animation-delay:1.15s; }
+  .grid-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--faint); margin-bottom:1.25rem; opacity:0; animation:up 0.7s ease forwards 0.9s; }
+  .section-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--faint); margin-bottom:0.85rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); }
 
-  .tool-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:0; border:1px solid var(--border); opacity:0; animation:up 0.7s ease forwards 1.1s; }
+  .tool-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:0; border:1px solid var(--border); }
 
   .tool-card { display:flex; align-items:center; justify-content:center; text-align:center; text-decoration:none; color:var(--ink); padding:2.75rem 1.5rem; border:1px solid var(--border); margin:-1px 0 0 -1px; position:relative; background:var(--bg); transition:background 0.25s; min-height:130px; overflow:hidden; }
   .tool-card::after { content:''; position:absolute; inset:0; background:var(--card-tint,rgba(42,90,106,0.05)); opacity:0; transition:opacity 0.3s; }
@@ -103,22 +108,44 @@
 
 <main>
   <div class="grid-label" id="gridLabel"></div>
-  <div class="tool-grid" id="toolGrid">
-    <a class="tool-card" href="cardiac-surgery-reference.html" style="--card-color:#c45e2a;--card-tint:rgba(196,94,42,0.05);"><div class="card-name">Cardiac Surgery</div></a>
-    <a class="tool-card" href="qigong.html" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Qigong</div></a>
-    <a class="tool-card" href="daily-tracker.html" style="--card-color:#5a7a3a;--card-tint:rgba(90,122,58,0.05);"><div class="card-name">Daily Tracker</div></a>
-    <a class="tool-card" href="lean-season.html" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Lean Season</div></a>
-    <a class="tool-card" href="book-recommender.html" style="--card-color:#6a3a7a;--card-tint:rgba(106,58,122,0.05);"><div class="card-name">Book Recommender</div></a>
-    <a class="tool-card" href="shaunswatch.html" style="--card-color:#1a2628;--card-tint:rgba(26,38,40,0.05);"><div class="card-name">Shaun's Watch</div></a>
-    <a class="tool-card" href="shauns-commonplace.html" style="--card-color:#7a6a20;--card-tint:rgba(122,106,32,0.05);"><div class="card-name">Shaun's Commonplace</div></a>
-    <a class="tool-card" href="shauns-ledger.html" style="--card-color:#6a3a7a;--card-tint:rgba(106,58,122,0.05);"><div class="card-name">Shaun's Ledger</div></a>
-    <a class="tool-card" href="rs3-hiscores.html" style="--card-color:#8a6a20;--card-tint:rgba(138,106,32,0.05);"><div class="card-name">RS3 Hiscores</div></a>
-    <a class="tool-card" href="drug-reference.html" style="--card-color:#8a2020;--card-tint:rgba(138,32,32,0.05);"><div class="card-name">Drug Reference</div></a>
-    <a class="tool-card" href="sql-dojo.html" style="--card-color:#2a6a3a;--card-tint:rgba(42,106,58,0.05);"><div class="card-name">SQL Dojo</div></a>
-    <a class="tool-card" href="shauns-scrolls.html" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Shaun's Scrolls</div></a>
-    <a class="tool-card" href="study-flashcards.html" style="--card-color:#5a3a7a;--card-tint:rgba(90,58,122,0.05);"><div class="card-name">Flashcards</div></a>
-    <!-- ADD NEW CARDS ABOVE THIS LINE -->
+
+  <div class="section-block">
+    <div class="section-label">— Clinical</div>
+    <div class="tool-grid">
+      <a class="tool-card" href="cardiac-surgery-reference.html" style="--card-color:#c45e2a;--card-tint:rgba(196,94,42,0.05);"><div class="card-name">Cardiac Surgery</div></a>
+      <a class="tool-card" href="drug-reference.html" style="--card-color:#8a2020;--card-tint:rgba(138,32,32,0.05);"><div class="card-name">Drug Reference</div></a>
+    </div>
   </div>
+
+  <div class="section-block">
+    <div class="section-label">— Personal</div>
+    <div class="tool-grid">
+      <a class="tool-card" href="daily-tracker.html" style="--card-color:#5a7a3a;--card-tint:rgba(90,122,58,0.05);"><div class="card-name">Daily Tracker</div></a>
+      <a class="tool-card" href="lean-season.html" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Lean Season</div></a>
+      <a class="tool-card" href="qigong.html" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Qigong</div></a>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-label">— Books &amp; Notes</div>
+    <div class="tool-grid">
+      <a class="tool-card" href="shauns-ledger.html" style="--card-color:#6a3a7a;--card-tint:rgba(106,58,122,0.05);"><div class="card-name">Shaun's Ledger</div></a>
+      <a class="tool-card" href="shauns-commonplace.html" style="--card-color:#7a6a20;--card-tint:rgba(122,106,32,0.05);"><div class="card-name">Shaun's Commonplace</div></a>
+      <a class="tool-card" href="shauns-scrolls.html" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Shaun's Scrolls</div></a>
+      <a class="tool-card" href="book-recommender.html" style="--card-color:#6a3a7a;--card-tint:rgba(106,58,122,0.05);"><div class="card-name">Book Recommender</div></a>
+      <a class="tool-card" href="study-flashcards.html" style="--card-color:#5a3a7a;--card-tint:rgba(90,58,122,0.05);"><div class="card-name">Flashcards</div></a>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-label">— Other</div>
+    <div class="tool-grid">
+      <a class="tool-card" href="sql-dojo.html" style="--card-color:#2a6a3a;--card-tint:rgba(42,106,58,0.05);"><div class="card-name">SQL Dojo</div></a>
+      <a class="tool-card" href="rs3-hiscores.html" style="--card-color:#8a6a20;--card-tint:rgba(138,106,32,0.05);"><div class="card-name">RS3 Hiscores</div></a>
+    </div>
+  </div>
+
+  <!-- ADD NEW CARDS ABOVE THIS LINE -->
 
   <div class="add-wrap">
     <div class="add-title">Add a Tool</div>
@@ -151,7 +178,7 @@
   document.getElementById('koansSource').textContent='\u2014 '+k.source;
   const count=document.querySelectorAll('.tool-card').length;
   document.getElementById('footerCount').textContent=count+' tools';
-  document.getElementById('gridLabel').textContent='\u2014 '+count+' tools';
+  document.getElementById('gridLabel').textContent='';
   function hexToRgb(h){h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
   function generateCard(){const name=document.getElementById('toolName').value.trim(),file=document.getElementById('toolFile').value.trim(),color=document.getElementById('toolColor').value.trim()||'#2a5a6a';if(!name||!file){alert('Need a name and filename.');return;}const[r,g,b]=hexToRgb(color);document.getElementById('codeOut').textContent=`<a class="tool-card" href="${file}" style="--card-color:${color};--card-tint:rgba(${r},${g},${b},0.05);">\n  <div class="card-name">${name}</div>\n</a>`;document.getElementById('codeWrap').style.display='block';}
   function copyCode(){navigator.clipboard.writeText(document.getElementById('codeOut').textContent).then(()=>{const b=document.querySelector('.copy-btn');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2000);});}

@@ -111,6 +111,10 @@
 
   .tab.cabg.active { border-bottom-color: white; }
   .tab.bentall.active { border-bottom-color: white; }
+  .tab.avr.active { border-bottom-color: white; }
+  .tab.mvr.active { border-bottom-color: white; }
+  .procedure-title.avr { color: var(--accent-blue); }
+  .procedure-title.mvr { color: var(--green, #3a6a2a); }
 
   .main {
     max-width: 1100px;
@@ -395,6 +399,8 @@
     <div class="tabs">
       <button class="tab cabg active" onclick="showProcedure('cabg', this)">Coronary Artery Bypass Graft</button>
       <button class="tab bentall" onclick="showProcedure('bentall', this)">Bentall Procedure</button>
+      <button class="tab avr" onclick="showProcedure('avr', this)">Aortic Valve Replacement</button>
+      <button class="tab mvr" onclick="showProcedure('mvr', this)">Mitral Valve Repair / Replacement</button>
     </div>
   </div>
 </div>
@@ -1090,6 +1096,418 @@
     </div>
 
   </div><!-- end Bentall -->
+
+
+  <!-- ==================== AVR ==================== -->
+  <div class="procedure" id="proc-avr">
+
+    <div class="procedure-header">
+      <div class="procedure-title avr">Isolated Aortic Valve Replacement (AVR)</div>
+      <p class="procedure-desc">Replacement of the aortic valve via median sternotomy using a prosthetic (mechanical or bioprosthetic) valve. Indicated for severe aortic stenosis or aortic regurgitation. Duration 2–4 hours. More straightforward than Bentall but de-airing is critical and conduction system is at risk.</p>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot anaes"></div> Anaesthetist</div>
+      <div class="legend-item"><div class="legend-dot surg"></div> Cardiac Surgeon</div>
+    </div>
+
+    <!-- Stage 1 -->
+    <div class="stage open" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">01</span>
+        <span class="stage-name">Pre-operative Assessment & Setup</span>
+        <div class="stage-tags"><span class="tag induction">PRE-OP</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Review echo: valve area (severe AS &lt;1.0 cm²), mean gradient (&gt;40 mmHg severe), AR severity, LV function (EF, hypertrophy, LVEDP)</li>
+              <li>AS physiology: fixed outflow obstruction, LV hypertrophy, diastolic dysfunction — induction is high risk; maintain sinus rhythm, avoid hypotension and tachycardia</li>
+              <li>AR physiology: volume-loaded, dilated LV; avoid bradycardia (increases regurgitant fraction); afterload reduction if on infusions</li>
+              <li>Arterial line (radial) pre-induction; large-bore IV ×2; consider CVC if complex or poor LV</li>
+              <li>TOE planned post-intubation: quantify valve pathology, LV function, RWMA, degree of calcification</li>
+              <li>Prepare vasopressors (metaraminol, phenylephrine for AS — maintain afterload); in AR, prefer noradrenaline over vasopressin</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Confirm valve selection with patient: mechanical (requires lifelong anticoagulation) vs bioprosthetic (avoids anticoagulation, limited durability ~15–20 years)</li>
+              <li>TAVI (transcatheter AVR) discussion: if patient high surgical risk, heart team may prefer TAVI — confirm operative plan pre-theatre</li>
+              <li>Review CT or echo for aortic annulus size (valve sizing), degree of calcification of root and valve</li>
+              <li>Discuss CPB plan with perfusionist: standard ascending aortic/right atrial cannulation; cardioplegia strategy (antegrade aortic root ± retrograde in severe AR)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 2 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">02</span>
+        <span class="stage-name">Induction & Intubation</span>
+        <div class="stage-tags"><span class="tag induction">INDUCTION</span><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ AS induction risk</strong>In severe AS, the LV cannot increase output against sudden afterload drops. Hypotension at induction can precipitate irreversible subendocardial ischaemia. Run phenylephrine or metaraminol infusion before induction. Avoid tachycardia — the hypertrophied LV needs time to fill.</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Vasopressor infusion (phenylephrine 50–100 mcg/min or metaraminol) running before induction to maintain SVR</li>
+              <li>High-dose opioid induction: fentanyl 5–10 mcg/kg + etomidate (preferred in severe AS) or low-dose propofol; avoid bolus vasodilation</li>
+              <li>Target: HR 60–80 (avoid tachycardia), MAP &gt;65 maintained throughout; sinus rhythm critical in AS (loss of atrial kick = haemodynamic collapse)</li>
+              <li>Immediate defibrillator availability; pads on patient before induction in severe AS</li>
+              <li>TOE immediately post-intubation: confirm valve anatomy, LVOT, LV function; look for any surprises (additional pathology)</li>
+              <li>In AR: slightly higher HR target (75–90) acceptable to reduce diastolic regurgitant time</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Not scrubbed — available for emergency sternotomy if cardiac arrest</li>
+              <li>Confirms prosthesis is available and correct size based on pre-op echo; backup sizes on standby</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">03</span>
+        <span class="stage-name">Sternotomy, Cannulation & CPB Initiation</span>
+        <div class="stage-tags"><span class="tag cpb">ON CPB</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Standard cardiac anaesthesia: deepen for incision, brief apnoea for saw pass</li>
+              <li>Heparin 300–400 IU/kg IV before cannulation; confirm ACT &gt;480 sec with perfusionist</li>
+              <li>In severe AR: antegrade cardioplegia via aortic root may not work well (regurgitant valve dilutes/bypasses coronaries) — surgeon may prefer direct coronary ostial delivery or retrograde; coordinate with surgeon</li>
+              <li>Cease ventilation on full CPB; maintain anaesthesia via circuit volatile or TIVA</li>
+              <li>TOE: watch for LV distension during CPB initiation (LV vent may be needed in AR)</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Median sternotomy, pericardiotomy, stay sutures; inspect aorta for cannulation site (avoid calcified areas)</li>
+              <li>Ascending aortic cannulation and single two-stage venous cannula (or bicaval if needed)</li>
+              <li>CPB initiated; aortic cross-clamp applied; cardioplegia delivered</li>
+              <li>In severe AR: cross-clamp causes immediate LV distension as regurgitant flow persists — LV vent via RSPV is standard; cardioplegia directly into coronary ostia</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 4 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">04</span>
+        <span class="stage-name">Aortotomy, Valve Excision & Prosthesis Implantation</span>
+        <div class="stage-tags"><span class="tag cpb">ON CPB</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Maintain stable CPB conditions; ACT checks; temperature management</li>
+              <li>Blood gas monitoring: K⁺ (cardioplegia loads potassium), glucose, Hct</li>
+              <li>Repeat cardioplegia every 15–20 min or per surgeon request</li>
+              <li>Minimal intervention during valve work — this is the surgeon's phase</li>
+              <li>Pre-wean preparation: draw inotropes (adrenaline), have vasopressors ready; pacing plan (pacemaker common post-AVR)</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Transverse or oblique aortotomy above sinotubular junction; retracted to expose valve</li>
+              <li>Valve excision: leaflets excised; annulus decalcified with rongeurs — careful not to disrupt the annulus or AV node (3 o'clock position, adjacent to right coronary sinus)</li>
+              <li>Annulus sized with valve sizer; prosthesis selected</li>
+              <li>Interrupted or continuous suture technique: pledgeted mattress sutures circumferentially through annulus and into sewing ring; prosthesis seated and tied</li>
+              <li>Mechanical valve: confirm leaflet opening/closing is unobstructed; correct orientation (avoid coronary ostial impingement)</li>
+              <li>Aortotomy closure: continuous 4-0 prolene with felt reinforcement if aortic wall fragile</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 5 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">05</span>
+        <span class="stage-name">De-airing, CPB Wean & Post-wean Assessment</span>
+        <div class="stage-tags"><span class="tag cpb">CPB WEAN</span><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ De-airing is critical in AVR</strong>The aortic valve is the outflow tract — air trapped in the LV or aortic root travels directly into the coronary ostia (RCA most vulnerable, as it sits anteriorly). Meticulous de-airing is mandatory. Complete heart block is common post-AVR — pacing wires are always placed.</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Recommence ventilation before cross-clamp removal; Trendelenburg position to move air to RV rather than LV</li>
+              <li>Aggressive TOE de-airing protocol: watch LV apex, LVOT, ascending aorta — alert surgeon to any air collections</li>
+              <li>Cross-clamp removal → reperfusion; expect VF (normal), internal defibrillation if needed</li>
+              <li>Heart block: extremely common after AVR (AV node proximity to non-coronary sinus) — surgeon will place atrial and ventricular pacing wires; pace at 80 if junctional or slow rhythm post-wean</li>
+              <li>Post-wean TOE: assess prosthetic valve function (mechanical: listen for clicks, look for normal leaflet motion; bioprosthesis: normal leaflet mobility, no stenosis or regurgitation); assess for perivalvular leak (colour Doppler); LV/RV function</li>
+              <li>Protamine reversal; watch for protamine reaction</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Systematic de-airing: root vent, needle aspiration of aortic root, manual cardiac massage to displace air</li>
+              <li>Cross-clamp removal; observe coronary reperfusion — RCA air embolism manifests as inferior ST elevation and RV dysfunction</li>
+              <li>Epicardial pacing wires: atrial and ventricular leads — standard in all AVR; AV conduction may be impaired for 24–48h post-op</li>
+              <li>Decannulation and haemostasis; sternal closure</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <div class="notes-title">Key AVR Considerations</div>
+      <div class="drug-grid">
+        <div class="drug-card">
+          <div class="drug-name">AS Induction Rule</div>
+          <div class="drug-use">Maintain SVR, maintain sinus rhythm, avoid tachycardia. The hypertrophied LV cannot compensate for hypotension. Vasopressor infusion before induction is standard.</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">AR Induction Rule</div>
+          <div class="drug-use">HR 75–90 (reduce diastolic regurgitation), afterload reduction, LV vent mandatory on CPB. IABP contraindicated in significant AR.</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Pacing Post-AVR</div>
+          <div class="drug-use">Complete heart block in ~5%; junctional rhythm common. Always pace at 80–90 bpm if slow. Permanent PPM if CHB persists &gt;5–7 days post-op.</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Mechanical Valve Anticoagulation</div>
+          <div class="drug-use">Heparin infusion 4–6h post-op; warfarin target INR 2.0–3.0 (aortic position); aspirin 100mg ongoing. Never delay anticoagulation.</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Patient-Prosthesis Mismatch</div>
+          <div class="drug-use">Small annulus → small prosthesis → residual gradient. Confirm post-implant gradient acceptable on TOE. Annular enlargement or supra-annular bioprosthesis if mismatch predicted.</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">RCA Air Embolism</div>
+          <div class="drug-use">Inferior ST elevation + RV dysfunction after cross-clamp removal = RCA air. Return to CPB if haemodynamically significant; temporary RV support; resolves with reperfusion.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end AVR -->
+
+
+  <!-- ==================== MVR ==================== -->
+  <div class="procedure" id="proc-mvr">
+
+    <div class="procedure-header">
+      <div class="procedure-title mvr">Mitral Valve Repair / Replacement (MVR)</div>
+      <p class="procedure-desc">Correction of mitral valve pathology via median sternotomy and left atriotomy. Repair is preferred when feasible (lower mortality, no anticoagulation, better LV preservation). Replacement used when repair is not durable. Bicaval cannulation is standard. Duration 3–5 hours.</p>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot anaes"></div> Anaesthetist</div>
+      <div class="legend-item"><div class="legend-dot surg"></div> Cardiac Surgeon</div>
+    </div>
+
+    <div class="alert-box info" style="margin-bottom:1.5rem;border-radius:6px;">
+      <strong>Pathology Context</strong>MR causes: degenerative (myxomatous, Barlow's disease), rheumatic, ischaemic (papillary muscle dysfunction), infective endocarditis, functional (dilated cardiomyopathy). MS causes: rheumatic predominates. Repair options depend on leaflet, chordal, and annular anatomy — pre-op TOE and surgical team discussion essential.
+    </div>
+
+    <!-- Stage 1 -->
+    <div class="stage open" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">01</span>
+        <span class="stage-name">Pre-operative Assessment</span>
+        <div class="stage-tags"><span class="tag induction">PRE-OP</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Review echo: MR mechanism (Carpentier classification I–III), severity, annular size, leaflet anatomy (posterior leaflet prolapse most repairable), LV size and function, pulmonary pressures</li>
+              <li>Severe chronic MR: LV is volume-loaded and may appear to have normal EF — EF &lt;60% in severe MR represents significant dysfunction; afterload dependence post-repair</li>
+              <li>Pulmonary hypertension: common in chronic MR/MS; anticipate RV failure post-CPB; milrinone/iloprost may be needed</li>
+              <li>AF: very common in mitral disease; confirm anticoagulation status pre-op; discuss rate/rhythm plan with surgeon (concomitant MAZE procedure planned?)</li>
+              <li>Arterial line, CVC ± PA catheter if pulmonary pressures severely elevated; large-bore IV ×2</li>
+              <li>Baseline TOE: quantify MR/MS, identify mechanism and anatomy, assess LV/RV, pulmonary vein flow reversal</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Detailed review of echo and TOE: identify repair feasibility — posterior leaflet prolapse has ~95% repair rate; anterior leaflet, bileaflet, and rheumatic disease are more complex</li>
+              <li>Repair strategy: ring annuloplasty ± leaflet resection (quadrangular/triangular), chordal transfer, artificial neochordae (PTFE sutures), commissuroplasty</li>
+              <li>Replacement strategy: if repair not feasible — bioprosthetic (no anticoagulation) vs mechanical; discuss with patient; chordal-sparing technique to preserve LV geometry</li>
+              <li>Concomitant procedures: MAZE (AF ablation), tricuspid repair, PFO closure — confirm operative plan</li>
+              <li>Bicaval cannulation required for all MVR — allows full right heart decompression and left atriotomy access</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 2 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">02</span>
+        <span class="stage-name">Induction, Sternotomy & Cannulation</span>
+        <div class="stage-tags"><span class="tag induction">INDUCTION</span><span class="tag cpb">ON CPB</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>MR induction: afterload reduction desirable (promotes forward flow); avoid bradycardia (worsens MR by increasing LVEDV); maintain HR 80–95</li>
+              <li>MS induction: similar caution to AS — avoid tachycardia (reduces diastolic filling time across tight valve); avoid hypotension; maintain sinus rhythm</li>
+              <li>Standard cardiac induction: high-dose opioid + etomidate or low-dose propofol; vasopressors available</li>
+              <li>TOE post-intubation: confirm anatomy; establish baseline LV/RV function; check pulmonary artery pressure estimate</li>
+              <li>Heparin 300–400 IU/kg; ACT &gt;480 sec before CPB</li>
+              <li>Bicaval cannulation changes haemodynamics more than single two-stage: expect modest MAP drop when IVC and SVC snared — vasopressors ready</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>Median sternotomy; pericardiotomy; bicaval cannulation: aortic cannula + separate SVC and IVC cannulae (allows full cardiac decompression and dry field for LA work)</li>
+              <li>CPB initiated; SVC and IVC snares tightened to prevent venous return diluting operative field</li>
+              <li>Aortic cross-clamp; cardioplegia antegrade (may supplement with retrograde via coronary sinus)</li>
+              <li>Left atriotomy: incision behind the interatrial groove (Waterson's groove) or trans-septal approach; retractor placed to expose mitral valve</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">03</span>
+        <span class="stage-name">Valve Repair or Replacement</span>
+        <div class="stage-tags"><span class="tag cpb">ON CPB</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>Maintain stable CPB; cardioplegia every 15–20 min; blood gas and ACT monitoring</li>
+              <li>This is the surgically intensive phase — anaesthetist primarily supports bypass conditions</li>
+              <li>Anticipate longer cross-clamp time than AVR (more complex reconstruction possible); communicate CPB time with perfusionist</li>
+              <li>Draw inotropes ahead of wean: milrinone (PDE3 inhibitor, reduces PVR — particularly useful in elevated pulmonary pressures), adrenaline; vasopressors available</li>
+              <li>Note: after repair or replacement of MR, the LV suddenly faces increased afterload (competent valve eliminates low-resistance LA pop-off) — LV dysfunction common post-repair; inotropes often needed</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li><strong>Repair:</strong> Assess leaflets, chordae, papillary muscles; identify prolapsing or flail segments</li>
+              <li>Posterior leaflet resection: quadrangular/triangular resection of prolapsing segment; leaflet edges approximated with 4-0 prolene running suture</li>
+              <li>Neochordae: PTFE (Gore-Tex) sutures from papillary muscle head to leaflet edge — correct length is critical (determined intraoperatively)</li>
+              <li>Ring annuloplasty: sizing and implantation of rigid, semi-rigid or flexible ring (Edwards, Medtronic, Carpentier-Edwards) with interrupted pledgeted sutures; reduces annular dilation and supports repair</li>
+              <li>Saline test: inject saline into LV under pressure to confirm coaptation — no central jet, no residual prolapse visible</li>
+              <li><strong>Replacement:</strong> Native valve excised; papillary muscle attachment preserved (chordal-sparing technique protects LV geometry); prosthesis sized and sutured; confirm leaflet clearance</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 4 -->
+    <div class="stage" onclick="toggleStage(this)">
+      <div class="stage-header">
+        <span class="stage-num">04</span>
+        <span class="stage-name">LA Closure, De-airing & CPB Wean</span>
+        <div class="stage-tags"><span class="tag cpb">CPB WEAN</span><span class="tag critical">CRITICAL</span></div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="stage-body">
+        <div class="alert-box warning"><strong>⚠ LV dysfunction after MR correction</strong>Post-repair, the LV loses its low-impedance pop-off into the LA. True LV function may be worse than pre-op EF suggested. Inotropic support is frequently needed. RV failure from elevated PVR is also common — milrinone is first-line.</div>
+        <div class="roles">
+          <div class="role-panel anaes">
+            <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+            <ul class="task-list">
+              <li>De-airing is critical: left heart is opened (LA, mitral valve) — air enters LV directly; fill carefully on TOE; watch LV apex, LVOT, and mitral prosthesis/repair area</li>
+              <li>Recommence ventilation before cross-clamp removal; Trendelenburg position helps move air anteriorly to be aspirated via aortic root vent</li>
+              <li>TOE post-wean — the most important assessment in MVR/repair:
+                <ul style="padding-left:1.2rem;margin-top:0.3rem">
+                  <li>Repair: residual MR? (trace/mild acceptable; moderate or above → return to bypass for revision); SAM (systolic anterior motion of anterior leaflet causing LVOTO — emergency, needs revision or medical management with fluids, phenylephrine, beta-blockade)</li>
+                  <li>Replacement: prosthesis function, perivalvular leak, leaflet mobility (ensure chordae not caught in prosthesis)</li>
+                </ul>
+              </li>
+              <li>LV function: often needs milrinone 0.375–0.5 mcg/kg/min + adrenaline; avoid high doses of noradrenaline (increases PVR)</li>
+              <li>Pulmonary hypertension: if PAP elevated, inhaled iloprost or NO if available; milrinone; avoid hypoxia and hypercarbia</li>
+              <li>Pacing: AV block less common than AVR but possible; atrial lead important if patient needs rate support</li>
+            </ul>
+          </div>
+          <div class="role-panel surg">
+            <div class="role-label surg"><div class="role-dot surg"></div>Cardiac Surgeon</div>
+            <ul class="task-list">
+              <li>LA closure: running 3-0 or 4-0 prolene; de-air via vent in closure suture line before final knot</li>
+              <li>Cross-clamp removal with aggressive de-airing of aortic root; cardiac massage to expel air from coronaries</li>
+              <li>Epicardial pacing wires: atrial lead (important for rate control in AF patients) + ventricular lead</li>
+              <li>If SAM detected on TOE: stop inotropes, give volume, consider phenylephrine; surgical revision (re-do repair or replacement) if haemodynamically significant SAM persists</li>
+              <li>If residual MR &gt;mild on TOE: assess repair — revision or conversion to replacement; do not accept significant residual MR</li>
+              <li>Decannulation; protamine; haemostasis; sternal closure</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <div class="notes-title">Key MVR/Repair Considerations</div>
+      <div class="drug-grid">
+        <div class="drug-card">
+          <div class="drug-name">SAM (Systolic Anterior Motion)</div>
+          <div class="drug-use">LVOTO caused by anterior mitral leaflet being drawn into LVOT in systole — after repair with redundant anterior leaflet or undersized ring. Treat: stop inotropes, give volume, phenylephrine. Surgical revision if refractory.</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Post-MR LV Dysfunction</div>
+          <div class="drug-use">After correcting chronic severe MR, true LV contractile function is unmasked. EF may fall from 'preserved' to low normal. Milrinone + adrenaline infusions frequently required post-CPB.</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Pulmonary Hypertension</div>
+          <div class="drug-use">Common in chronic MR/MS. Milrinone reduces PVR and supports RV. Inhaled iloprost or NO if PAP crisis. Avoid hypoxia, hypercarbia, acidosis. Vasopressin preferred vasopressor to avoid worsening PVR.</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Bicaval Cannulation</div>
+          <div class="drug-use">Mandatory for mitral work — allows full right heart decompression. SVC and IVC snares prevent blood from flooding the operative field. More access than single two-stage venous cannula.</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Mitral Replacement Anticoag</div>
+          <div class="drug-use">Mechanical mitral: INR 2.5–3.5 (higher than aortic position — mitral has lower flow velocity). Bioprosthetic: aspirin ± 3 months warfarin while endothelialisation occurs; then aspirin alone.</div>
+        </div>
+        <div class="drug-card">
+          <div class="drug-name">Repair vs Replacement</div>
+          <div class="drug-use">Repair: lower 30-day mortality, no anticoagulation, better LV preservation, ~1% per year failure rate. Replacement: more durable for complex/rheumatic disease, but requires lifelong follow-up and anticoagulation (mechanical).</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end MVR -->
 
 </div><!-- end main -->
 

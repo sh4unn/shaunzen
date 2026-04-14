@@ -218,18 +218,7 @@
         <span class="star" onclick="setRating(4)" onmouseover="hoverRating(4)" onmouseout="unhoverRating()">★</span>
         <span class="star" onclick="setRating(5)" onmouseover="hoverRating(5)" onmouseout="unhoverRating()">★</span>
       </div>
-      <div class="two-col">
-        <div class="field">
-          <label>Genre</label>
-          <select id="bookGenre">
-            <option>Horror</option><option>Thriller</option><option>Literary Fiction</option>
-            <option>Australian Fiction</option><option>Sci-Fi</option><option>Fantasy</option>
-            <option>Crime</option><option>Non-Fiction</option><option>Philosophy</option>
-            <option>Biography</option><option>Adventure</option><option>Other</option>
-          </select>
-        </div>
-        <div class="field"><label>Pages</label><input type="number" id="bookPages" placeholder="320" min="1"></div>
-      </div>
+      <div class="field"><label>Pages</label><input type="number" id="bookPages" placeholder="320" min="1"></div>
       <div class="field"><label>Notes / thoughts</label><textarea id="bookNotes" placeholder="What did you think…"></textarea></div>
       <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.25rem;">
         <button class="btn" onclick="addBook()" id="addBookBtn">Save to GitHub</button>
@@ -375,6 +364,7 @@
     document.getElementById('bookYear').value=new Date().getFullYear();
     document.getElementById('bookSearch').value='';
     currentRating=0; renderStars(0); clearSelectedBook(); setStatus('addBookStatus','','');
+
   }
 
   async function addBook() {
@@ -383,7 +373,7 @@
     const btn = document.getElementById('addBookBtn');
     btn.disabled=true; btn.textContent='Saving…';
     try {
-      const book = { id:Date.now(), title, author:document.getElementById('bookAuthor').value.trim(), status:document.getElementById('bookStatus').value, year:parseInt(document.getElementById('bookYear').value)||new Date().getFullYear(), rating:currentRating, genre:document.getElementById('bookGenre').value, pages:parseInt(document.getElementById('bookPages').value)||0, notes:document.getElementById('bookNotes').value.trim(), cover:selectedBook?.cover||null, added:new Date().toISOString().split('T')[0] };
+      const book = { id:Date.now(), title, author:document.getElementById('bookAuthor').value.trim(), status:document.getElementById('bookStatus').value, year:parseInt(document.getElementById('bookYear').value)||new Date().getFullYear(), rating:currentRating, pages:parseInt(document.getElementById('bookPages').value)||0, notes:document.getElementById('bookNotes').value.trim(), cover:selectedBook?.cover||null, added:new Date().toISOString().split('T')[0] };
       let books=[]; const ex=await ghLoad('ledger/books.json'); if(ex) books=JSON.parse(ex);
       books.unshift(book);
       await ghSave('ledger/books.json',JSON.stringify(books,null,2));
@@ -421,7 +411,7 @@
     container.innerHTML = `<div class="book-grid">${filtered.map(b=>{
       const coverHtml = b.cover ? `<img class="book-card-cover" src="https://covers.openlibrary.org/b/id/${b.cover}-M.jpg" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="book-card-cover-ph" style="display:none">📖</div>` : `<div class="book-card-cover-ph">📖</div>`;
       const stars = b.rating ? '★'.repeat(b.rating)+'☆'.repeat(5-b.rating) : '';
-      return `<div class="book-card">${coverHtml}<div class="book-card-body"><div class="book-card-title">${b.title}</div><div class="book-card-author">${b.author||''}</div>${stars?`<div class="book-card-stars">${stars}</div>`:''}<div class="book-card-meta">${b.year||''}${b.genre?' · '+b.genre:''}${b.pages?' · '+b.pages+'p':''}</div>${b.notes?`<div class="book-card-notes">"${b.notes.slice(0,80)}${b.notes.length>80?'…':''}"</div>`:''}</div></div>`;
+      return `<div class="book-card">${coverHtml}<div class="book-card-body"><div class="book-card-title">${b.title}</div><div class="book-card-author">${b.author||''}</div>${stars?`<div class="book-card-stars">${stars}</div>`:''}<div class="book-card-meta">${b.year||''}${b.pages?' · '+b.pages+'p':''}</div>${b.notes?`<div class="book-card-notes">"${b.notes.slice(0,80)}${b.notes.length>80?'…':''}"</div>`:''}</div></div>`;
     }).join('')}</div>`;
   }
 
