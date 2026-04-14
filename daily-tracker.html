@@ -44,6 +44,9 @@
   .habit-row.done .habit-name{color:var(--green);}
   .habit-streak{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);}
   .habit-row.done .habit-streak{color:var(--green);}
+  .habit-delete{background:none;border:none;color:var(--faint);cursor:pointer;font-size:1rem;line-height:1;padding:0 0.2rem;opacity:0;transition:opacity 0.2s;}
+  .habit-row:hover .habit-delete{opacity:0.5;}
+  .habit-delete:hover{opacity:1!important;color:var(--red);}
   .add-habit-row{display:flex;gap:0.5rem;margin-top:1rem;}
   .add-input{flex:1;background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.85rem;font-family:'IBM Plex Mono',monospace;font-size:0.85rem;color:var(--ink);outline:none;transition:border-color 0.2s;}
   .add-input:focus{border-color:var(--teal);}
@@ -51,10 +54,14 @@
   .emoji-input{width:48px;flex:none;text-align:center;}
   .btn-add{background:var(--teal);color:var(--cream);border:none;border-radius:6px;padding:0.6rem 1rem;font-family:'IBM Plex Mono',monospace;font-size:0.82rem;font-weight:500;cursor:pointer;transition:background 0.2s;}
   .btn-add:hover{background:var(--teal-light);}
-  .save-row{display:flex;justify-content:center;margin-top:1.5rem;}
+  .save-row{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;}
   .btn-save{background:var(--teal);color:var(--cream);border:none;border-radius:8px;padding:0.85rem 2.5rem;font-family:'IBM Plex Mono',monospace;font-size:0.9rem;font-weight:500;cursor:pointer;letter-spacing:0.05em;transition:background 0.2s,transform 0.1s;}
   .btn-save:hover{background:var(--teal-light);}
   .btn-save:active{transform:scale(0.98);}
+  .btn-save:disabled{opacity:0.5;cursor:not-allowed;}
+  .save-status{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--faint);}
+  .save-status.ok{color:var(--green);}
+  .save-status.err{color:var(--red);}
   .history-entry{background:var(--parchment);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1rem;}
   .history-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:0.75rem;display:flex;justify-content:space-between;align-items:center;}
   .history-habits{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.6rem;}
@@ -62,6 +69,25 @@
   .history-habit-tag.done{background:var(--green-faint);color:var(--green);border-color:var(--green);}
   .history-note{font-family:'Spectral',serif;font-size:0.82rem;font-style:italic;color:var(--muted);margin-top:0.5rem;line-height:1.6;}
   .empty-history{text-align:center;padding:3rem 1rem;color:var(--faint);font-family:'Spectral',serif;font-style:italic;font-size:0.9rem;}
+  /* Settings */
+  .settings-card{background:var(--parchment);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.25rem;}
+  .settings-title{font-family:'New Rocker',cursive;font-size:1.4rem;color:var(--teal);margin-bottom:0.2rem;}
+  .settings-sub{font-size:0.8rem;color:var(--muted);font-style:italic;margin-bottom:1.25rem;line-height:1.6;}
+  .s-field{margin-bottom:0.85rem;}
+  .s-field label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:0.4rem;}
+  .s-field input{width:100%;background:white;border:1px solid var(--border);border-radius:4px;padding:0.6rem 0.85rem;font-family:'IBM Plex Mono',monospace;font-size:0.82rem;color:var(--ink);outline:none;transition:border-color 0.2s;}
+  .s-field input:focus{border-color:var(--teal);}
+  .s-field input::placeholder{color:var(--border);}
+  .btn-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
+  .btn{background:var(--teal);color:white;border:none;border-radius:4px;padding:0.6rem 1.4rem;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;cursor:pointer;transition:background 0.2s;}
+  .btn:hover{background:var(--teal-light);}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:0.6rem 1.1rem;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;cursor:pointer;transition:all 0.2s;}
+  .btn-ghost:hover{border-color:var(--teal);color:var(--teal);}
+  .status-msg{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--faint);margin-top:0.65rem;min-height:16px;}
+  .status-msg.ok{color:var(--green);} .status-msg.err{color:var(--red);}
+  .sync-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.08em;padding:0.2rem 0.6rem;border-radius:20px;border:1px solid var(--border);color:var(--faint);margin-left:auto;}
+  .sync-badge.ok{color:var(--green);border-color:var(--green);background:var(--green-faint);}
+  .sync-badge.err{color:var(--red);border-color:rgba(122,32,32,0.3);}
   .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(4rem);background:var(--teal);color:var(--cream);padding:0.75rem 1.5rem;border-radius:30px;font-size:0.85rem;font-weight:500;transition:transform 0.3s;z-index:100;pointer-events:none;}
   .toast.show{transform:translateX(-50%) translateY(0);}
 </style>
@@ -77,8 +103,10 @@
 <nav class="tabs">
   <div class="tab active" onclick="showTab('today',this)">Today</div>
   <div class="tab" onclick="showTab('history',this)">History</div>
+  <div class="tab" onclick="showTab('settings',this)">Settings</div>
 </nav>
 <main>
+  <!-- TODAY -->
   <div class="panel active" id="panel-today">
     <div class="mood-section">
       <div class="section-title">How are you feeling?</div>
@@ -100,33 +128,344 @@
         <button class="btn-add" onclick="addHabit()">Add</button>
       </div>
     </div>
-    <div class="save-row"><button class="btn-save" onclick="saveDay()">Save today</button></div>
+    <div class="save-row">
+      <button class="btn-save" id="saveBtn" onclick="saveDay()">Save today</button>
+      <span class="save-status" id="saveStatus"></span>
+    </div>
   </div>
+
+  <!-- HISTORY -->
   <div class="panel" id="panel-history"><div id="historyList"></div></div>
+
+  <!-- SETTINGS -->
+  <div class="panel" id="panel-settings">
+    <div class="settings-card">
+      <div class="settings-title">GitHub Backup</div>
+      <div class="settings-sub">All entries, habits and streaks are saved to <code style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--surface2);padding:0.1rem 0.4rem;border-radius:3px;">daily-tracker/data.json</code> in your repo. Your token is stored in localStorage only — never sent anywhere except GitHub's API.</div>
+      <div class="s-field"><label>Personal Access Token</label><input type="password" id="ghToken" placeholder="ghp_…"></div>
+      <div class="s-field"><label>Repository (owner/repo)</label><input type="text" id="ghRepo" placeholder="sh4unn/shaunzen"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="saveSettings()">Save</button>
+        <button class="btn-ghost" onclick="testConnection()">Test connection</button>
+        <button class="btn-ghost" onclick="pullFromGitHub()">Pull from GitHub</button>
+      </div>
+      <div class="status-msg" id="settingsStatus"></div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-title">Local data</div>
+      <div class="settings-sub">Data is also cached locally so the tracker works offline. Clear only if you want to reset to what's on GitHub.</div>
+      <div class="btn-row">
+        <button class="btn-ghost" style="color:var(--red);border-color:rgba(122,32,32,0.3)" onclick="clearLocal()">Clear local cache</button>
+      </div>
+    </div>
+  </div>
 </main>
 <div class="toast" id="toast"></div>
+
 <script>
   const MOODS={1:'😔',2:'😕',3:'😐',4:'🙂',5:'😄'};
   const MOOD_LABELS={1:'Low',2:'Meh',3:'Okay',4:'Good',5:'Great'};
-  let selectedMood=null;
-  const DEFAULT_HABITS=[{id:1,name:'Qigong / movement',icon:'🌿'},{id:2,name:'Reading',icon:'📖'},{id:3,name:'Run or cycle',icon:'🏃'},{id:4,name:'Study / learning',icon:'💻'},{id:5,name:'Good sleep',icon:'🌙'},{id:6,name:'Balcony time',icon:'🌌'}];
-  function getHabits(){return JSON.parse(localStorage.getItem('habits')||JSON.stringify(DEFAULT_HABITS));}
-  function saveHabits(h){localStorage.setItem('habits',JSON.stringify(h));}
-  function getTodayKey(){return new Date().toISOString().split('T')[0];}
-  function getTodayChecked(){return JSON.parse(localStorage.getItem('checked_'+getTodayKey())||'[]');}
-  function getStreaks(){return JSON.parse(localStorage.getItem('streaks')||'{}');}
-  function renderHabits(){const habits=getHabits(),checked=getTodayChecked(),streaks=getStreaks(),list=document.getElementById('habitList');list.innerHTML='';habits.forEach(h=>{const done=checked.includes(h.id),streak=streaks[h.id]||0,row=document.createElement('div');row.className='habit-row'+(done?' done':'');row.innerHTML=`<div class="habit-check">${done?'✓':''}</div><div style="font-size:1rem">${h.icon}</div><div class="habit-name">${h.name}</div><div class="habit-streak">${streak>0?streak+'d':''}</div>`;row.onclick=()=>toggleHabit(h.id);list.appendChild(row);});}
-  function toggleHabit(id){const key='checked_'+getTodayKey();let checked=getTodayChecked();checked.includes(id)?checked=checked.filter(x=>x!==id):checked.push(id);localStorage.setItem(key,JSON.stringify(checked));renderHabits();}
-  function addHabit(){const n=document.getElementById('newHabitName').value.trim();if(!n)return;const icon=document.getElementById('newHabitEmoji').value.trim()||'📌',habits=getHabits();habits.push({id:Date.now(),name:n,icon});saveHabits(habits);document.getElementById('newHabitName').value='';document.getElementById('newHabitEmoji').value='';renderHabits();}
-  function selectMood(el,val){document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');selectedMood=val;}
-  function saveDay(){const key=getTodayKey(),checked=getTodayChecked(),note=document.getElementById('moodNote').value.trim(),entry={date:key,mood:selectedMood,note,habits:checked,habitNames:getHabits().reduce((a,h)=>{a[h.id]={name:h.name,icon:h.icon};return a;},{})};const all=JSON.parse(localStorage.getItem('entries')||'[]'),i=all.findIndex(e=>e.date===key);i>=0?all[i]=entry:all.unshift(entry);localStorage.setItem('entries',JSON.stringify(all));showToast('Saved ✓');renderHabits();}
-  function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-  function renderHistory(){const entries=JSON.parse(localStorage.getItem('entries')||'[]'),list=document.getElementById('historyList');if(!entries.length){list.innerHTML='<div class="empty-history">No entries yet — save your first day above.</div>';return;}list.innerHTML=entries.map(e=>{const d=new Date(e.date+'T12:00:00'),ds=d.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),tags=Object.entries(e.habitNames||{}).map(([id,h])=>`<span class="history-habit-tag ${e.habits.includes(parseInt(id))||e.habits.includes(id)?'done':''}">${h.icon} ${h.name}</span>`).join('');return`<div class="history-entry"><div class="history-date"><span>${ds}</span><span>${e.mood?MOODS[e.mood]+' '+MOOD_LABELS[e.mood]:'—'}</span></div>${e.note?`<div class="history-note">"${e.note}"</div>`:''}<div class="history-habits">${tags}</div></div>`;}).join('');}
-  function showTab(id,el){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('panel-'+id).classList.add('active');el.classList.add('active');if(id==='history')renderHistory();}
-  const now=new Date();document.getElementById('headerDate').innerHTML=now.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'})+'<br>'+now.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
-  const todayEntry=JSON.parse(localStorage.getItem('entries')||'[]').find(e=>e.date===getTodayKey());
-  if(todayEntry){if(todayEntry.mood){const btn=document.querySelector(`[data-mood="${todayEntry.mood}"]`);if(btn){btn.classList.add('selected');selectedMood=todayEntry.mood;}}if(todayEntry.note)document.getElementById('moodNote').value=todayEntry.note;}
+  const GH_PATH = 'daily-tracker/data.json';
+  let selectedMood = null;
+
+  const DEFAULT_HABITS = [
+    {id:1,name:'Qigong / movement',icon:'🌿'},
+    {id:2,name:'Reading',icon:'📖'},
+    {id:3,name:'Run or cycle',icon:'🏃'},
+    {id:4,name:'Study / learning',icon:'💻'},
+    {id:5,name:'Good sleep',icon:'🌙'},
+    {id:6,name:'Balcony time',icon:'🌌'}
+  ];
+
+  // ── LOCAL DATA ──
+  function getHabits()  { return JSON.parse(localStorage.getItem('tracker_habits') || JSON.stringify(DEFAULT_HABITS)); }
+  function getEntries() { return JSON.parse(localStorage.getItem('tracker_entries') || '[]'); }
+  function getStreaks() { return JSON.parse(localStorage.getItem('tracker_streaks') || '{}'); }
+  function getTodayKey(){ return new Date().toISOString().split('T')[0]; }
+  function getTodayChecked() { return JSON.parse(localStorage.getItem('tracker_checked_' + getTodayKey()) || '[]'); }
+
+  function setHabits(h)  { localStorage.setItem('tracker_habits',  JSON.stringify(h)); }
+  function setEntries(e) { localStorage.setItem('tracker_entries', JSON.stringify(e)); }
+  function setStreaks(s)  { localStorage.setItem('tracker_streaks', JSON.stringify(s)); }
+
+  function getConfig() {
+    return {
+      token: localStorage.getItem('tracker_gh_token') || '',
+      repo:  localStorage.getItem('tracker_gh_repo')  || 'sh4unn/shaunzen'
+    };
+  }
+
+  // ── GITHUB ──
+  async function ghLoad() {
+    const { token, repo } = getConfig();
+    if (!token) return null;
+    const r = await fetch(`https://api.github.com/repos/${repo}/contents/${GH_PATH}`, {
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error('Load failed (' + r.status + ')');
+    const j = await r.json();
+    return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g, '')))));
+  }
+
+  async function ghSave(data) {
+    const { token, repo } = getConfig();
+    if (!token) return;
+    let sha = null;
+    try {
+      const r = await fetch(`https://api.github.com/repos/${repo}/contents/${GH_PATH}`, {
+        headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (r.ok) sha = (await r.json()).sha;
+    } catch(e) {}
+    const body = { message: 'Daily Tracker: update data', content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))) };
+    if (sha) body.sha = sha;
+    const res = await fetch(`https://api.github.com/repos/${repo}/contents/${GH_PATH}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error('Save failed (' + res.status + ')');
+  }
+
+  function assembleData() {
+    return { habits: getHabits(), entries: getEntries(), streaks: getStreaks() };
+  }
+
+  function applyData(data) {
+    if (data.habits)  setHabits(data.habits);
+    if (data.entries) setEntries(data.entries);
+    if (data.streaks) setStreaks(data.streaks);
+  }
+
+  // ── RENDER ──
+  function renderHabits() {
+    const habits  = getHabits();
+    const checked = getTodayChecked();
+    const streaks = getStreaks();
+    const list = document.getElementById('habitList');
+    list.innerHTML = '';
+    habits.forEach(h => {
+      const done   = checked.includes(h.id);
+      const streak = streaks[h.id] || 0;
+      const row    = document.createElement('div');
+      row.className = 'habit-row' + (done ? ' done' : '');
+      row.innerHTML = `<div class="habit-check">${done ? '✓' : ''}</div><div style="font-size:1rem">${h.icon}</div><div class="habit-name">${h.name}</div><div class="habit-streak">${streak > 0 ? streak + 'd' : ''}</div><button class="habit-delete" onclick="deleteHabit(${h.id},event)" title="Remove habit">×</button>`;
+      row.onclick = () => toggleHabit(h.id);
+      list.appendChild(row);
+    });
+  }
+
+  function renderHistory() {
+    const entries = getEntries();
+    const list = document.getElementById('historyList');
+    if (!entries.length) { list.innerHTML = '<div class="empty-history">No entries yet — save your first day above.</div>'; return; }
+    list.innerHTML = entries.map(e => {
+      const d  = new Date(e.date + 'T12:00:00');
+      const ds = d.toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      const tags = Object.entries(e.habitNames || {}).map(([id, h]) =>
+        `<span class="history-habit-tag ${e.habits.includes(parseInt(id)) || e.habits.includes(id) ? 'done' : ''}">${h.icon} ${h.name}</span>`
+      ).join('');
+      return `<div class="history-entry">
+        <div class="history-date"><span>${ds}</span><span>${e.mood ? MOODS[e.mood] + ' ' + MOOD_LABELS[e.mood] : '—'}</span></div>
+        ${e.note ? `<div class="history-note">"${e.note}"</div>` : ''}
+        <div class="history-habits">${tags}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── INTERACTIONS ──
+  function toggleHabit(id) {
+    const key = 'tracker_checked_' + getTodayKey();
+    let checked = getTodayChecked();
+    checked.includes(id) ? checked = checked.filter(x => x !== id) : checked.push(id);
+    localStorage.setItem(key, JSON.stringify(checked));
+    renderHabits();
+  }
+
+  function deleteHabit(id, e) {
+    e.stopPropagation();
+    const habits = getHabits().filter(h => h.id !== id);
+    setHabits(habits);
+    renderHabits();
+    ghSave(assembleData()).catch(() => {});
+  }
+
+  function addHabit() {
+    const n = document.getElementById('newHabitName').value.trim();
+    if (!n) return;
+    const icon   = document.getElementById('newHabitEmoji').value.trim() || '📌';
+    const habits = getHabits();
+    habits.push({ id: Date.now(), name: n, icon });
+    setHabits(habits);
+    document.getElementById('newHabitName').value  = '';
+    document.getElementById('newHabitEmoji').value = '';
+    renderHabits();
+    ghSave(assembleData()).catch(() => {});
+  }
+
+  function selectMood(el, val) {
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedMood = val;
+  }
+
+  async function saveDay() {
+    const key     = getTodayKey();
+    const checked = getTodayChecked();
+    const note    = document.getElementById('moodNote').value.trim();
+
+    // Build streaks
+    const streaks = getStreaks();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yKey = yesterday.toISOString().split('T')[0];
+    const prevEntry = getEntries().find(e => e.date === yKey);
+    getHabits().forEach(h => {
+      if (checked.includes(h.id)) {
+        const prevDone = prevEntry && (prevEntry.habits.includes(h.id) || prevEntry.habits.includes(parseInt(h.id)));
+        streaks[h.id] = prevDone ? (streaks[h.id] || 0) + 1 : 1;
+      } else {
+        streaks[h.id] = 0;
+      }
+    });
+    setStreaks(streaks);
+
+    const entry = {
+      date: key, mood: selectedMood, note, habits: checked,
+      habitNames: getHabits().reduce((a, h) => { a[h.id] = { name: h.name, icon: h.icon }; return a; }, {})
+    };
+    const all = getEntries();
+    const i   = all.findIndex(e => e.date === key);
+    i >= 0 ? all[i] = entry : all.unshift(entry);
+    setEntries(all);
+
+    renderHabits();
+
+    const btn = document.getElementById('saveBtn');
+    const status = document.getElementById('saveStatus');
+    btn.disabled = true;
+
+    const { token } = getConfig();
+    if (token) {
+      status.textContent = 'Saving to GitHub…';
+      status.className   = 'save-status';
+      try {
+        await ghSave(assembleData());
+        status.textContent = 'Saved to GitHub ✓';
+        status.className   = 'save-status ok';
+        showToast('Saved to GitHub ✓');
+      } catch(e) {
+        status.textContent = 'Saved locally — GitHub error: ' + e.message;
+        status.className   = 'save-status err';
+        showToast('Saved locally');
+      }
+    } else {
+      status.textContent = 'Saved locally (add GitHub token in Settings to back up)';
+      status.className   = 'save-status';
+      showToast('Saved ✓');
+    }
+    btn.disabled = false;
+  }
+
+  // ── SETTINGS ──
+  function saveSettings() {
+    const t = document.getElementById('ghToken').value.trim();
+    const r = document.getElementById('ghRepo').value.trim() || 'sh4unn/shaunzen';
+    localStorage.setItem('tracker_gh_token', t);
+    localStorage.setItem('tracker_gh_repo',  r);
+    setStatus('settingsStatus', 'Saved ✓', 'ok');
+  }
+
+  async function testConnection() {
+    setStatus('settingsStatus', 'Testing…', '');
+    const { token, repo } = getConfig();
+    if (!token) { setStatus('settingsStatus', 'No token saved', 'err'); return; }
+    try {
+      const r = await fetch(`https://api.github.com/repos/${repo}`, { headers: { Authorization: `token ${token}` } });
+      r.ok ? setStatus('settingsStatus', 'Connected ✓ — ' + repo, 'ok')
+           : setStatus('settingsStatus', 'Failed (' + r.status + ') — check token/repo', 'err');
+    } catch(e) { setStatus('settingsStatus', 'Error: ' + e.message, 'err'); }
+  }
+
+  async function pullFromGitHub() {
+    setStatus('settingsStatus', 'Pulling from GitHub…', '');
+    try {
+      const data = await ghLoad();
+      if (!data) { setStatus('settingsStatus', 'No data found on GitHub yet', ''); return; }
+      applyData(data);
+      renderHabits();
+      setStatus('settingsStatus', 'Pulled ✓ — local data updated', 'ok');
+      showToast('Data pulled from GitHub ✓');
+    } catch(e) { setStatus('settingsStatus', 'Pull failed: ' + e.message, 'err'); }
+  }
+
+  function clearLocal() {
+    if (!confirm('Clear all local data? This won\'t delete your GitHub backup.')) return;
+    ['tracker_habits','tracker_entries','tracker_streaks'].forEach(k => localStorage.removeItem(k));
+    // clear today's checked state too
+    localStorage.removeItem('tracker_checked_' + getTodayKey());
+    selectedMood = null;
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('moodNote').value = '';
+    renderHabits();
+    setStatus('settingsStatus', 'Local cache cleared', 'ok');
+  }
+
+  function loadSettingsFields() {
+    const { token, repo } = getConfig();
+    document.getElementById('ghToken').value = token;
+    document.getElementById('ghRepo').value  = repo;
+  }
+
+  function setStatus(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className   = 'status-msg' + (type ? ' ' + type : '');
+  }
+
+  // ── TABS ──
+  function showTab(id, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    el.classList.add('active');
+    if (id === 'history')  renderHistory();
+    if (id === 'settings') loadSettingsFields();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ── INIT ──
+  const now = new Date();
+  document.getElementById('headerDate').innerHTML =
+    now.toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'long' }) +
+    '<br>' + now.toLocaleTimeString('en-AU', { hour:'2-digit', minute:'2-digit' });
+
+  // Restore today's entry if already saved
+  const todayEntry = getEntries().find(e => e.date === getTodayKey());
+  if (todayEntry) {
+    if (todayEntry.mood) {
+      const btn = document.querySelector(`[data-mood="${todayEntry.mood}"]`);
+      if (btn) { btn.classList.add('selected'); selectedMood = todayEntry.mood; }
+    }
+    if (todayEntry.note) document.getElementById('moodNote').value = todayEntry.note;
+  }
+
   renderHabits();
+
+  // Silently pull from GitHub on load if token set
+  (async () => {
+    try {
+      const data = await ghLoad();
+      if (data) { applyData(data); renderHabits(); }
+    } catch(e) {}
+  })();
 </script>
 <div style="background:var(--surface);border-top:1px solid var(--border);padding:0.75rem 1.5rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--faint);text-align:center;"><a href="index.html" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo; Daily Tracker</div>
 </body>
