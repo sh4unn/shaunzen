@@ -1,0 +1,80 @@
+{
+  "habits": [
+    {
+      "id": 1,
+      "name": "Qigong / movement",
+      "icon": "🌿"
+    },
+    {
+      "id": 2,
+      "name": "Reading",
+      "icon": "📖"
+    },
+    {
+      "id": 3,
+      "name": "Run or cycle",
+      "icon": "🏃"
+    },
+    {
+      "id": 4,
+      "name": "Study / learning",
+      "icon": "💻"
+    },
+    {
+      "id": 5,
+      "name": "Good sleep",
+      "icon": "🌙"
+    },
+    {
+      "id": 6,
+      "name": "Balcony time",
+      "icon": "🌌"
+    }
+  ],
+  "entries": [
+    {
+      "date": "2026-04-14",
+      "mood": 4,
+      "note": "",
+      "habits": [
+        1,
+        4,
+        5
+      ],
+      "habitNames": {
+        "1": {
+          "name": "Qigong / movement",
+          "icon": "🌿"
+        },
+        "2": {
+          "name": "Reading",
+          "icon": "📖"
+        },
+        "3": {
+          "name": "Run or cycle",
+          "icon": "🏃"
+        },
+        "4": {
+          "name": "Study / learning",
+          "icon": "💻"
+        },
+        "5": {
+          "name": "Good sleep",
+          "icon": "🌙"
+        },
+        "6": {
+          "name": "Balcony time",
+          "icon": "🌌"
+        }
+      }
+    }
+  ],
+  "streaks": {
+    "1": 1,
+    "2": 0,
+    "3": 0,
+    "4": 1,
+    "5": 1,
+    "6": 0
+  }
+}
