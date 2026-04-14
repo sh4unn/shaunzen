@@ -4,43 +4,47 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Qigong Practice</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&family=Noto+Serif+SC&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream:#f4efe4; --parchment:#ede6d6; --warm:#e4dbc8;
-    --teal:#2a6b5e; --teal-light:#3a8a7c; --teal-faint:#e8f4f2;
-    --burnt:#b8511e; --burnt-faint:#faf0ea;
-    --gold:#9a7820; --ink:#1a1410; --muted:#7a6a5a; --faint:#c4b89e; --border:#d5c9b2;
+    --bg:#f0f4f5; --surface:#e4ecee; --surface2:#dde7ea;
+    --border:#c0ced2; --slate:#bfcbce;
+    --ink:#1a2628; --muted:#4a6068; --faint:#8fa0a5;
+    --accent:#2a5a6a; --accent-light:#3a7a8c; --accent-faint:#e0ecf0;
+    --warm:#c45e2a; --gold:#8a6a20; --green:#3a6a2a; --red:#7a2020; --purple:#5a3a7a;
+    --cream:#f0f4f5; --parchment:#e4ecee; --teal:#2a5a6a; --teal-light:#3a7a8c; --teal-faint:#e0ecf0;
+    --burnt:#c45e2a; --burnt-faint:#f8f0e8;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--cream);color:var(--ink);font-family:'Noto Sans',sans-serif;min-height:100vh;line-height:1.7;padding-bottom:4rem;}
+  body{background:var(--bg);color:var(--ink);font-family:'Spectral',serif;min-height:100vh;line-height:1.7;padding-bottom:4rem;}
   /* HOME BTN */
-  .home-btn{position:fixed;top:1rem;left:1rem;z-index:100;background:var(--teal);color:var(--cream);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;border-radius:2px;transition:background 0.2s;opacity:0.85;}
-  .home-btn:hover{background:var(--teal-light);opacity:1;}
+  .home-btn{position:fixed;top:1rem;left:1rem;z-index:100;background:var(--accent);color:white;text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;border-radius:2px;transition:background 0.2s;}
+  .home-btn:hover{background:var(--accent-light);}
   /* HEADER */
   .header{background:var(--teal);color:var(--cream);padding:3rem 2rem 2.5rem;position:relative;overflow:hidden;text-align:center;}
   .yinyang-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18rem;opacity:0.05;line-height:1;pointer-events:none;user-select:none;}
   .header-chinese{font-family:'Noto Serif SC',serif;font-size:3rem;color:rgba(244,239,228,0.15);letter-spacing:0.5rem;margin-bottom:0.5rem;position:relative;}
   .header-label{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(244,239,228,0.45);margin-bottom:0.75rem;position:relative;}
-  header h1{font-family:'Noto Serif',serif;font-size:clamp(2rem,5vw,2.8rem);font-weight:300;letter-spacing:0.05em;position:relative;margin-bottom:0.5rem;}
+  header h1{font-family:'New Rocker',cursive;font-size:clamp(2rem,6vw,3rem);font-weight:400;letter-spacing:0.02em;position:relative;margin-bottom:0.5rem;}
   .header-sub{font-size:0.85rem;color:rgba(244,239,228,0.5);font-weight:300;font-style:italic;position:relative;}
   .yinyang-row{margin-top:1.5rem;font-size:1.4rem;opacity:0.4;letter-spacing:1rem;position:relative;}
   /* TABS */
   .tabs{background:var(--teal-light);display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:10;}
   .tabs::-webkit-scrollbar{display:none;}
-  .tab{padding:0.85rem 1.5rem;font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(244,239,228,0.5);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s;font-family:'Noto Sans',sans-serif;}
+  .tab{padding:0.85rem 1.5rem;font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(244,239,228,0.5);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s;font-family:'IBM Plex Mono',monospace;}
   .tab:hover{color:rgba(244,239,228,0.85);}
   .tab.active{color:var(--cream);border-bottom-color:var(--cream);}
   main{max-width:820px;margin:0 auto;padding:2.5rem 1.5rem 4rem;position:relative;}
   .panel{display:none;} .panel.active{display:block;}
   .section-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.75rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);}
-  .section-head h2{font-family:'Noto Serif',serif;font-size:1.4rem;font-weight:300;color:var(--teal);}
+  .section-head h2{font-family:'Spectral',serif;font-size:1.4rem;font-weight:300;color:var(--teal);}
   .section-head .chinese{font-family:'Noto Serif SC',serif;font-size:1.1rem;color:var(--border);}
   /* PRINCIPLES */
   .principles{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2.5rem;}
   .principle-card{background:var(--parchment);border:1px solid var(--border);border-radius:8px;padding:1.25rem;position:relative;overflow:hidden;}
   .principle-card::before{content:attr(data-symbol);position:absolute;bottom:-0.5rem;right:0.5rem;font-family:'Noto Serif SC',serif;font-size:3rem;color:var(--teal);opacity:0.06;pointer-events:none;}
-  .principle-name{font-family:'Noto Serif',serif;font-size:0.95rem;color:var(--teal);margin-bottom:0.3rem;}
+  .principle-name{font-family:'Spectral',serif;font-size:0.95rem;color:var(--teal);margin-bottom:0.3rem;}
   .principle-chinese{font-family:'Noto Serif SC',serif;font-size:0.8rem;color:var(--gold);margin-bottom:0.5rem;}
   .principle-desc{font-size:0.82rem;color:var(--muted);font-weight:300;line-height:1.6;}
   /* WORKOUTS */
@@ -49,13 +53,13 @@
   .workout-header{background:var(--teal);color:var(--cream);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;}
   .workout-header:hover{background:var(--teal-light);}
   .workout-title-group{display:flex;flex-direction:column;gap:0.15rem;}
-  .workout-title{font-family:'Noto Serif',serif;font-size:1rem;font-weight:400;}
+  .workout-title{font-family:'Spectral',serif;font-size:1rem;font-weight:400;}
   .workout-meta{font-size:0.75rem;color:rgba(244,239,228,0.55);font-weight:300;}
   .workout-chevron{font-size:0.8rem;opacity:0.6;transition:transform 0.25s;}
   .workout-card.open .workout-chevron{transform:rotate(180deg);}
   .workout-body{display:none;padding:1.5rem;}
   .workout-card.open .workout-body{display:block;}
-  .workout-intro{font-size:0.85rem;color:var(--muted);font-style:italic;margin-bottom:1.25rem;font-family:'Noto Serif',serif;line-height:1.7;padding-left:1rem;border-left:2px solid var(--border);}
+  .workout-intro{font-size:0.85rem;color:var(--muted);font-style:italic;margin-bottom:1.25rem;font-family:'Spectral',serif;line-height:1.7;padding-left:1rem;border-left:2px solid var(--border);}
   .exercise-list{list-style:none;display:flex;flex-direction:column;gap:0.85rem;}
   .exercise-item{display:grid;grid-template-columns:2rem 1fr;gap:0.75rem;align-items:start;}
   .exercise-num{font-family:'Noto Serif SC',serif;font-size:0.75rem;color:var(--teal);opacity:0.5;padding-top:0.1rem;text-align:center;}
@@ -65,21 +69,21 @@
   /* BREATHING */
   .breath-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;}
   .breath-card{background:var(--parchment);border:1px solid var(--border);border-radius:8px;padding:1.25rem;}
-  .breath-name{font-family:'Noto Serif',serif;font-size:0.95rem;color:var(--teal);margin-bottom:0.2rem;}
+  .breath-name{font-family:'Spectral',serif;font-size:0.95rem;color:var(--teal);margin-bottom:0.2rem;}
   .breath-chinese{font-family:'Noto Serif SC',serif;font-size:0.8rem;color:var(--gold);margin-bottom:0.6rem;}
   .breath-steps{list-style:none;font-size:0.82rem;color:var(--muted);font-weight:300;line-height:1.7;}
   .breath-steps li::before{content:'— ';color:var(--border);}
   /* PHILOSOPHY */
-  .philosophy-intro{font-family:'Noto Serif',serif;font-size:1rem;color:var(--muted);font-style:italic;font-weight:300;line-height:1.85;margin-bottom:2rem;padding:1.25rem 1.5rem;background:var(--parchment);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;}
+  .philosophy-intro{font-family:'Spectral',serif;font-size:1rem;color:var(--muted);font-style:italic;font-weight:300;line-height:1.85;margin-bottom:2rem;padding:1.25rem 1.5rem;background:var(--parchment);border-left:3px solid var(--teal);border-radius:0 6px 6px 0;}
   .concept-list{display:flex;flex-direction:column;gap:1.25rem;}
   .concept-item{display:grid;grid-template-columns:3rem 1fr;gap:1rem;align-items:start;padding:1.1rem;background:var(--parchment);border:1px solid var(--border);border-radius:8px;}
   .concept-char{font-family:'Noto Serif SC',serif;font-size:2rem;color:var(--teal);opacity:0.7;line-height:1;text-align:center;padding-top:0.1rem;}
-  .concept-name{font-family:'Noto Serif',serif;font-size:0.95rem;color:var(--ink);margin-bottom:0.25rem;}
+  .concept-name{font-family:'Spectral',serif;font-size:0.95rem;color:var(--ink);margin-bottom:0.25rem;}
   .concept-desc{font-size:0.82rem;color:var(--muted);font-weight:300;line-height:1.6;}
   /* KOAN */
   .koan-box{margin-top:3rem;text-align:center;padding:2rem 1.5rem;border-top:1px solid var(--border);}
   .koan-symbol{font-size:1.5rem;opacity:0.2;margin-bottom:0.75rem;}
-  .koan-text{font-family:'Noto Serif',serif;font-size:0.95rem;font-style:italic;color:var(--muted);font-weight:300;line-height:1.8;max-width:400px;margin:0 auto 0.5rem;}
+  .koan-text{font-family:'Spectral',serif;font-size:0.95rem;font-style:italic;color:var(--muted);font-weight:300;line-height:1.8;max-width:400px;margin:0 auto 0.5rem;}
   .koan-source{font-size:0.75rem;color:var(--border);letter-spacing:0.1em;}
   @media(max-width:600px){main{padding:2rem 1rem 3rem;} .principles{grid-template-columns:1fr 1fr;}}
 </style>
@@ -210,5 +214,6 @@
   function showTab(id,el){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('panel-'+id).classList.add('active');el.classList.add('active');}
   function toggleWorkout(card){card.classList.toggle('open');}
 </script>
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:0.75rem 1.5rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--faint);text-align:center;"><a href="index.html" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo; Qigong</div>
 </body>
 </html>

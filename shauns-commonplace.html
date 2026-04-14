@@ -3,96 +3,113 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#8a6a20">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Shaun's Commonplace</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream:#f4efe4; --parchment:#ede6d6; --warm:#e4dbc8;
-    --teal:#2a6b5e; --teal-light:#3a8a7c; --teal-faint:#e8f4f2;
-    --burnt:#b8511e; --gold:#9a7820; --gold-faint:#faf5e8;
-    --ink:#1a1410; --muted:#7a6a5a; --faint:#c4b89e; --border:#d5c9b2;
+    --bg: #f0f4f5;
+    --surface: #e4ecee;
+    --surface2: #dde7ea;
+    --border: #c0ced2;
+    --slate: #bfcbce;
+    --ink: #1a2628;
+    --muted: #4a6068;
+    --faint: #8fa0a5;
+    --accent: #2a5a6a;
+    --accent-light: #3a7a8c;
+    --accent-faint: #e0ecf0;
+    --warm: #c45e2a;
+    --gold: #8a6a20;
+    --gold-light: #aa8a30;
+    --gold-faint: #f5f0e0;
+    --green: #3a6a2a;
+    --red: #7a2020;
+    --purple: #5a3a7a;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--cream); color:var(--ink); font-family:'Noto Sans',sans-serif; min-height:100vh; padding-bottom:5rem; }
+  body { background:var(--bg); color:var(--ink); font-family:'Spectral',serif; min-height:100vh; padding-bottom:5rem; }
 
-  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--teal); color:var(--cream); text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; opacity:0.85; transition:background 0.2s; }
-  .home-btn:hover { background:var(--teal-light); opacity:1; }
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--accent); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; }
+  .home-btn:hover { background:var(--accent-light); }
 
-  .header { background:var(--gold); color:var(--cream); padding:2.5rem 2rem 2rem; text-align:center; position:relative; overflow:hidden; }
+  .header { background:var(--gold); color:white; padding:2.5rem 2rem 2rem; text-align:center; position:relative; overflow:hidden; }
   .header::before { content:'📖'; position:absolute; right:-1rem; top:-1rem; font-size:9rem; opacity:0.08; pointer-events:none; }
-  .header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(244,239,228,0.55); margin-bottom:0.6rem; }
-  .header h1 { font-family:'Noto Serif',serif; font-size:clamp(1.8rem,5vw,2.8rem); font-weight:300; letter-spacing:0.05em; margin-bottom:0.3rem; }
-  .header-sub { font-size:0.82rem; color:rgba(244,239,228,0.55); font-style:italic; font-family:'Noto Serif',serif; }
+  .header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-bottom:0.6rem; }
+  .header h1 { font-family:'New Rocker',cursive; font-size:clamp(2rem,6vw,3rem); font-weight:400; letter-spacing:0.02em; margin-bottom:0.3rem; }
+  .header-sub { font-size:0.85rem; color:rgba(255,255,255,0.55); font-style:italic; }
 
-  .tabs { background:#7a6010; display:flex; }
-  .tab { flex:1; padding:0.75rem; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(244,239,228,0.45); cursor:pointer; text-align:center; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; }
-  .tab.active { color:var(--cream); border-bottom-color:var(--cream); }
-  .tab:hover { color:rgba(244,239,228,0.8); }
+  .tabs { background:rgba(0,0,0,0.2); display:flex; }
+  .tab { flex:1; padding:0.75rem; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.45); cursor:pointer; text-align:center; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; }
+  .tab.active { color:white; border-bottom-color:white; }
+  .tab:hover { color:rgba(255,255,255,0.8); }
 
   main { max-width:760px; margin:0 auto; padding:2rem 1.5rem; }
   .panel { display:none; } .panel.active { display:block; }
 
-  /* SHARED */
-  .card { background:var(--parchment); border:1px solid var(--border); border-radius:10px; padding:1.5rem; margin-bottom:1.25rem; }
-  .card-title { font-family:'Noto Serif',serif; font-size:1rem; color:var(--gold); margin-bottom:1rem; font-weight:400; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin-bottom:1.25rem; }
+  .card-title { font-family:'Spectral',serif; font-size:1rem; color:var(--gold); margin-bottom:1rem; }
   .field { margin-bottom:0.85rem; }
   .field label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:0.4rem; }
-  .field input, .field select { width:100%; background:white; border:1px solid var(--border); border-radius:6px; padding:0.6rem 0.85rem; font-family:'Noto Sans',sans-serif; font-size:0.85rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .field input, .field select { width:100%; background:white; border:1px solid var(--border); border-radius:4px; padding:0.6rem 0.85rem; font-family:'Spectral',serif; font-size:0.9rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
   .field input:focus, .field select:focus { border-color:var(--gold); }
-  .field input::placeholder { color:var(--border); }
-  .btn { background:var(--gold); color:var(--cream); border:none; border-radius:6px; padding:0.6rem 1.4rem; font-family:'Noto Sans',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; transition:background 0.2s; }
-  .btn:hover { background:#b89028; }
-  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:6px; padding:0.6rem 1.1rem; font-family:'Noto Sans',sans-serif; font-size:0.82rem; cursor:pointer; transition:all 0.2s; margin-left:0.5rem; }
+  .field input::placeholder { color:var(--slate); }
+  .btn { background:var(--gold); color:white; border:none; border-radius:4px; padding:0.6rem 1.4rem; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; cursor:pointer; transition:background 0.2s; letter-spacing:0.04em; }
+  .btn:hover { background:var(--gold-light); }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:4px; padding:0.6rem 1.1rem; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; cursor:pointer; transition:all 0.2s; margin-left:0.5rem; }
   .btn-ghost:hover { border-color:var(--gold); color:var(--gold); }
   .status-msg { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); margin-top:0.75rem; min-height:16px; }
-  .status-msg.ok { color:var(--teal); } .status-msg.err { color:var(--burnt); }
+  .status-msg.ok { color:var(--green); } .status-msg.err { color:var(--red); }
 
-  /* NOTE EDITOR */
-  .note-title-input { width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); padding:0.5rem 0; font-family:'Noto Serif',serif; font-size:1.15rem; color:var(--ink); outline:none; margin-bottom:0.75rem; transition:border-color 0.2s; }
+  .note-title-input { width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); padding:0.5rem 0; font-family:'Spectral',serif; font-size:1.15rem; color:var(--ink); outline:none; margin-bottom:0.75rem; transition:border-color 0.2s; }
   .note-title-input:focus { border-bottom-color:var(--gold); }
-  .note-title-input::placeholder { color:var(--border); font-style:italic; }
+  .note-title-input::placeholder { color:var(--slate); font-style:italic; }
 
   .tag-row { display:flex; gap:0.5rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap; }
   .tag-input { background:white; border:1px solid var(--border); border-radius:20px; padding:0.25rem 0.75rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink); outline:none; width:140px; transition:border-color 0.2s; }
   .tag-input:focus { border-color:var(--gold); }
-  .tag-input::placeholder { color:var(--border); }
+  .tag-input::placeholder { color:var(--slate); }
   .tag-chip { background:var(--gold-faint); border:1px solid #d4b870; border-radius:20px; padding:0.2rem 0.65rem; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--gold); cursor:pointer; }
   .tag-chip:hover { background:#e8d88a; }
 
-  .note-body-input { width:100%; background:transparent; border:none; font-family:'Noto Serif',serif; font-size:0.95rem; color:var(--ink); outline:none; resize:none; line-height:1.9; min-height:300px; }
-  .note-body-input::placeholder { color:var(--border); font-style:italic; }
+  .note-body-input { width:100%; background:transparent; border:none; font-family:'Spectral',serif; font-size:0.95rem; color:var(--ink); outline:none; resize:none; line-height:1.9; min-height:300px; }
+  .note-body-input::placeholder { color:var(--slate); font-style:italic; }
   .editor-footer { display:flex; justify-content:space-between; align-items:center; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border); }
-  .word-count { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--border); }
+  .word-count { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--slate); }
 
-  /* NOTES LIST */
-  .search-bar { width:100%; background:white; border:1px solid var(--border); border-radius:8px; padding:0.65rem 1rem; font-family:'Noto Sans',sans-serif; font-size:0.85rem; color:var(--ink); outline:none; margin-bottom:1.25rem; transition:border-color 0.2s; }
+  .search-bar { width:100%; background:white; border:1px solid var(--border); border-radius:6px; padding:0.65rem 1rem; font-family:'Spectral',serif; font-size:0.9rem; color:var(--ink); outline:none; margin-bottom:1.25rem; transition:border-color 0.2s; }
   .search-bar:focus { border-color:var(--gold); }
   .search-bar::placeholder { color:var(--faint); font-style:italic; }
 
   .category-filter { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1.25rem; }
-  .cat-chip { background:white; border:1.5px solid var(--border); border-radius:20px; padding:0.25rem 0.75rem; font-size:0.78rem; cursor:pointer; transition:all 0.2s; color:var(--muted); user-select:none; }
+  .cat-chip { background:white; border:1.5px solid var(--border); border-radius:20px; padding:0.25rem 0.75rem; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; cursor:pointer; transition:all 0.2s; color:var(--muted); user-select:none; }
   .cat-chip:hover { border-color:var(--gold); color:var(--gold); }
-  .cat-chip.active { background:var(--gold-faint); border-color:var(--gold); color:var(--gold); font-weight:500; }
+  .cat-chip.active { background:var(--gold-faint); border-color:var(--gold); color:var(--gold); }
 
-  .note-card { background:var(--parchment); border:1px solid var(--border); border-radius:10px; padding:1.1rem 1.4rem; margin-bottom:0.75rem; cursor:pointer; transition:border-color 0.2s; }
+  .note-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.1rem 1.4rem; margin-bottom:0.75rem; cursor:pointer; transition:border-color 0.2s; }
   .note-card:hover { border-color:var(--gold); }
   .note-card-meta { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); margin-bottom:0.3rem; display:flex; justify-content:space-between; }
-  .note-card-title { font-family:'Noto Serif',serif; font-size:0.95rem; color:var(--ink); margin-bottom:0.3rem; }
-  .note-card-preview { font-size:0.78rem; color:var(--muted); font-style:italic; font-family:'Noto Serif',serif; line-height:1.5; }
+  .note-card-title { font-family:'Spectral',serif; font-size:0.95rem; color:var(--ink); margin-bottom:0.3rem; }
+  .note-card-preview { font-size:0.78rem; color:var(--muted); font-style:italic; line-height:1.5; }
   .note-card-tags { display:flex; gap:0.3rem; flex-wrap:wrap; margin-top:0.5rem; }
   .note-card-tag { font-family:'IBM Plex Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.1em; background:var(--gold-faint); color:var(--gold); border-radius:20px; padding:0.1rem 0.5rem; }
 
-  /* READER */
   .reader-back { background:none; border:none; color:var(--gold); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; cursor:pointer; margin-bottom:1.5rem; padding:0; text-transform:uppercase; }
   .reader-meta { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); margin-bottom:0.5rem; }
-  .reader-title { font-family:'Noto Serif',serif; font-size:1.6rem; font-weight:300; color:var(--ink); margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
-  .reader-body { font-family:'Noto Serif',serif; font-size:0.95rem; line-height:1.9; color:var(--ink); white-space:pre-wrap; }
+  .reader-title { font-family:'Spectral',serif; font-size:1.6rem; font-weight:300; color:var(--ink); margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
+  .reader-body { font-family:'Spectral',serif; font-size:0.95rem; line-height:1.9; color:var(--ink); white-space:pre-wrap; }
 
-  .empty-state { text-align:center; padding:3rem 1rem; color:var(--faint); font-family:'Noto Serif',serif; font-style:italic; }
+  .empty-state { text-align:center; padding:3rem 1rem; color:var(--faint); font-style:italic; }
   .loading-overlay { text-align:center; padding:2rem; }
   .spinner { width:28px; height:28px; border:2px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 0.75rem; }
   @keyframes spin { to { transform:rotate(360deg); } }
-  .loading-text { font-family:'Noto Serif',serif; font-style:italic; font-size:0.85rem; color:var(--muted); }
+  .loading-text { font-style:italic; font-size:0.85rem; color:var(--muted); }
+
+  .breadcrumb { background:var(--surface); border-top:1px solid var(--border); padding:0.75rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--faint); text-align:center; }
+  .breadcrumb a { color:var(--accent); text-decoration:none; }
+  .breadcrumb a:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -160,7 +177,7 @@
   <div class="panel" id="panel-settings">
     <div class="card">
       <div class="card-title">GitHub Connection</div>
-      <div style="font-size:0.8rem;color:var(--muted);font-style:italic;font-family:'Noto Serif',serif;margin-bottom:1.25rem;">Token stored locally in your browser only.</div>
+      <div style="font-size:0.82rem;color:var(--muted);font-style:italic;margin-bottom:1.25rem;">Token stored locally in your browser only.</div>
       <div class="field"><label>GitHub Token</label><input type="password" id="ghToken" placeholder="ghp_…"></div>
       <div class="field"><label>Repo</label><input type="text" id="ghRepo" placeholder="sh4unn/shaunzen" value="sh4unn/shaunzen"></div>
       <button class="btn" onclick="saveSettings()">Save</button>
@@ -170,6 +187,7 @@
   </div>
 
 </main>
+<div class="breadcrumb"><a href="index.html">Home</a> &rsaquo; Shaun's Commonplace</div>
 <script>
   let activeTags = [];
   let allNotes = [];
@@ -209,18 +227,14 @@
     if (val && !activeTags.includes(val)) { activeTags.push(val); renderActiveTags(); }
     input.value = '';
   }
-
   function removeTag(tag) { activeTags = activeTags.filter(t => t !== tag); renderActiveTags(); }
-
   function renderActiveTags() {
     document.getElementById('activeTags').innerHTML = activeTags.map(t => `<span class="tag-chip" onclick="removeTag('${t}')">${t} ×</span>`).join('');
   }
-
   function updateNoteWordCount() {
     const w = document.getElementById('noteBody').value.trim().split(/\s+/).filter(x=>x).length;
     document.getElementById('noteWordCount').textContent = w + ' word' + (w!==1?'s':'');
   }
-
   function clearNote() { document.getElementById('noteTitle').value=''; document.getElementById('noteBody').value=''; activeTags=[]; renderActiveTags(); updateNoteWordCount(); }
 
   async function saveNote() {
@@ -263,9 +277,7 @@
     const cats = ['All', ...new Set(allNotes.map(n=>n.category))];
     document.getElementById('catFilter').innerHTML = cats.map(c => `<div class="cat-chip${c===activeCategory?' active':''}" onclick="setCategory('${c}')">${c}</div>`).join('');
   }
-
   function setCategory(cat) { activeCategory=cat; buildCategoryFilter(); renderNotes(); }
-
   function filterNotes() { renderNotes(); }
 
   function renderNotes() {

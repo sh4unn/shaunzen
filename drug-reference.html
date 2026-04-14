@@ -4,325 +4,327 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Drug Reference</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Libre+Franklin:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream:#f4efe4; --parchment:#ede6d6; --warm:#e4dbc8;
-    --teal:#2a6b5e; --teal-light:#3a8a7c; --teal-faint:#e8f4f2;
-    --burnt:#b8511e; --burnt-faint:#faf0ea;
-    --red:#8a2020; --red-faint:#faf0f0;
-    --ink:#1a1410; --muted:#7a6a5a; --faint:#c4b89e; --border:#d5c9b2;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--cream); color:var(--ink); font-family:'Noto Sans',sans-serif; min-height:100vh; padding-bottom:5rem; }
-
-  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--teal); color:var(--cream); text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; opacity:0.85; transition:background 0.2s; }
-  .home-btn:hover { background:var(--teal-light); opacity:1; }
-
-  .header { background:var(--red); color:var(--cream); padding:2.5rem 2rem 2rem; text-align:center; position:relative; overflow:hidden; }
-  .header::before { content:'💊'; position:absolute; right:-0.5rem; top:-0.5rem; font-size:9rem; opacity:0.07; pointer-events:none; }
-  .header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(244,239,228,0.45); margin-bottom:0.6rem; }
-  .header h1 { font-family:'Noto Serif',serif; font-size:clamp(1.8rem,5vw,2.8rem); font-weight:300; letter-spacing:0.05em; margin-bottom:0.3rem; }
-  .header-sub { font-size:0.82rem; color:rgba(244,239,228,0.5); font-style:italic; font-family:'Noto Serif',serif; }
-
-  .disclaimer { background:#fff8e8; border-bottom:1px solid #e8d5a0; padding:0.75rem 1.5rem; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8a6420; letter-spacing:0.05em; }
-
-  main { max-width:760px; margin:0 auto; padding:2rem 1.5rem; }
-
-  /* SEARCH */
-  .search-card { background:var(--parchment); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
-  .search-row { display:flex; gap:0.5rem; margin-bottom:0.75rem; }
-  .search-input { flex:1; background:white; border:1px solid var(--border); border-radius:6px; padding:0.75rem 1rem; font-family:'Noto Sans',sans-serif; font-size:1rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
-  .search-input:focus { border-color:var(--red); }
-  .search-input::placeholder { color:var(--faint); }
-  .search-btn { background:var(--red); color:white; border:none; border-radius:6px; padding:0.75rem 1.5rem; font-family:'Noto Sans',sans-serif; font-size:0.9rem; font-weight:500; cursor:pointer; transition:background 0.2s; white-space:nowrap; }
-  .search-btn:hover { background:#aa2828; }
-  .search-btn:disabled { opacity:0.45; cursor:not-allowed; }
-
-  .context-row { display:flex; gap:0.5rem; flex-wrap:wrap; }
-  .ctx-chip { background:white; border:1.5px solid var(--border); border-radius:20px; padding:0.25rem 0.75rem; font-size:0.78rem; cursor:pointer; transition:all 0.2s; color:var(--muted); user-select:none; }
-  .ctx-chip:hover { border-color:var(--red); color:var(--red); }
-  .ctx-chip.active { background:var(--red-faint); border-color:var(--red); color:var(--red); font-weight:500; }
-
-  /* QUICK DRUGS */
-  .quick-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--faint); margin-bottom:0.75rem; }
-  .quick-grid { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1.5rem; }
-  .quick-btn { background:var(--parchment); border:1px solid var(--border); border-radius:20px; padding:0.3rem 0.85rem; font-family:'IBM Plex Mono',monospace; font-size:11px; cursor:pointer; transition:all 0.2s; color:var(--muted); }
-  .quick-btn:hover { border-color:var(--red); color:var(--red); background:var(--red-faint); }
-
-  /* LOADING */
-  .loading { text-align:center; padding:2.5rem; display:none; }
-  .loading.show { display:block; }
-  .spinner { width:32px; height:32px; border:2px solid var(--border); border-top-color:var(--red); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 0.75rem; }
-  @keyframes spin { to{transform:rotate(360deg)} }
-  .loading-text { font-family:'Noto Serif',serif; font-style:italic; font-size:0.85rem; color:var(--muted); }
-
-  /* RESULT */
-  .result { display:none; }
-  .result.show { display:block; }
-
-  .drug-header { background:var(--red); color:white; border-radius:10px 10px 0 0; padding:1.25rem 1.5rem; }
-  .drug-name { font-family:'Noto Serif',serif; font-size:1.6rem; font-weight:300; margin-bottom:0.2rem; }
-  .drug-class { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; opacity:0.65; }
-
-  .drug-body { background:var(--parchment); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; }
-
-  .drug-section { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); }
-  .drug-section:last-child { border-bottom:none; }
-  .section-title { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--faint); margin-bottom:0.6rem; }
-  .section-content { font-family:'Noto Serif',serif; font-size:0.9rem; color:var(--ink); line-height:1.75; }
-
-  .info-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:0.75rem; }
-  .info-box { background:white; border:1px solid var(--border); border-radius:6px; padding:0.75rem; }
-  .info-box-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); margin-bottom:0.25rem; }
-  .info-box-val { font-family:'Noto Serif',serif; font-size:0.88rem; color:var(--ink); line-height:1.4; }
-
-  .warning-box { background:#fff5f5; border:1px solid #f0c0c0; border-radius:6px; padding:0.85rem 1rem; margin-top:0.75rem; }
-  .warning-box .section-title { color:#cc4444; }
-  .warning-content { font-size:0.85rem; color:#8a3030; font-family:'Noto Serif',serif; font-style:italic; line-height:1.7; }
-
-  .tag-row { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.5rem; }
-  .drug-tag { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; background:var(--teal-faint); color:var(--teal); border-radius:20px; padding:0.15rem 0.6rem; border:1px solid #90c0b8; }
-
-  .error-box { background:var(--burnt-faint); border:1px solid #daa090; border-radius:10px; padding:1.25rem; margin-bottom:1.5rem; display:none; font-size:0.85rem; color:var(--burnt); font-family:'Noto Serif',serif; font-style:italic; }
-  .error-box.show { display:block; }
-
-  .history-section { margin-top:1.5rem; }
-  .history-item { background:var(--parchment); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin-bottom:0.5rem; cursor:pointer; transition:border-color 0.2s; display:flex; justify-content:space-between; align-items:center; }
-  .history-item:hover { border-color:var(--red); }
-  .history-name { font-family:'Noto Serif',serif; font-size:0.9rem; }
-  .history-class { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); text-transform:uppercase; letter-spacing:0.1em; }
+  :root{--bg:#f0f4f5;--surface:#e4ecee;--parchment:#d8e4e8;--warm:#ccdce0;--steel:#bfcbce;--border:#a8bcc0;--navy:#1a2330;--navy-light:#243040;--teal:#2a5a6a;--teal-light:#3a7a8a;--teal-faint:#e8f4f6;--rust:#7a3a1a;--rust-light:#9a5030;--rust-faint:#f5ede8;--gold:#8a6a20;--ink:#0f1518;--muted:#4a5a60;--faint:#8a9ea4;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--ink);font-family:'Libre Franklin',sans-serif;min-height:100vh;padding-bottom:5rem;}
+  .home-btn{position:fixed;top:1rem;left:1rem;z-index:100;background:var(--navy);color:#f0f4f5;text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;border-radius:2px;opacity:0.85;transition:background 0.2s;}
+  .home-btn:hover{background:var(--navy-light);opacity:1;}
+  .header{background:linear-gradient(135deg,var(--rust) 0%,#5a2010 100%);color:#f0f4f5;padding:2.5rem 2rem 2rem;text-align:center;position:relative;overflow:hidden;}
+  .header::before{content:'💊';position:absolute;right:-0.5rem;top:-0.5rem;font-size:9rem;opacity:0.07;pointer-events:none;}
+  .header-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(240,244,245,0.45);margin-bottom:0.6rem;}
+  .header h1{font-family:'New Rocker',cursive;font-size:clamp(2rem,6vw,3.2rem);margin-bottom:0.3rem;color:#f0f4f5;}
+  .header-sub{font-size:0.82rem;color:rgba(240,244,245,0.5);font-style:italic;font-weight:300;}
+  .tabs{background:var(--rust-light);display:flex;}
+  .tab{flex:1;padding:0.75rem;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(240,244,245,0.45);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s;}
+  .tab.active{color:#f0f4f5;border-bottom-color:#f0f4f5;}
+  .tab:hover{color:rgba(240,244,245,0.8);}
+  .disclaimer{background:#fff8e8;border-bottom:1px solid #e8d5a0;padding:0.65rem 1.5rem;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a6420;letter-spacing:0.04em;}
+  main{max-width:760px;margin:0 auto;padding:2rem 1.5rem;}
+  .panel{display:none;}.panel.active{display:block;}
+  .no-key-banner{background:var(--rust-faint);border:1px solid #c8a090;border-radius:8px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:none;}
+  .no-key-banner.show{display:block;}
+  .no-key-title{font-family:'New Rocker',cursive;font-size:1.2rem;color:var(--rust);margin-bottom:0.4rem;}
+  .no-key-text{font-size:0.82rem;color:var(--muted);line-height:1.65;margin-bottom:0.75rem;}
+  .no-key-btn{background:var(--rust);color:#f0f4f5;border:none;border-radius:4px;padding:0.5rem 1.1rem;font-size:0.82rem;font-weight:500;cursor:pointer;transition:background 0.2s;}
+  .no-key-btn:hover{background:var(--rust-light);}
+  .search-card{background:var(--parchment);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem;}
+  .search-row{display:flex;gap:0.5rem;margin-bottom:0.85rem;}
+  .search-input{flex:1;background:white;border:1px solid var(--border);border-radius:4px;padding:0.75rem 1rem;font-family:'Libre Franklin',sans-serif;font-size:1rem;color:var(--ink);outline:none;transition:border-color 0.2s;}
+  .search-input:focus{border-color:var(--rust);}
+  .search-input::placeholder{color:var(--faint);}
+  .search-btn{background:var(--rust);color:white;border:none;border-radius:4px;padding:0.75rem 1.5rem;font-family:'Libre Franklin',sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;transition:background 0.2s;white-space:nowrap;}
+  .search-btn:hover{background:var(--rust-light);}
+  .search-btn:disabled{opacity:0.45;cursor:not-allowed;}
+  .ctx-row{display:flex;gap:0.4rem;flex-wrap:wrap;}
+  .ctx-chip{background:white;border:1.5px solid var(--border);border-radius:20px;padding:0.25rem 0.75rem;font-size:0.78rem;cursor:pointer;transition:all 0.2s;color:var(--muted);user-select:none;}
+  .ctx-chip:hover{border-color:var(--rust);color:var(--rust);}
+  .ctx-chip.active{background:var(--rust-faint);border-color:var(--rust);color:var(--rust);font-weight:500;}
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--faint);margin-bottom:0.75rem;}
+  .quick-grid{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.5rem;}
+  .quick-btn{background:var(--parchment);border:1px solid var(--border);border-radius:20px;padding:0.3rem 0.85rem;font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;transition:all 0.2s;color:var(--muted);}
+  .quick-btn:hover{border-color:var(--rust);color:var(--rust);background:var(--rust-faint);}
+  .loading{text-align:center;padding:2.5rem;display:none;}
+  .loading.show{display:block;}
+  .spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--rust);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 0.75rem;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{font-style:italic;font-size:0.85rem;color:var(--muted);}
+  .result{display:none;}
+  .result.show{display:block;}
+  .drug-header{background:linear-gradient(135deg,var(--rust),#5a2010);color:white;border-radius:8px 8px 0 0;padding:1.25rem 1.5rem;}
+  .drug-name{font-family:'New Rocker',cursive;font-size:1.8rem;margin-bottom:0.2rem;}
+  .drug-class{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.65;}
+  .drug-body{background:var(--parchment);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;margin-bottom:1.5rem;}
+  .drug-section{padding:1rem 1.5rem;border-bottom:1px solid var(--border);}
+  .drug-section:last-child{border-bottom:none;}
+  .section-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--faint);margin-bottom:0.5rem;}
+  .section-content{font-size:0.88rem;color:var(--ink);line-height:1.75;}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.6rem;}
+  .info-box{background:white;border:1px solid var(--border);border-radius:4px;padding:0.65rem;}
+  .info-box-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--faint);margin-bottom:0.2rem;}
+  .info-box-val{font-size:0.85rem;color:var(--ink);line-height:1.4;}
+  .info-box-note{font-size:0.75rem;color:var(--muted);font-style:italic;margin-top:0.2rem;}
+  .warning-box{background:#fff5f5;border:1px solid #f0c0c0;border-radius:4px;padding:0.85rem 1rem;}
+  .warning-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#cc4444;margin-bottom:0.4rem;}
+  .warning-content{font-size:0.85rem;color:#8a3030;font-style:italic;line-height:1.7;}
+  .tag-row{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.6rem;}
+  .drug-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;background:var(--teal-faint);color:var(--teal);border-radius:20px;padding:0.15rem 0.6rem;border:1px solid #90c0b8;}
+  .error-box{background:var(--rust-faint);border:1px solid #c8a090;border-radius:8px;padding:1.1rem 1.25rem;margin-bottom:1.5rem;display:none;font-size:0.85rem;color:var(--rust);font-style:italic;}
+  .error-box.show{display:block;}
+  .history-item{background:var(--parchment);border:1px solid var(--border);border-radius:6px;padding:0.75rem 1rem;margin-bottom:0.5rem;cursor:pointer;transition:border-color 0.2s;display:flex;justify-content:space-between;align-items:center;}
+  .history-item:hover{border-color:var(--rust);}
+  .history-name{font-size:0.9rem;}
+  .history-class{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:0.1em;}
+  .settings-card{background:var(--parchment);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.25rem;}
+  .settings-title{font-family:'New Rocker',cursive;font-size:1.4rem;color:var(--rust);margin-bottom:0.25rem;}
+  .settings-sub{font-size:0.8rem;color:var(--muted);font-style:italic;margin-bottom:1.25rem;line-height:1.6;}
+  .field{margin-bottom:0.85rem;}
+  .field label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:0.4rem;}
+  .field input{width:100%;background:white;border:1px solid var(--border);border-radius:4px;padding:0.6rem 0.85rem;font-family:'IBM Plex Mono',monospace;font-size:0.82rem;color:var(--ink);outline:none;transition:border-color 0.2s;}
+  .field input:focus{border-color:var(--rust);}
+  .field input::placeholder{color:var(--border);}
+  .btn{background:var(--rust);color:#f0f4f5;border:none;border-radius:4px;padding:0.6rem 1.4rem;font-family:'Libre Franklin',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;transition:background 0.2s;}
+  .btn:hover{background:var(--rust-light);}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:0.6rem 1.1rem;font-family:'Libre Franklin',sans-serif;font-size:0.82rem;cursor:pointer;transition:all 0.2s;margin-left:0.5rem;}
+  .btn-ghost:hover{border-color:var(--rust);color:var(--rust);}
+  .status-msg{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-top:0.75rem;min-height:16px;}
+  .status-msg.ok{color:var(--teal);}.status-msg.err{color:var(--rust);}
+  .how-to{background:white;border:1px solid var(--border);border-radius:6px;padding:1rem 1.25rem;margin-top:1rem;}
+  .how-to-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--faint);margin-bottom:0.75rem;}
+  .how-to ol{padding-left:1.25rem;}
+  .how-to li{font-size:0.82rem;color:var(--muted);line-height:1.9;}
+  .how-to a{color:var(--teal);}
+  .how-to code{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--warm);padding:0.1rem 0.4rem;border-radius:3px;}
 </style>
 </head>
 <body>
-
 <a class="home-btn" href="index.html">← Home</a>
-
 <div class="header">
   <div class="header-label">Clinical Reference</div>
   <h1>Drug Reference</h1>
-  <div class="header-sub">AI-powered — for clinical reference only</div>
+  <div class="header-sub">FDA drug label lookup — no account required</div>
 </div>
-
-<div class="disclaimer">⚠ For reference use only — always verify with current guidelines, pharmacist or prescriber before clinical use</div>
-
+<nav class="tabs">
+  <div class="tab active" onclick="showTab('search',this)">Search</div>
+  <div class="tab" onclick="showTab('settings',this)">Settings</div>
+</nav>
+<div class="disclaimer">⚠ For reference only — verify with current guidelines, pharmacist or prescriber before clinical use</div>
 <main>
-
-  <div class="search-card">
-    <div class="search-row">
-      <input type="text" class="search-input" id="drugInput" placeholder="Drug name (e.g. metoprolol, vancomycin, propofol)…" onkeydown="if(event.key==='Enter')searchDrug()">
-      <button class="search-btn" onclick="searchDrug()" id="searchBtn">Look up</button>
+  <div class="panel active" id="panel-search">
+    <div class="no-key-banner" id="noKeyBanner" style="display:none"></div>
+    <div class="search-card">
+      <div class="search-row">
+        <input type="text" class="search-input" id="drugInput" placeholder="Drug name (e.g. metoprolol, vancomycin, propofol)…" onkeydown="if(event.key==='Enter')searchDrug()">
+        <button class="search-btn" onclick="searchDrug()" id="searchBtn">Look up</button>
+      </div>
+      <div class="ctx-row">
+        <div class="ctx-chip active" data-val="ICU / Critical Care">ICU</div>
+        <div class="ctx-chip active" data-val="Cardiac / Perioperative">Cardiac</div>
+        <div class="ctx-chip active" data-val="Endoscopy / GI">Endoscopy</div>
+        <div class="ctx-chip" data-val="Emergency">Emergency</div>
+        <div class="ctx-chip" data-val="General Ward">General Ward</div>
+      </div>
     </div>
-    <div class="context-row" id="contextChips">
-      <div class="ctx-chip active" data-val="ICU / Critical Care">ICU</div>
-      <div class="ctx-chip active" data-val="Cardiac / Perioperative">Cardiac</div>
-      <div class="ctx-chip active" data-val="Endoscopy / GI">Endoscopy</div>
-      <div class="ctx-chip" data-val="Emergency">Emergency</div>
-      <div class="ctx-chip" data-val="General Ward">General Ward</div>
-      <div class="ctx-chip" data-val="Paediatric">Paediatric</div>
+    <div class="section-label">— Common lookups</div>
+    <div class="quick-grid">
+      <button class="quick-btn" onclick="quickSearch('Propofol')">Propofol</button>
+      <button class="quick-btn" onclick="quickSearch('Midazolam')">Midazolam</button>
+      <button class="quick-btn" onclick="quickSearch('Fentanyl')">Fentanyl</button>
+      <button class="quick-btn" onclick="quickSearch('Noradrenaline')">Noradrenaline</button>
+      <button class="quick-btn" onclick="quickSearch('Metoprolol')">Metoprolol</button>
+      <button class="quick-btn" onclick="quickSearch('Vancomycin')">Vancomycin</button>
+      <button class="quick-btn" onclick="quickSearch('Heparin')">Heparin</button>
+      <button class="quick-btn" onclick="quickSearch('Amiodarone')">Amiodarone</button>
+      <button class="quick-btn" onclick="quickSearch('Ketamine')">Ketamine</button>
+      <button class="quick-btn" onclick="quickSearch('Pantoprazole')">Pantoprazole</button>
+      <button class="quick-btn" onclick="quickSearch('Metoclopramide')">Metoclopramide</button>
+      <button class="quick-btn" onclick="quickSearch('Enoxaparin')">Enoxaparin</button>
+      <button class="quick-btn" onclick="quickSearch('Dexamethasone')">Dexamethasone</button>
+      <button class="quick-btn" onclick="quickSearch('Adenosine')">Adenosine</button>
+      <button class="quick-btn" onclick="quickSearch('Naloxone')">Naloxone</button>
+      <button class="quick-btn" onclick="quickSearch('Hyoscine')">Hyoscine</button>
+    </div>
+    <div class="error-box" id="errorBox"></div>
+    <div class="loading" id="loading"><div class="spinner"></div><div class="loading-text" id="loadingText">Looking up drug information…</div></div>
+    <div class="result" id="result"></div>
+    <div id="historySection" style="display:none"><div class="section-label">— Recent lookups</div><div id="historyList"></div></div>
+  </div>
+  <div class="panel" id="panel-settings">
+    <div class="settings-card">
+      <div class="settings-title">About this tool</div>
+      <div class="settings-sub">Drug information is sourced from the <strong>FDA drug label database</strong> (OpenFDA) — no account or API key required. Data reflects US prescribing information; always verify against current Australian guidelines, AMH, or MIMS before clinical use.</div>
+      <div class="how-to">
+        <div class="how-to-title">Data source</div>
+        <ol>
+          <li>Search uses <a href="https://open.fda.gov/apis/drug/label/" target="_blank">api.fda.gov/drug/label.json</a></li>
+          <li>Australian drug names are automatically mapped where they differ (e.g. noradrenaline → norepinephrine, paracetamol → acetaminophen)</li>
+          <li>If a drug isn't found, try the generic name or alternate spelling</li>
+          <li>Label text may be verbose — key sections are trimmed for readability</li>
+        </ol>
+      </div>
     </div>
   </div>
-
-  <div class="quick-label">— Common lookups</div>
-  <div class="quick-grid">
-    <button class="quick-btn" onclick="quickSearch('Propofol')">Propofol</button>
-    <button class="quick-btn" onclick="quickSearch('Midazolam')">Midazolam</button>
-    <button class="quick-btn" onclick="quickSearch('Fentanyl')">Fentanyl</button>
-    <button class="quick-btn" onclick="quickSearch('Noradrenaline')">Noradrenaline</button>
-    <button class="quick-btn" onclick="quickSearch('Metoprolol')">Metoprolol</button>
-    <button class="quick-btn" onclick="quickSearch('Vancomycin')">Vancomycin</button>
-    <button class="quick-btn" onclick="quickSearch('Heparin')">Heparin</button>
-    <button class="quick-btn" onclick="quickSearch('Amiodarone')">Amiodarone</button>
-    <button class="quick-btn" onclick="quickSearch('Ketamine')">Ketamine</button>
-    <button class="quick-btn" onclick="quickSearch('Pantoprazole')">Pantoprazole</button>
-    <button class="quick-btn" onclick="quickSearch('Metoclopramide')">Metoclopramide</button>
-    <button class="quick-btn" onclick="quickSearch('Enoxaparin')">Enoxaparin</button>
-    <button class="quick-btn" onclick="quickSearch('Dexamethasone')">Dexamethasone</button>
-    <button class="quick-btn" onclick="quickSearch('Adenosine')">Adenosine</button>
-    <button class="quick-btn" onclick="quickSearch('Naloxone')">Naloxone</button>
-    <button class="quick-btn" onclick="quickSearch('Hyoscine')">Hyoscine</button>
-  </div>
-
-  <div class="error-box" id="errorBox"></div>
-
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <div class="loading-text" id="loadingText">Looking up drug information…</div>
-  </div>
-
-  <div class="result" id="result"></div>
-
-  <div class="history-section" id="historySection" style="display:none">
-    <div class="quick-label">— Recent lookups</div>
-    <div id="historyList"></div>
-  </div>
-
 </main>
-
 <script>
+  // Australian → US name map for OpenFDA lookup
+  const AU_TO_US = {
+    'noradrenaline':'norepinephrine','adrenaline':'epinephrine','hyoscine':'scopolamine',
+    'paracetamol':'acetaminophen','salbutamol':'albuterol','lignocaine':'lidocaine',
+    'frusemide':'furosemide','pethidine':'meperidine','amoxycillin':'amoxicillin',
+    'metronidazole':'metronidazole','suxamethonium':'succinylcholine','rocuronium':'rocuronium'
+  };
+
+  function fdaName(name) {
+    return AU_TO_US[name.toLowerCase().trim()] || name.toLowerCase().trim();
+  }
+
+  function trunc(text, len) {
+    len = len || 420;
+    if (!text) return '';
+    const clean = text.replace(/\n+/g,' ').replace(/\s+/g,' ').trim();
+    if (clean.length <= len) return clean;
+    const cut = clean.lastIndexOf('. ', len);
+    return (cut > 80 ? clean.slice(0, cut + 1) : clean.slice(0, len)) + '…';
+  }
+
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  let activeContexts = ['ICU / Critical Care','Cardiac / Perioperative','Endoscopy / GI'];
   let searchHistory = JSON.parse(localStorage.getItem('drugHistory') || '[]');
-  let activeContexts = ['ICU / Critical Care', 'Cardiac / Perioperative', 'Endoscopy / GI'];
 
   document.querySelectorAll('.ctx-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       chip.classList.toggle('active');
       const val = chip.dataset.val;
-      if(chip.classList.contains('active')) { if(!activeContexts.includes(val)) activeContexts.push(val); }
-      else { activeContexts = activeContexts.filter(c => c !== val); }
+      chip.classList.contains('active') ? activeContexts.push(val) : (activeContexts = activeContexts.filter(c => c !== val));
     });
   });
 
-  function quickSearch(name) {
-    document.getElementById('drugInput').value = name;
-    searchDrug();
-  }
+  function quickSearch(name) { document.getElementById('drugInput').value = name; searchDrug(); }
 
   async function searchDrug() {
-    const name = document.getElementById('drugInput').value.trim();
-    if(!name) return;
+    const raw = document.getElementById('drugInput').value.trim();
+    if (!raw) return;
 
     document.getElementById('errorBox').classList.remove('show');
     document.getElementById('result').classList.remove('show');
     document.getElementById('loading').classList.add('show');
     document.getElementById('searchBtn').disabled = true;
 
-    const contexts = activeContexts.join(', ') || 'general clinical';
-
-    const prompt = `You are a clinical pharmacology reference for a Registered Nurse in Australia working in ${contexts} settings.
-
-Provide a concise clinical reference for: "${name}"
-
-Respond ONLY with this JSON structure, no other text:
-{
-  "name": "Generic name (Brand names)",
-  "drug_class": "Drug class / category",
-  "indication": "What it is used for clinically — 2-3 sentences",
-  "mechanism": "How it works — 1-2 sentences, clear language",
-  "dosing": [
-    {"route": "IV", "dose": "dose info", "notes": "any notes"},
-    {"route": "Oral", "dose": "dose info", "notes": "any notes"}
-  ],
-  "onset_duration": "Onset: X min. Duration: X hrs",
-  "monitoring": "What to monitor — vitals, levels, signs",
-  "contraindications": "Key contraindications",
-  "interactions": "Key drug interactions",
-  "nursing_notes": "2-3 practical nursing pearls relevant to ${contexts}",
-  "warnings": "Any black box warnings or critical safety points",
-  "tags": ["tag1","tag2","tag3"]
-}
-
-Use Australian drug names where they differ. Keep clinical, accurate and concise. If the drug is not found, return {"error": "Drug not found: ${name}"}`;
-
-    const msgs = [{ role:'loading_0', label:'Searching drug database…' }, { role:'loading_1', label:'Compiling clinical data…' }, { role:'loading_2', label:'Checking interactions…' }];
-    let msgIdx = 0;
-    const msgInterval = setInterval(() => {
-      msgIdx = (msgIdx+1) % msgs.length;
-      document.getElementById('loadingText').textContent = ['Searching drug database…','Compiling clinical data…','Checking nursing notes…'][msgIdx];
-    }, 1800);
+    const msgs = ['Searching FDA database…','Fetching drug information…','Loading clinical data…','Compiling reference…'];
+    let mi = 0;
+    const miv = setInterval(() => { mi = (mi+1) % msgs.length; document.getElementById('loadingText').textContent = msgs[mi]; }, 1800);
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:1500,
-          messages:[{role:'user',content:prompt}]
-        })
-      });
+      const usName = fdaName(raw);
+      let result = null;
 
-      clearInterval(msgInterval);
-      if(!res.ok) throw new Error('API error ' + res.status);
-      const data = await res.json();
-      const text = data.content.filter(c=>c.type==='text').map(c=>c.text).join('');
-      const clean = text.replace(/```json|```/g,'').trim();
-      const drug = JSON.parse(clean);
+      // Try multiple search strategies in order
+      const strategies = [
+        `openfda.generic_name:"${usName}"`,
+        `openfda.brand_name:"${usName}"`,
+        `openfda.substance_name:"${usName}"`,
+        usName
+      ];
 
-      if(drug.error) { throw new Error(drug.error); }
+      for (const q of strategies) {
+        const url = `https://api.fda.gov/drug/label.json?search=${encodeURIComponent(q)}&limit=1`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.results && data.results.length) { result = data.results[0]; break; }
+        }
+      }
+
+      clearInterval(miv);
+      document.getElementById('loading').classList.remove('show');
+      document.getElementById('searchBtn').disabled = false;
+
+      if (!result) throw new Error(`"${raw}" not found in FDA database. Try the generic or US name.`);
+
+      const ofd = result.openfda || {};
+      const genericName = (ofd.generic_name?.[0] || raw).toUpperCase();
+      const brands = ofd.brand_name ? ofd.brand_name.slice(0,3).join(', ') : '';
+      const displayName = brands ? `${genericName} (${brands})` : genericName;
+      const drugClass = ofd.pharm_class_epc?.[0] || ofd.pharm_class_moa?.[0] || ofd.pharm_class_cs?.[0] || 'See prescribing information';
+      const routes = (ofd.route || []).map(r => r.toLowerCase());
+
+      const dosingRaw = trunc(result.dosage_and_administration?.[0] || '', 350);
+      const dosing = dosingRaw ? [{ route: 'Dosing', dose: dosingRaw, notes: '' }] : [];
+
+      const drug = {
+        name: displayName,
+        drug_class: drugClass,
+        indication: trunc(result.indications_and_usage?.[0] || 'See product label'),
+        mechanism: trunc(result.mechanism_of_action?.[0] || result.pharmacodynamics?.[0] || 'See prescribing information', 320),
+        dosing,
+        onset_duration: trunc(result.pharmacokinetics?.[0] || 'See prescribing information', 280),
+        monitoring: trunc(result.warnings_and_precautions?.[0] || result.precautions?.[0] || 'Monitor as clinically indicated', 320),
+        contraindications: trunc(result.contraindications?.[0] || 'See prescribing information', 320),
+        interactions: trunc(result.drug_interactions?.[0] || 'See prescribing information', 320),
+        nursing_notes: trunc(result.information_for_patients?.[0] || 'Refer to current clinical guidelines.', 320),
+        warnings: result.boxed_warning?.[0] ? trunc(result.boxed_warning[0], 320) : '',
+        tags: [...routes, ...(ofd.pharm_class_epc || []).map(c => c.toLowerCase())].slice(0, 5)
+      };
 
       renderDrug(drug);
       addToHistory(drug.name, drug.drug_class);
 
     } catch(e) {
-      clearInterval(msgInterval);
+      clearInterval(miv);
       document.getElementById('loading').classList.remove('show');
       document.getElementById('searchBtn').disabled = false;
       const eb = document.getElementById('errorBox');
-      eb.textContent = e.message.includes('not found') ? `"${name}" not found — check spelling or try generic name.` : 'Error: ' + e.message;
+      eb.textContent = e.message;
       eb.classList.add('show');
     }
   }
 
   function renderDrug(d) {
-    document.getElementById('loading').classList.remove('show');
-    document.getElementById('searchBtn').disabled = false;
-
-    const dosingRows = (d.dosing || []).map(r => `
-      <div class="info-box">
-        <div class="info-box-label">${r.route}</div>
-        <div class="info-box-val">${r.dose}${r.notes?'<br><span style="font-size:0.78rem;color:var(--muted);font-style:italic">'+r.notes+'</span>':''}</div>
-      </div>`).join('');
-
-    const html = `
-      <div class="drug-header">
-        <div class="drug-name">${d.name}</div>
-        <div class="drug-class">${d.drug_class}</div>
-      </div>
+    const dosing = (d.dosing || []).map(r =>
+      `<div class="info-box"><div class="info-box-label">${esc(r.route)}</div><div class="info-box-val">${esc(r.dose)}</div>${r.notes ? `<div class="info-box-note">${esc(r.notes)}</div>` : ''}</div>`
+    ).join('');
+    document.getElementById('result').innerHTML = `
+      <div class="drug-header"><div class="drug-name">${esc(d.name)}</div><div class="drug-class">${esc(d.drug_class)}</div></div>
       <div class="drug-body">
-        <div class="drug-section">
-          <div class="section-title">Indication</div>
-          <div class="section-content">${d.indication}</div>
-          ${d.tags&&d.tags.length?`<div class="tag-row">${d.tags.map(t=>`<span class="drug-tag">${t}</span>`).join('')}</div>`:''}
-        </div>
-        <div class="drug-section">
-          <div class="section-title">Mechanism of Action</div>
-          <div class="section-content">${d.mechanism}</div>
-        </div>
-        ${dosingRows ? `<div class="drug-section"><div class="section-title">Dosing</div><div class="info-grid">${dosingRows}</div></div>` : ''}
-        <div class="drug-section">
-          <div class="section-title">Onset & Duration</div>
-          <div class="section-content">${d.onset_duration}</div>
-        </div>
-        <div class="drug-section">
-          <div class="section-title">Monitoring</div>
-          <div class="section-content">${d.monitoring}</div>
-        </div>
-        <div class="drug-section">
-          <div class="section-title">Contraindications</div>
-          <div class="section-content">${d.contraindications}</div>
-        </div>
-        <div class="drug-section">
-          <div class="section-title">Key Interactions</div>
-          <div class="section-content">${d.interactions}</div>
-        </div>
-        <div class="drug-section">
-          <div class="section-title">Nursing Notes</div>
-          <div class="section-content">${d.nursing_notes}</div>
-        </div>
-        ${d.warnings ? `<div class="drug-section"><div class="warning-box"><div class="section-title">⚠ Warnings</div><div class="warning-content">${d.warnings}</div></div></div>` : ''}
+        <div class="drug-section"><div class="section-title">Indication</div><div class="section-content">${esc(d.indication)}</div>${d.tags&&d.tags.length?`<div class="tag-row">${d.tags.map(t=>`<span class="drug-tag">${esc(t)}</span>`).join('')}</div>`:''}</div>
+        <div class="drug-section"><div class="section-title">Mechanism</div><div class="section-content">${esc(d.mechanism)}</div></div>
+        ${dosing?`<div class="drug-section"><div class="section-title">Dosing</div><div class="info-grid">${dosing}</div></div>`:''}
+        <div class="drug-section"><div class="section-title">Pharmacokinetics</div><div class="section-content">${esc(d.onset_duration)}</div></div>
+        <div class="drug-section"><div class="section-title">Monitoring</div><div class="section-content">${esc(d.monitoring)}</div></div>
+        <div class="drug-section"><div class="section-title">Contraindications</div><div class="section-content">${esc(d.contraindications)}</div></div>
+        <div class="drug-section"><div class="section-title">Key Interactions</div><div class="section-content">${esc(d.interactions)}</div></div>
+        <div class="drug-section"><div class="section-title">Patient / Nursing Notes</div><div class="section-content">${esc(d.nursing_notes)}</div></div>
+        ${d.warnings?`<div class="drug-section"><div class="warning-box"><div class="warning-title">⚠ Boxed Warning</div><div class="warning-content">${esc(d.warnings)}</div></div></div>`:''}
       </div>`;
-
-    document.getElementById('result').innerHTML = html;
     document.getElementById('result').classList.add('show');
-    document.getElementById('result').scrollIntoView({behavior:'smooth', block:'start'});
+    document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'start' });
   }
 
   function addToHistory(name, drugClass) {
     searchHistory = searchHistory.filter(h => h.name !== name);
-    searchHistory.unshift({name, drugClass});
-    if(searchHistory.length > 10) searchHistory = searchHistory.slice(0,10);
+    searchHistory.unshift({ name, drugClass });
+    if (searchHistory.length > 10) searchHistory = searchHistory.slice(0, 10);
     localStorage.setItem('drugHistory', JSON.stringify(searchHistory));
     renderHistory();
   }
 
   function renderHistory() {
-    if(!searchHistory.length) return;
+    if (!searchHistory.length) return;
     document.getElementById('historySection').style.display = 'block';
-    document.getElementById('historyList').innerHTML = searchHistory.map(h => `
-      <div class="history-item" onclick="quickSearch('${h.name.split(' ')[0]}')">
-        <div class="history-name">${h.name}</div>
-        <div class="history-class">${h.drugClass||''}</div>
-      </div>`).join('');
+    document.getElementById('historyList').innerHTML = searchHistory.map(h =>
+      `<div class="history-item" onclick="quickSearch('${esc(h.name.split(' ')[0])}')"><div class="history-name">${esc(h.name)}</div><div class="history-class">${esc(h.drugClass||'')}</div></div>`
+    ).join('');
+  }
+
+  function setStatus(id, msg, type) { const el = document.getElementById(id); el.textContent = msg; el.className = 'status-msg' + (type ? ' ' + type : ''); }
+
+  function showTab(id, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    if (el) el.classList.add('active');
   }
 
   renderHistory();

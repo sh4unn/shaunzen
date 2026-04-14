@@ -5,27 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Lean Season</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400&family=Noto+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream:#f4efe4; --parchment:#ede6d6; --warm:#e4dbc8;
-    --teal:#2a6b5e; --teal-light:#3a8a7c; --teal-faint:#e8f4f2;
-    --burnt:#b8511e; --burnt-faint:#faf0ea; --burnt-light:#d4703a;
-    --gold:#9a7820; --ink:#1a1410; --muted:#7a6a5a;
-    --faint:#c4b89e; --border:#d5c9b2;
-    --green:#3a6b3a; --green-faint:#eaf2ea;
+    --bg:#f0f4f5; --surface:#e4ecee; --surface2:#dde7ea;
+    --border:#c0ced2; --slate:#bfcbce;
+    --ink:#1a2628; --muted:#4a6068; --faint:#8fa0a5;
+    --accent:#2a5a6a; --accent-light:#3a7a8c; --accent-faint:#e0ecf0;
+    --warm:#c45e2a; --gold:#8a6a20; --green:#3a6a2a; --green-faint:#e8f5e8; --red:#7a2020; --purple:#5a3a7a;
+    --cream:#f0f4f5; --parchment:#e4ecee; --teal:#2a5a6a; --teal-light:#3a7a8c; --teal-faint:#e0ecf0;
+    --burnt:#c45e2a; --burnt-faint:#f8f0e8; --burnt-light:#d4703a;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--cream); color:var(--ink); font-family:'Noto Sans',sans-serif; min-height:100vh; padding-bottom:4rem; }
+  body { background:var(--bg); color:var(--ink); font-family:'Spectral',serif; min-height:100vh; padding-bottom:4rem; }
 
-  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--teal); color:var(--cream); text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; opacity:0.85; }
-  .home-btn:hover { background:var(--teal-light); opacity:1; }
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--accent); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; }
+  .home-btn:hover { background:var(--accent-light); }
 
-  .header { background:var(--burnt); color:var(--cream); padding:2.5rem 2rem 2rem; text-align:center; position:relative; overflow:hidden; }
+  .header { background:var(--warm); color:white; padding:2.5rem 2rem 2rem; text-align:center; position:relative; overflow:hidden; }
   .header::before { content:''; position:absolute; top:-60px; right:-60px; width:300px; height:300px; background:radial-gradient(circle,rgba(244,239,228,0.08),transparent 70%); pointer-events:none; }
   .header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(244,239,228,0.5); margin-bottom:0.6rem; }
-  .header h1 { font-family:'Noto Serif',serif; font-size:clamp(2rem,6vw,3rem); font-weight:300; letter-spacing:0.05em; margin-bottom:0.3rem; }
-  .header-sub { font-size:0.82rem; color:rgba(244,239,228,0.55); font-style:italic; font-family:'Noto Serif',serif; }
+  .header h1 { font-family:'New Rocker',cursive; font-size:clamp(2rem,6vw,3rem); font-weight:400; letter-spacing:0.02em; margin-bottom:0.3rem; }
+  .header-sub { font-size:0.82rem; color:rgba(244,239,228,0.55); font-style:italic; font-family:'Spectral',serif; }
 
   /* TABS */
   .tabs { background:var(--burnt-light); display:flex; }
@@ -46,7 +48,7 @@
 
   /* SETTINGS */
   .setup-card { background:var(--parchment); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
-  .setup-title { font-family:'Noto Serif',serif; font-size:1rem; color:var(--burnt); margin-bottom:1.25rem; font-weight:400; }
+  .setup-title { font-family:'Spectral',serif; font-size:1rem; color:var(--burnt); margin-bottom:1.25rem; font-weight:400; }
   .setup-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
   .setup-item { display:flex; flex-direction:column; gap:0.4rem; }
   .setup-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); }
@@ -80,13 +82,13 @@
   .current-ex.show { display:block; }
   .current-ex.resting { background:var(--teal-faint); border-color:#90c0b8; }
   .current-ex-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--faint); margin-bottom:0.3rem; }
-  .current-ex-name { font-family:'Noto Serif',serif; font-size:1.2rem; font-weight:400; color:var(--burnt); margin-bottom:0.2rem; }
+  .current-ex-name { font-family:'Spectral',serif; font-size:1.2rem; font-weight:400; color:var(--burnt); margin-bottom:0.2rem; }
   .current-ex.resting .current-ex-name { color:var(--teal); }
-  .current-ex-hint { font-size:0.8rem; color:var(--muted); font-style:italic; font-family:'Noto Serif',serif; line-height:1.5; }
+  .current-ex-hint { font-size:0.8rem; color:var(--muted); font-style:italic; font-family:'Spectral',serif; line-height:1.5; }
 
   /* BIG BUTTONS */
   .btn-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.85rem; margin-bottom:1.5rem; }
-  .big-btn { border:none; border-radius:10px; padding:1.25rem 0.5rem; font-family:'Noto Sans',sans-serif; font-size:1rem; font-weight:600; cursor:pointer; transition:transform 0.1s, background 0.2s, opacity 0.2s; letter-spacing:0.02em; -webkit-tap-highlight-color:transparent; }
+  .big-btn { border:none; border-radius:10px; padding:1.25rem 0.5rem; font-family:'IBM Plex Mono',monospace; font-size:1rem; font-weight:600; cursor:pointer; transition:transform 0.1s, background 0.2s, opacity 0.2s; letter-spacing:0.02em; -webkit-tap-highlight-color:transparent; }
   .big-btn:active { transform:scale(0.96); }
   .big-btn:disabled { opacity:0.35; cursor:not-allowed; }
   .btn-start { background:var(--teal); color:var(--cream); }
@@ -117,7 +119,7 @@
 
   .ex-body { display:none; padding:0.75rem 1rem 1rem 2.75rem; border-top:1px solid var(--border); }
   .ex-card.open .ex-body { display:block; }
-  .ex-desc { font-family:'Noto Serif',serif; font-style:italic; font-size:0.83rem; color:var(--muted); line-height:1.65; margin-bottom:0.5rem; }
+  .ex-desc { font-family:'Spectral',serif; font-style:italic; font-size:0.83rem; color:var(--muted); line-height:1.65; margin-bottom:0.5rem; }
   .ex-cues { list-style:none; display:flex; flex-direction:column; gap:0.3rem; }
   .ex-cues li { font-size:0.8rem; color:var(--muted); padding-left:0.75rem; position:relative; }
   .ex-cues li::before { content:'—'; position:absolute; left:0; color:var(--border); }
@@ -125,10 +127,10 @@
   .ex-del:hover { border-color:var(--burnt); color:var(--burnt); }
 
   .add-ex-row { display:flex; gap:0.5rem; }
-  .add-ex-input { flex:1; background:white; border:1px solid var(--border); border-radius:6px; padding:0.6rem 0.85rem; font-family:'Noto Sans',sans-serif; font-size:0.85rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .add-ex-input { flex:1; background:white; border:1px solid var(--border); border-radius:6px; padding:0.6rem 0.85rem; font-family:'IBM Plex Mono',monospace; font-size:0.85rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
   .add-ex-input:focus { border-color:var(--burnt); }
   .add-ex-input::placeholder { color:var(--faint); }
-  .btn-sm { background:var(--burnt); color:var(--cream); border:none; border-radius:6px; padding:0.6rem 1rem; font-family:'Noto Sans',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; transition:background 0.2s; }
+  .btn-sm { background:var(--burnt); color:var(--cream); border:none; border-radius:6px; padding:0.6rem 1rem; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; font-weight:500; cursor:pointer; transition:background 0.2s; }
   .btn-sm:hover { background:var(--burnt-light); }
 
   .section-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--faint); margin-bottom:0.85rem; }
@@ -478,5 +480,6 @@
   document.getElementById('timerDisplay').textContent = fmt(settings.work);
   renderExList();
 </script>
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:0.75rem 1.5rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--faint);text-align:center;"><a href="index.html" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo; Lean Season</div>
 </body>
 </html>

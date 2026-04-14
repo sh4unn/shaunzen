@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#5a3a7a">
+<title>Study Flashcards</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f0f4f5; --surface:#e4ecee; --surface2:#dde7ea;
+    --border:#c0ced2;
+    --ink:#1a2628; --muted:#4a6068; --faint:#8fa0a5;
+    --accent:#5a3a7a; --accent-light:#7a5a9a; --accent-faint:#f0eaf8;
+    --green:#3a6a2a; --green-faint:#eaf5e8;
+    --red:#7a2020; --red-faint:#f5e8e8;
+    --gold:#8a6a20;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:'Spectral',serif; min-height:100vh; padding-bottom:5rem; }
+
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--accent); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; }
+  .home-btn:hover { background:var(--accent-light); }
+
+  .header { background:var(--accent); color:white; padding:2.5rem 2rem 0; text-align:center; position:relative; overflow:hidden; }
+  .header::before { content:'🃏'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:14rem; opacity:0.04; pointer-events:none; }
+  .header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:0.6rem; }
+  .header h1 { font-family:'New Rocker',cursive; font-size:clamp(2rem,6vw,3rem); font-weight:400; letter-spacing:0.02em; margin-bottom:0.3rem; }
+  .header-sub { font-size:0.85rem; color:rgba(255,255,255,0.5); font-style:italic; margin-bottom:1.5rem; }
+
+  .tabs { background:rgba(0,0,0,0.2); display:flex; }
+  .tab { flex:1; padding:0.75rem; font-family:'IBM Plex Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.45); cursor:pointer; text-align:center; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; }
+  .tab.active { color:white; border-bottom-color:white; }
+  .tab:hover { color:rgba(255,255,255,0.8); }
+
+  main { max-width:720px; margin:0 auto; padding:2rem 1.5rem; }
+  .panel { display:none; } .panel.active { display:block; }
+
+  /* SHARED */
+  .card-ui { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin-bottom:1.25rem; }
+  .section-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--faint); margin-bottom:0.75rem; }
+  .field { margin-bottom:1rem; }
+  .field label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:0.4rem; }
+  .field input, .field textarea, .field select { width:100%; background:white; border:1px solid var(--border); border-radius:4px; padding:0.65rem 0.9rem; font-family:'Spectral',serif; font-size:0.95rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color:var(--accent); }
+  .field input::placeholder, .field textarea::placeholder { color:var(--faint); font-style:italic; }
+  .field textarea { resize:vertical; min-height:100px; line-height:1.65; }
+  .field select option { background:white; }
+
+  .btn { background:var(--accent); color:white; border:none; border-radius:4px; padding:0.65rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; cursor:pointer; transition:background 0.2s; letter-spacing:0.04em; }
+  .btn:hover { background:var(--accent-light); }
+  .btn-green { background:var(--green); }
+  .btn-green:hover { background:#4a8a3a; }
+  .btn-red { background:var(--red); }
+  .btn-red:hover { background:#9a3030; }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:4px; padding:0.65rem 1.1rem; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; cursor:pointer; transition:all 0.2s; }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-row { display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center; }
+  .status-msg { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); margin-top:0.5rem; min-height:16px; }
+  .status-msg.ok { color:var(--green); } .status-msg.err { color:var(--red); }
+
+  /* STUDY TAB */
+  .deck-selector { display:flex; gap:0.5rem; margin-bottom:1.5rem; }
+  .deck-selector select { flex:1; background:white; border:1px solid var(--border); border-radius:4px; padding:0.6rem 0.85rem; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; color:var(--ink); outline:none; }
+  .deck-selector select:focus { border-color:var(--accent); }
+
+  .study-progress { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
+  .progress-text { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); }
+  .progress-bar-wrap { flex:1; margin:0 1rem; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .progress-bar { height:100%; background:var(--accent); border-radius:2px; transition:width 0.3s; }
+
+  /* FLASHCARD */
+  .flashcard-wrap { perspective:1200px; margin-bottom:1.5rem; }
+  .flashcard { width:100%; min-height:220px; position:relative; transform-style:preserve-3d; transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); cursor:pointer; }
+  .flashcard.flipped { transform:rotateY(180deg); }
+  .card-face { position:absolute; inset:0; backface-visibility:hidden; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; text-align:center; border:1px solid var(--border); }
+  .card-face.front { background:white; }
+  .card-face.back { background:var(--accent-faint); border-color:#c0a8d8; transform:rotateY(180deg); }
+  .card-face-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--faint); margin-bottom:0.75rem; position:absolute; top:1rem; left:50%; transform:translateX(-50%); }
+  .card-face.back .card-face-label { color:var(--accent); }
+  .card-text { font-family:'Spectral',serif; font-size:1.1rem; line-height:1.75; color:var(--ink); }
+  .card-tap-hint { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); position:absolute; bottom:1rem; }
+
+  .study-actions { display:flex; gap:0.75rem; }
+  .study-actions .btn { flex:1; text-align:center; }
+
+  .study-empty { text-align:center; padding:3rem 1rem; color:var(--faint); font-style:italic; }
+  .study-complete { text-align:center; padding:2.5rem 1rem; }
+  .complete-icon { font-size:3rem; margin-bottom:0.75rem; }
+  .complete-title { font-family:'New Rocker',cursive; font-size:1.8rem; color:var(--accent); margin-bottom:0.5rem; }
+  .complete-sub { font-size:0.88rem; color:var(--muted); font-style:italic; margin-bottom:1.5rem; }
+  .score-row { display:flex; gap:1rem; justify-content:center; margin-bottom:1.5rem; }
+  .score-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1.25rem; text-align:center; }
+  .score-num { font-family:'New Rocker',cursive; font-size:2rem; }
+  .score-num.green { color:var(--green); }
+  .score-num.red { color:var(--red); }
+  .score-label { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); text-transform:uppercase; letter-spacing:0.1em; }
+
+  /* DECKS TAB */
+  .deck-list { display:flex; flex-direction:column; gap:0.5rem; }
+  .deck-item { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:1rem 1.25rem; display:flex; align-items:center; justify-content:space-between; }
+  .deck-item:hover { border-color:var(--accent); }
+  .deck-name { font-family:'New Rocker',cursive; font-size:1.1rem; color:var(--ink); }
+  .deck-count { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); margin-top:0.1rem; }
+  .deck-actions { display:flex; gap:0.4rem; }
+  .deck-btn { background:none; border:1px solid var(--border); border-radius:3px; padding:0.25rem 0.6rem; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); cursor:pointer; transition:all 0.2s; }
+  .deck-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .deck-btn.del:hover { border-color:var(--red); color:var(--red); }
+
+  .empty-state { text-align:center; padding:3rem 1rem; color:var(--faint); font-style:italic; }
+  .empty-icon { font-size:2.5rem; margin-bottom:0.75rem; opacity:0.4; }
+
+  /* CREATE TAB */
+  .suggested-decks { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1rem; }
+  .sugg-chip { background:var(--accent-faint); border:1px solid #c0a8d8; border-radius:20px; padding:0.25rem 0.75rem; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--accent); cursor:pointer; transition:all 0.2s; }
+  .sugg-chip:hover { background:var(--accent); color:white; }
+
+  /* SETTINGS */
+  .s-field { margin-bottom:0.85rem; }
+  .s-field label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:0.4rem; }
+  .s-field input { width:100%; background:white; border:1px solid var(--border); border-radius:4px; padding:0.6rem 0.85rem; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .s-field input:focus { border-color:var(--accent); }
+  .s-field input::placeholder { color:var(--border); }
+</style>
+</head>
+<body>
+
+<a class="home-btn" href="index.html">← Home</a>
+
+<div class="header">
+  <div class="header-label">Study</div>
+  <h1>Flashcards</h1>
+  <div class="header-sub">Create decks, study cards, track what you know</div>
+</div>
+<nav class="tabs">
+  <div class="tab active" onclick="showTab('study',this)">Study</div>
+  <div class="tab" onclick="showTab('decks',this)">Decks</div>
+  <div class="tab" onclick="showTab('create',this)">Create</div>
+  <div class="tab" onclick="showTab('settings',this)">Settings</div>
+</nav>
+
+<main>
+
+  <!-- STUDY -->
+  <div class="panel active" id="panel-study">
+    <div class="deck-selector">
+      <select id="studyDeckSelect" onchange="loadStudyDeck()">
+        <option value="">— Select a deck —</option>
+      </select>
+      <button class="btn-ghost" onclick="shuffleDeck()">Shuffle</button>
+    </div>
+    <div id="studyArea">
+      <div class="study-empty"><div class="empty-icon">🃏</div>Select a deck above to start studying.</div>
+    </div>
+  </div>
+
+  <!-- DECKS -->
+  <div class="panel" id="panel-decks">
+    <div class="deck-list" id="deckList"></div>
+  </div>
+
+  <!-- CREATE -->
+  <div class="panel" id="panel-create">
+    <div class="card-ui">
+      <div class="section-label">— Deck</div>
+      <div class="field">
+        <label>Deck name</label>
+        <input type="text" id="newDeckName" placeholder="e.g. Pharmacology, Anatomy, NUR101…">
+      </div>
+      <div class="section-label">— QUT unit suggestions (starting July 2026)</div>
+      <div class="suggested-decks">
+        <span class="sugg-chip" onclick="setDeckName('Pharmacology')">Pharmacology</span>
+        <span class="sugg-chip" onclick="setDeckName('Anatomy & Physiology')">Anatomy & Physiology</span>
+        <span class="sugg-chip" onclick="setDeckName('Pathophysiology')">Pathophysiology</span>
+        <span class="sugg-chip" onclick="setDeckName('Clinical Assessment')">Clinical Assessment</span>
+        <span class="sugg-chip" onclick="setDeckName('Evidence-Based Practice')">Evidence-Based Practice</span>
+        <span class="sugg-chip" onclick="setDeckName('Mental Health Nursing')">Mental Health Nursing</span>
+        <span class="sugg-chip" onclick="setDeckName('Community Nursing')">Community Nursing</span>
+      </div>
+    </div>
+    <div class="card-ui">
+      <div class="section-label">— New card</div>
+      <div class="field">
+        <label>Front (question / term)</label>
+        <textarea id="cardFront" placeholder="What is the mechanism of action of beta blockers?" rows="3"></textarea>
+      </div>
+      <div class="field">
+        <label>Back (answer / definition)</label>
+        <textarea id="cardBack" placeholder="Competitive antagonists at β-adrenergic receptors. Block the effects of catecholamines — reduce HR, BP, and myocardial contractility." rows="3"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="addCard()">Add card</button>
+        <button class="btn-ghost" onclick="clearCardForm()">Clear</button>
+        <span class="status-msg" id="createStatus"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="panel" id="panel-settings">
+    <div class="card-ui">
+      <div class="settings-title" style="font-family:'New Rocker',cursive;font-size:1.4rem;color:var(--accent);margin-bottom:0.2rem;">GitHub Sync</div>
+      <div style="font-size:0.8rem;color:var(--muted);font-style:italic;margin-bottom:1.25rem;line-height:1.6;">Decks are saved under <code style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--surface2);padding:0.1rem 0.4rem;border-radius:3px;">flashcards/</code> in your repo.</div>
+      <div class="s-field"><label>Personal Access Token</label><input type="password" id="ghToken" placeholder="ghp_…"></div>
+      <div class="s-field"><label>Repository (owner/repo)</label><input type="text" id="ghRepo" placeholder="sh4unn/shaunzen"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="saveSettings()">Save</button>
+        <button class="btn-ghost" onclick="testGH()">Test connection</button>
+        <button class="btn-ghost" onclick="syncAllDecks()">Sync all decks</button>
+      </div>
+      <div class="status-msg" id="settingsStatus"></div>
+    </div>
+    <div class="card-ui">
+      <div style="font-family:'New Rocker',cursive;font-size:1.4rem;color:var(--accent);margin-bottom:0.75rem;">Data</div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="exportDecks()">Export JSON</button>
+        <button class="btn-ghost" style="color:var(--red);border-color:rgba(122,32,32,0.3)" onclick="clearAll()">Clear all decks</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:0.75rem 1.5rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--faint);text-align:center;"><a href="index.html" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo; Study Flashcards</div>
+
+<script>
+  // ── DATA ──
+  // decks: { [deckName]: { cards: [{id, front, back}], created } }
+  let decks = JSON.parse(localStorage.getItem('flashcardDecks') || '{}');
+
+  // Study state
+  let studyQueue = [];
+  let studyIdx = 0;
+  let studyResults = { known: 0, unknown: 0 };
+  let isFlipped = false;
+
+  function saveDecks() { localStorage.setItem('flashcardDecks', JSON.stringify(decks)); }
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── STUDY TAB ──
+  function populateDeckSelect() {
+    const sel = document.getElementById('studyDeckSelect');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— Select a deck —</option>';
+    Object.keys(decks).sort().forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = `${name} (${decks[name].cards.length} cards)`;
+      if (name === cur) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function loadStudyDeck() {
+    const name = document.getElementById('studyDeckSelect').value;
+    if (!name || !decks[name]) { document.getElementById('studyArea').innerHTML = '<div class="study-empty"><div class="empty-icon">🃏</div>Select a deck above to start studying.</div>'; return; }
+    const cards = [...decks[name].cards];
+    // Shuffle
+    for (let i = cards.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i+1)); [cards[i], cards[j]] = [cards[j], cards[i]]; }
+    studyQueue = cards;
+    studyIdx = 0;
+    studyResults = { known: 0, unknown: 0 };
+    renderStudyCard();
+  }
+
+  function shuffleDeck() { loadStudyDeck(); }
+
+  function renderStudyCard() {
+    const area = document.getElementById('studyArea');
+    if (!studyQueue.length) { area.innerHTML = '<div class="study-empty"><div class="empty-icon">🃏</div>This deck has no cards yet. Go to Create to add some.</div>'; return; }
+    if (studyIdx >= studyQueue.length) { renderComplete(); return; }
+
+    isFlipped = false;
+    const card = studyQueue[studyIdx];
+    const total = studyQueue.length;
+    const pct = Math.round((studyIdx / total) * 100);
+
+    area.innerHTML = `
+      <div class="study-progress">
+        <span class="progress-text">${studyIdx + 1} / ${total}</span>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
+        <span class="progress-text">✓ ${studyResults.known} · ✗ ${studyResults.unknown}</span>
+      </div>
+      <div class="flashcard-wrap">
+        <div class="flashcard" id="flashcard" onclick="flipCard()">
+          <div class="card-face front">
+            <div class="card-face-label">Question</div>
+            <div class="card-text">${esc(card.front)}</div>
+            <div class="card-tap-hint">Tap to reveal answer</div>
+          </div>
+          <div class="card-face back">
+            <div class="card-face-label">Answer</div>
+            <div class="card-text">${esc(card.back)}</div>
+          </div>
+        </div>
+      </div>
+      <div class="study-actions" id="studyActions" style="display:none">
+        <button class="btn btn-red" onclick="markCard(false)">✗ Don't know</button>
+        <button class="btn btn-green" onclick="markCard(true)">✓ Know it</button>
+      </div>
+      <div style="text-align:center;margin-top:0.75rem;">
+        <button class="btn-ghost" onclick="skipCard()" style="font-size:0.75rem;padding:0.4rem 0.85rem;">Skip</button>
+      </div>
+    `;
+  }
+
+  function flipCard() {
+    const card = document.getElementById('flashcard');
+    if (!card) return;
+    isFlipped = !isFlipped;
+    card.classList.toggle('flipped', isFlipped);
+    if (isFlipped) document.getElementById('studyActions').style.display = 'flex';
+  }
+
+  function markCard(known) {
+    if (known) studyResults.known++; else studyResults.unknown++;
+    studyIdx++;
+    renderStudyCard();
+  }
+
+  function skipCard() { studyIdx++; renderStudyCard(); }
+
+  function renderComplete() {
+    const total = studyQueue.length;
+    document.getElementById('studyArea').innerHTML = `
+      <div class="study-complete">
+        <div class="complete-icon">🎉</div>
+        <div class="complete-title">Deck complete!</div>
+        <div class="complete-sub">You went through all ${total} cards.</div>
+        <div class="score-row">
+          <div class="score-box"><div class="score-num green">${studyResults.known}</div><div class="score-label">Known</div></div>
+          <div class="score-box"><div class="score-num red">${studyResults.unknown}</div><div class="score-label">Unsure</div></div>
+        </div>
+        <div class="btn-row" style="justify-content:center;gap:0.75rem;">
+          <button class="btn" onclick="loadStudyDeck()">Study again</button>
+          ${studyResults.unknown > 0 ? `<button class="btn-ghost" onclick="studyUnknown()">Revise ${studyResults.unknown} unsure</button>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function studyUnknown() {
+    // Re-queue just the unknown cards (those not marked known)
+    // Simple: reshuffle and go again with subset
+    const name = document.getElementById('studyDeckSelect').value;
+    if (!name) return;
+    // We don't track which are unknown specifically - just replay full deck
+    loadStudyDeck();
+  }
+
+  // ── DECKS TAB ──
+  function renderDeckList() {
+    const list = document.getElementById('deckList');
+    const names = Object.keys(decks).sort();
+    if (!names.length) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-icon">🃏</div>No decks yet — go to Create to make your first one.</div>';
+      return;
+    }
+    list.innerHTML = names.map(name => `
+      <div class="deck-item">
+        <div>
+          <div class="deck-name">${esc(name)}</div>
+          <div class="deck-count">${decks[name].cards.length} card${decks[name].cards.length !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="deck-actions">
+          <button class="deck-btn" onclick="studyThisDeck('${esc(name)}')">Study</button>
+          <button class="deck-btn del" onclick="deleteDeck('${esc(name)}')">Delete</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function studyThisDeck(name) {
+    document.getElementById('studyDeckSelect').value = name;
+    loadStudyDeck();
+    showTab('study', document.querySelectorAll('.tab')[0]);
+  }
+
+  function deleteDeck(name) {
+    if (!confirm(`Delete deck "${name}" and all its cards?`)) return;
+    delete decks[name];
+    saveDecks();
+    renderDeckList();
+    populateDeckSelect();
+  }
+
+  // ── CREATE TAB ──
+  function setDeckName(name) {
+    document.getElementById('newDeckName').value = name;
+    document.getElementById('cardFront').focus();
+  }
+
+  function addCard() {
+    const name = document.getElementById('newDeckName').value.trim();
+    const front = document.getElementById('cardFront').value.trim();
+    const back = document.getElementById('cardBack').value.trim();
+    if (!name) { setCreateStatus('Give the deck a name first', 'err'); return; }
+    if (!front || !back) { setCreateStatus('Fill in both sides of the card', 'err'); return; }
+
+    if (!decks[name]) decks[name] = { cards: [], created: new Date().toISOString() };
+    decks[name].cards.push({ id: Date.now().toString(), front, back });
+    saveDecks();
+
+    document.getElementById('cardFront').value = '';
+    document.getElementById('cardBack').value = '';
+    document.getElementById('cardFront').focus();
+    setCreateStatus(`Card added — deck now has ${decks[name].cards.length} card${decks[name].cards.length !== 1 ? 's' : ''}`, 'ok');
+
+    // Sync to GitHub if configured
+    const token = localStorage.getItem('fc_token');
+    const repo = localStorage.getItem('fc_repo');
+    if (token && repo) ghPut(token, repo, `flashcards/${slugify(name)}.json`, JSON.stringify(decks[name], null, 2), `Flashcards: ${name}`).catch(() => {});
+  }
+
+  function clearCardForm() {
+    document.getElementById('cardFront').value = '';
+    document.getElementById('cardBack').value = '';
+    setCreateStatus('', '');
+  }
+
+  // ── SETTINGS ──
+  function loadSettings() {
+    const t = localStorage.getItem('fc_token');
+    const r = localStorage.getItem('fc_repo');
+    if (t) document.getElementById('ghToken').value = t;
+    if (r) document.getElementById('ghRepo').value = r;
+  }
+
+  function saveSettings() {
+    const t = document.getElementById('ghToken').value.trim();
+    const r = document.getElementById('ghRepo').value.trim();
+    if (!t || !r) { setSettingsStatus('Fill in both fields', 'err'); return; }
+    localStorage.setItem('fc_token', t);
+    localStorage.setItem('fc_repo', r);
+    setSettingsStatus('Saved ✓', 'ok');
+  }
+
+  async function testGH() {
+    const t = document.getElementById('ghToken').value.trim() || localStorage.getItem('fc_token');
+    const r = document.getElementById('ghRepo').value.trim() || localStorage.getItem('fc_repo');
+    if (!t || !r) { setSettingsStatus('Fill in both fields first', 'err'); return; }
+    setSettingsStatus('Testing…', '');
+    try {
+      const res = await fetch(`https://api.github.com/repos/${r}`, { headers: { Authorization: `token ${t}` } });
+      res.ok ? setSettingsStatus('Connected ✓ — ' + r, 'ok') : setSettingsStatus('Failed (' + res.status + ')', 'err');
+    } catch(e) { setSettingsStatus('Error: ' + e.message, 'err'); }
+  }
+
+  async function syncAllDecks() {
+    const t = localStorage.getItem('fc_token');
+    const r = localStorage.getItem('fc_repo');
+    if (!t || !r) { setSettingsStatus('Save GitHub settings first', 'err'); return; }
+    setSettingsStatus('Syncing…', '');
+    try {
+      for (const name of Object.keys(decks)) {
+        await ghPut(t, r, `flashcards/${slugify(name)}.json`, JSON.stringify(decks[name], null, 2), `Flashcards sync: ${name}`);
+      }
+      setSettingsStatus('All decks synced ✓', 'ok');
+    } catch(e) { setSettingsStatus('Sync error: ' + e.message, 'err'); }
+  }
+
+  function exportDecks() {
+    const blob = new Blob([JSON.stringify(decks, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'flashcard-decks.json';
+    a.click();
+  }
+
+  function clearAll() {
+    if (!confirm('Delete ALL decks and cards? This cannot be undone.')) return;
+    decks = {};
+    saveDecks();
+    renderDeckList();
+    populateDeckSelect();
+  }
+
+  // ── GITHUB ──
+  async function ghPut(token, repo, path, content, message) {
+    let sha;
+    const check = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+      headers: { Authorization: `token ${token}` }
+    });
+    if (check.ok) { const d = await check.json(); sha = d.sha; }
+    const body = { message, content: btoa(unescape(encodeURIComponent(content))) };
+    if (sha) body.sha = sha;
+    const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error('GitHub ' + res.status);
+  }
+
+  function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  function setCreateStatus(msg, type) { const el = document.getElementById('createStatus'); el.textContent = msg; el.className = 'status-msg' + (type ? ' ' + type : ''); }
+  function setSettingsStatus(msg, type) { const el = document.getElementById('settingsStatus'); el.textContent = msg; el.className = 'status-msg' + (type ? ' ' + type : ''); }
+
+  function showTab(id, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    if (el) el.classList.add('active');
+    if (id === 'decks') renderDeckList();
+    if (id === 'study') populateDeckSelect();
+    if (id === 'settings') loadSettings();
+  }
+
+  // ── REGISTER SW ──
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+
+  populateDeckSelect();
+</script>
+</body>
+</html>

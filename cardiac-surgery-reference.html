@@ -5,40 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cardiac Surgery Reference</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap');
 
   :root {
-    --bg: #0a0d12;
-    --surface: #111520;
-    --border: #1e2535;
-    --accent-red: #c0392b;
-    --accent-amber: #d4a017;
-    --accent-blue: #2e86c1;
-    --text-primary: #e8ecf0;
-    --text-secondary: #8a95a3;
-    --text-muted: #4a5568;
-    --anaes: #1a3a4a;
-    --anaes-accent: #3fb0d8;
-    --surg: #2a1a1a;
-    --surg-accent: #e05252;
-    --tag-bg: #1a2235;
+    --bg: #f0f4f5;
+    --surface: #e4ecee;
+    --border: #c0ced2;
+    --ink: #1a2628;
+    --muted: #4a6068;
+    --faint: #8fa0a5;
+    --accent: #2a5a6a;
+    --accent-light: #3a7a8c;
+    --accent-faint: #e0ecf0;
+    --accent-red: #7a2020;
+    --accent-amber: #7a5a10;
+    --accent-blue: #1a5080;
+    --anaes-accent: #2a5a6a;
+    --anaes-faint: #e0ecf0;
+    --surg-accent: #7a2020;
+    --surg-faint: #f5e8e8;
+    --tag-bg: #e4ecee;
+    /* legacy aliases */
+    --text-primary: #1a2628;
+    --text-secondary: #4a6068;
+    --text-muted: #8fa0a5;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     background: var(--bg);
-    color: var(--text-primary);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
+    color: var(--ink);
+    font-family: 'Spectral', serif;
+    font-size: 15px;
     line-height: 1.7;
     min-height: 100vh;
+    padding-bottom: 3rem;
   }
 
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--accent); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; }
+  .home-btn:hover { background:var(--accent-light); }
+
   .header {
-    border-bottom: 1px solid var(--border);
-    padding: 2.5rem 2rem 2rem;
-    background: linear-gradient(180deg, #0d1118 0%, var(--bg) 100%);
+    background: var(--accent);
+    color: white;
+    padding: 2.5rem 2rem 0;
   }
 
   .header-inner {
@@ -49,56 +60,57 @@
   .header-label {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 0.6rem;
   }
 
   h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-family: 'New Rocker', cursive;
+    font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 400;
-    color: var(--text-primary);
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
+    color: white;
+    line-height: 1.15;
+    margin-bottom: 0.3rem;
   }
 
   .subtitle {
-    color: var(--text-secondary);
-    font-size: 13px;
-    font-weight: 300;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    font-style: italic;
+    margin-bottom: 1.5rem;
   }
 
   .tabs {
     display: flex;
     gap: 0;
     max-width: 1100px;
-    margin: 2rem auto 0;
-    border-bottom: 1px solid var(--border);
+    margin: 1.5rem auto 0;
+    border-bottom: none;
   }
 
   .tab {
     padding: 0.75rem 1.75rem;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
     border-bottom: 2px solid transparent;
     transition: all 0.2s;
-    letter-spacing: 0.02em;
     background: none;
     border-top: none;
     border-left: none;
     border-right: none;
-    font-family: 'DM Sans', sans-serif;
   }
 
-  .tab:hover { color: var(--text-secondary); }
-  .tab.active { color: var(--text-primary); border-bottom-color: var(--accent-amber); }
+  .tab:hover { color: rgba(255,255,255,0.8); }
+  .tab.active { color: white; border-bottom-color: white; }
 
-  .tab.cabg.active { border-bottom-color: var(--accent-amber); }
-  .tab.bentall.active { border-bottom-color: var(--accent-red); }
+  .tab.cabg.active { border-bottom-color: white; }
+  .tab.bentall.active { border-bottom-color: white; }
 
   .main {
     max-width: 1100px;
@@ -116,20 +128,22 @@
   }
 
   .procedure-title {
-    font-family: 'DM Serif Display', serif;
+    font-family: 'New Rocker', cursive;
     font-size: 1.6rem;
     font-weight: 400;
     margin-bottom: 0.4rem;
+    color: var(--accent);
   }
 
   .procedure-title.cabg { color: var(--accent-amber); }
   .procedure-title.bentall { color: var(--accent-red); }
 
   .procedure-desc {
-    color: var(--text-secondary);
-    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    font-size: 0.88rem;
     max-width: 700px;
-    line-height: 1.6;
+    line-height: 1.65;
   }
 
   .legend {
@@ -143,8 +157,11 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 12px;
-    color: var(--text-secondary);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
 
   .legend-dot {
@@ -164,7 +181,7 @@
     transition: border-color 0.2s;
   }
 
-  .stage:hover { border-color: #2e3a50; }
+  .stage:hover { border-color: var(--accent); }
 
   .stage-header {
     padding: 1rem 1.25rem;
@@ -184,10 +201,11 @@
   }
 
   .stage-name {
-    font-weight: 500;
-    font-size: 14px;
+    font-weight: 400;
+    font-size: 0.95rem;
     flex: 1;
-    color: var(--text-primary);
+    color: var(--ink);
+    font-family: 'Spectral', serif;
   }
 
   .stage-tags {
@@ -204,13 +222,13 @@
     letter-spacing: 0.05em;
   }
 
-  .tag.cpb { background: #1a2a3a; color: #5b9bd5; border: 1px solid #2a3d52; }
-  .tag.off { background: #1e2a1a; color: #6ab04c; border: 1px solid #2c3d22; }
-  .tag.critical { background: #2a1a1a; color: #e05252; border: 1px solid #3d2222; }
-  .tag.induction { background: #2a2a1a; color: #d4a017; border: 1px solid #3d3a1a; }
+  .tag.cpb { background: var(--accent-faint); color: var(--accent); border: 1px solid #a0c8d8; }
+  .tag.off { background: #eaf5e8; color: #3a6a2a; border: 1px solid #aacca8; }
+  .tag.critical { background: #f5e8e8; color: var(--accent-red); border: 1px solid #d0a0a0; }
+  .tag.induction { background: #f5f0e0; color: var(--accent-amber); border: 1px solid #d0c090; }
 
   .chevron {
-    color: var(--text-muted);
+    color: var(--faint);
     font-size: 12px;
     transition: transform 0.2s;
   }
@@ -240,11 +258,11 @@
 
   .role-panel.anaes {
     border-right: 1px solid var(--border);
-    background: rgba(26,58,74,0.15);
+    background: var(--anaes-faint);
   }
 
   .role-panel.surg {
-    background: rgba(42,26,26,0.15);
+    background: var(--surg-faint);
   }
 
   .role-label {
@@ -258,8 +276,8 @@
     gap: 0.5rem;
   }
 
-  .role-label.anaes { color: var(--anaes-accent); }
-  .role-label.surg { color: var(--surg-accent); }
+  .role-label.anaes { color: var(--anaes-accent); font-weight:500; }
+  .role-label.surg { color: var(--surg-accent); font-weight:500; }
 
   .role-dot {
     width: 6px; height: 6px;
@@ -277,20 +295,20 @@
 
   ul.task-list li {
     padding: 0.35rem 0;
-    color: var(--text-secondary);
-    font-size: 13px;
-    line-height: 1.55;
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
     display: flex;
     gap: 0.6rem;
     align-items: flex-start;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
   }
 
   ul.task-list li:last-child { border-bottom: none; }
 
   ul.task-list li::before {
     content: '–';
-    color: var(--text-muted);
+    color: var(--faint);
     flex-shrink: 0;
     margin-top: 0.05em;
   }
@@ -305,19 +323,19 @@
   }
 
   .alert-box.warning {
-    background: rgba(192,57,43,0.12);
+    background: #fdf0ee;
     border-left: 3px solid var(--accent-red);
-    color: #d9836e;
+    color: var(--accent-red);
   }
 
   .alert-box.info {
-    background: rgba(46,134,193,0.1);
+    background: #eef5fc;
     border-left: 3px solid var(--accent-blue);
-    color: #7ab8d9;
+    color: var(--accent-blue);
   }
 
   .alert-box strong {
-    font-weight: 500;
+    font-weight: 600;
     display: block;
     margin-bottom: 0.2rem;
   }
@@ -335,7 +353,7 @@
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--faint);
     margin-bottom: 1rem;
   }
 
@@ -346,7 +364,7 @@
   }
 
   .drug-card {
-    background: var(--tag-bg);
+    background: white;
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 0.75rem 1rem;
@@ -354,19 +372,19 @@
 
   .drug-name {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--anaes-accent);
     margin-bottom: 0.25rem;
   }
 
   .drug-use {
-    font-size: 12px;
-    color: var(--text-secondary);
+    font-size: 0.82rem;
+    color: var(--muted);
   }
 </style>
 </head>
 <body>
-<a href="index.html" style="position:fixed;top:1rem;left:1rem;z-index:9999;background:#2a7a6e;color:#f5f0e6;text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;border-radius:2px;opacity:0.85;">← Home</a>
+<a class="home-btn" href="index.html">← Home</a>
 
 <div class="header">
   <div class="header-inner">
@@ -1087,5 +1105,6 @@
     el.classList.toggle('open');
   }
 </script>
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:0.75rem 1.5rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--faint);text-align:center;"><a href="index.html" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo; Cardiac Surgery Reference</div>
 </body>
 </html>

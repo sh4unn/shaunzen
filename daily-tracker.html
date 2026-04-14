@@ -5,18 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Daily Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;1,300&family=Noto+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
-  :root{--cream:#f4efe4;--parchment:#ede6d6;--warm:#e4dbc8;--teal:#2a6b5e;--teal-light:#3a8a7c;--teal-faint:#e8f4f2;--burnt:#b8511e;--gold:#9a7820;--ink:#1a1410;--muted:#7a6a5a;--faint:#c4b89e;--border:#d5c9b2;--green:#3a6b3a;--green-faint:#eaf2ea;}
+  :root{--bg:#f0f4f5;--surface:#e4ecee;--surface2:#dde7ea;--border:#c0ced2;--slate:#bfcbce;--ink:#1a2628;--muted:#4a6068;--faint:#8fa0a5;--accent:#2a5a6a;--accent-light:#3a7a8c;--accent-faint:#e0ecf0;--warm:#c45e2a;--gold:#8a6a20;--green:#3a6a2a;--green-faint:#e8f5e8;--red:#7a2020;--purple:#5a3a7a;--cream:#f0f4f5;--parchment:#e4ecee;--teal:#2a5a6a;--teal-light:#3a7a8c;--teal-faint:#e0ecf0;--burnt:#c45e2a;}
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--cream);color:var(--ink);font-family:'Noto Sans',sans-serif;min-height:100vh;padding-bottom:4rem;}
-  .home-btn{position:fixed;top:1rem;left:1rem;z-index:100;background:var(--teal);color:var(--cream);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;border-radius:2px;transition:background 0.2s;opacity:0.85;}
-  .home-btn:hover{background:var(--teal-light);opacity:1;}
-  .header{background:var(--teal);color:var(--cream);padding:2rem 1.5rem 1.75rem;position:relative;overflow:hidden;}
+  body{background:var(--bg);color:var(--ink);font-family:'Spectral',serif;min-height:100vh;padding-bottom:4rem;}
+  .home-btn{position:fixed;top:1rem;left:1rem;z-index:100;background:var(--accent);color:white;text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 0.9rem;border-radius:2px;transition:background 0.2s;}
+  .home-btn:hover{background:var(--accent-light);}
+  .header{background:var(--accent);color:white;padding:2rem 1.5rem 1.75rem;position:relative;overflow:hidden;}
   .header::after{content:'☯';position:absolute;right:-1rem;top:-1rem;font-size:8rem;opacity:0.06;pointer-events:none;}
   .header-top{display:flex;justify-content:space-between;align-items:flex-start;max-width:680px;margin:0 auto;}
   .header-label{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(244,239,228,0.45);margin-bottom:0.4rem;}
-  .header h1{font-family:'Noto Serif',serif;font-size:1.6rem;font-weight:300;}
+  .header h1{font-family:'New Rocker',cursive;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:400;}
   .header-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(244,239,228,0.45);text-align:right;margin-top:0.25rem;}
   .tabs{background:var(--teal-light);display:flex;}
   .tab{flex:1;padding:0.75rem;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(244,239,228,0.5);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s;}
@@ -25,12 +26,12 @@
   main{max-width:680px;margin:0 auto;padding:2rem 1.25rem;}
   .panel{display:none;} .panel.active{display:block;}
   .mood-section,.habits-section{background:var(--parchment);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.5rem;}
-  .section-title{font-family:'Noto Serif',serif;font-size:1rem;font-weight:400;color:var(--teal);margin-bottom:1rem;}
+  .section-title{font-family:'Spectral',serif;font-size:1rem;font-weight:400;color:var(--teal);margin-bottom:1rem;}
   .mood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;margin-bottom:1rem;}
   .mood-btn{background:var(--cream);border:1.5px solid var(--border);border-radius:8px;padding:0.75rem 0.25rem 0.5rem;cursor:pointer;text-align:center;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:0.3rem;}
   .mood-btn:hover,.mood-btn.selected{border-color:var(--teal);background:var(--teal-faint);}
   .mood-emoji{font-size:1.5rem;} .mood-label{font-size:0.65rem;color:var(--muted);letter-spacing:0.05em;}
-  .mood-note{width:100%;background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:0.65rem 0.85rem;font-family:'Noto Serif',serif;font-size:0.85rem;color:var(--ink);resize:none;outline:none;transition:border-color 0.2s;height:70px;}
+  .mood-note{width:100%;background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:0.65rem 0.85rem;font-family:'Spectral',serif;font-size:0.85rem;color:var(--ink);resize:none;outline:none;transition:border-color 0.2s;height:70px;}
   .mood-note:focus{border-color:var(--teal);}
   .mood-note::placeholder{color:var(--faint);font-style:italic;}
   .habit-list{display:flex;flex-direction:column;gap:0.6rem;}
@@ -44,14 +45,14 @@
   .habit-streak{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);}
   .habit-row.done .habit-streak{color:var(--green);}
   .add-habit-row{display:flex;gap:0.5rem;margin-top:1rem;}
-  .add-input{flex:1;background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.85rem;font-family:'Noto Sans',sans-serif;font-size:0.85rem;color:var(--ink);outline:none;transition:border-color 0.2s;}
+  .add-input{flex:1;background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.85rem;font-family:'IBM Plex Mono',monospace;font-size:0.85rem;color:var(--ink);outline:none;transition:border-color 0.2s;}
   .add-input:focus{border-color:var(--teal);}
   .add-input::placeholder{color:var(--faint);}
   .emoji-input{width:48px;flex:none;text-align:center;}
-  .btn-add{background:var(--teal);color:var(--cream);border:none;border-radius:6px;padding:0.6rem 1rem;font-family:'Noto Sans',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;transition:background 0.2s;}
+  .btn-add{background:var(--teal);color:var(--cream);border:none;border-radius:6px;padding:0.6rem 1rem;font-family:'IBM Plex Mono',monospace;font-size:0.82rem;font-weight:500;cursor:pointer;transition:background 0.2s;}
   .btn-add:hover{background:var(--teal-light);}
   .save-row{display:flex;justify-content:center;margin-top:1.5rem;}
-  .btn-save{background:var(--teal);color:var(--cream);border:none;border-radius:8px;padding:0.85rem 2.5rem;font-family:'Noto Sans',sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;letter-spacing:0.05em;transition:background 0.2s,transform 0.1s;}
+  .btn-save{background:var(--teal);color:var(--cream);border:none;border-radius:8px;padding:0.85rem 2.5rem;font-family:'IBM Plex Mono',monospace;font-size:0.9rem;font-weight:500;cursor:pointer;letter-spacing:0.05em;transition:background 0.2s,transform 0.1s;}
   .btn-save:hover{background:var(--teal-light);}
   .btn-save:active{transform:scale(0.98);}
   .history-entry{background:var(--parchment);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1rem;}
@@ -59,8 +60,8 @@
   .history-habits{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.6rem;}
   .history-habit-tag{font-size:0.75rem;padding:0.2rem 0.6rem;border-radius:20px;background:var(--warm);color:var(--muted);border:1px solid var(--border);}
   .history-habit-tag.done{background:var(--green-faint);color:var(--green);border-color:var(--green);}
-  .history-note{font-family:'Noto Serif',serif;font-size:0.82rem;font-style:italic;color:var(--muted);margin-top:0.5rem;line-height:1.6;}
-  .empty-history{text-align:center;padding:3rem 1rem;color:var(--faint);font-family:'Noto Serif',serif;font-style:italic;font-size:0.9rem;}
+  .history-note{font-family:'Spectral',serif;font-size:0.82rem;font-style:italic;color:var(--muted);margin-top:0.5rem;line-height:1.6;}
+  .empty-history{text-align:center;padding:3rem 1rem;color:var(--faint);font-family:'Spectral',serif;font-style:italic;font-size:0.9rem;}
   .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(4rem);background:var(--teal);color:var(--cream);padding:0.75rem 1.5rem;border-radius:30px;font-size:0.85rem;font-weight:500;transition:transform 0.3s;z-index:100;pointer-events:none;}
   .toast.show{transform:translateX(-50%) translateY(0);}
 </style>
@@ -127,5 +128,6 @@
   if(todayEntry){if(todayEntry.mood){const btn=document.querySelector(`[data-mood="${todayEntry.mood}"]`);if(btn){btn.classList.add('selected');selectedMood=todayEntry.mood;}}if(todayEntry.note)document.getElementById('moodNote').value=todayEntry.note;}
   renderHabits();
 </script>
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:0.75rem 1.5rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--faint);text-align:center;"><a href="index.html" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo; Daily Tracker</div>
 </body>
 </html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2a5a6a">
+<title>Shaun's Scrolls</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f0f4f5; --surface:#e4ecee; --surface2:#dde7ea;
+    --border:#c0ced2; --slate:#bfcbce;
+    --ink:#1a2628; --muted:#4a6068; --faint:#8fa0a5;
+    --accent:#2a5a6a; --accent-light:#3a7a8c; --accent-faint:#e0ecf0;
+    --warm:#c45e2a; --gold:#8a6a20; --green:#3a6a2a; --red:#7a2020;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:'Spectral',serif; min-height:100vh; padding-bottom:5rem; }
+
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--accent); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; }
+  .home-btn:hover { background:var(--accent-light); }
+
+  .header { background:var(--accent); color:white; padding:2.5rem 2rem 0; text-align:center; position:relative; overflow:hidden; }
+  .header::before { content:'📜'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:14rem; opacity:0.04; pointer-events:none; }
+  .header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:0.6rem; }
+  .header h1 { font-family:'New Rocker',cursive; font-size:clamp(2rem,6vw,3rem); font-weight:400; letter-spacing:0.02em; margin-bottom:0.3rem; }
+  .header-sub { font-size:0.85rem; color:rgba(255,255,255,0.5); font-style:italic; margin-bottom:1.5rem; }
+
+  .tabs { background:rgba(0,0,0,0.15); display:flex; }
+  .tab { flex:1; padding:0.75rem; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.45); cursor:pointer; text-align:center; border-bottom:2px solid transparent; transition:color 0.2s,border-color 0.2s; }
+  .tab.active { color:white; border-bottom-color:white; }
+  .tab:hover { color:rgba(255,255,255,0.8); }
+
+  main { max-width:720px; margin:0 auto; padding:2rem 1.5rem; }
+  .panel { display:none; } .panel.active { display:block; }
+
+  /* WRITE TAB */
+  .write-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin-bottom:1.25rem; }
+  .field { margin-bottom:1rem; }
+  .field label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:0.4rem; }
+  .field input, .field textarea { width:100%; background:white; border:1px solid var(--border); border-radius:4px; padding:0.65rem 0.9rem; font-family:'Spectral',serif; font-size:0.95rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .field input:focus, .field textarea:focus { border-color:var(--accent); }
+  .field input::placeholder, .field textarea::placeholder { color:var(--faint); font-style:italic; }
+  .field textarea { resize:vertical; min-height:200px; line-height:1.75; }
+  .field-row { display:flex; gap:0.75rem; }
+  .field-row .field { flex:1; }
+
+  .char-count { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); text-align:right; margin-top:0.2rem; }
+
+  .tag-input-wrap { display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center; background:white; border:1px solid var(--border); border-radius:4px; padding:0.5rem 0.75rem; cursor:text; transition:border-color 0.2s; }
+  .tag-input-wrap:focus-within { border-color:var(--accent); }
+  .tag-pill { background:var(--accent-faint); color:var(--accent); font-family:'IBM Plex Mono',monospace; font-size:10px; padding:0.15rem 0.55rem; border-radius:20px; display:flex; align-items:center; gap:0.3rem; }
+  .tag-pill button { background:none; border:none; color:var(--accent); cursor:pointer; font-size:12px; line-height:1; padding:0; opacity:0.6; }
+  .tag-pill button:hover { opacity:1; }
+  .tag-raw { border:none; outline:none; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink); min-width:80px; flex:1; padding:0; background:transparent; }
+  .tag-hint { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); margin-top:0.25rem; }
+
+  .btn-row { display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; }
+  .btn { background:var(--accent); color:white; border:none; border-radius:4px; padding:0.65rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; cursor:pointer; transition:background 0.2s; letter-spacing:0.04em; }
+  .btn:hover { background:var(--accent-light); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:4px; padding:0.65rem 1.1rem; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; cursor:pointer; transition:all 0.2s; }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+  .save-status { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); }
+  .save-status.ok { color:var(--green); }
+  .save-status.err { color:var(--red); }
+
+  /* SCROLLS TAB */
+  .search-bar { display:flex; gap:0.5rem; margin-bottom:1.25rem; }
+  .search-input { flex:1; background:white; border:1px solid var(--border); border-radius:4px; padding:0.6rem 0.9rem; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .search-input:focus { border-color:var(--accent); }
+  .search-input::placeholder { color:var(--faint); }
+
+  .scroll-list { display:flex; flex-direction:column; gap:0.5rem; }
+  .scroll-item { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:1rem 1.25rem; cursor:pointer; transition:border-color 0.2s; }
+  .scroll-item:hover { border-color:var(--accent); background:var(--accent-faint); }
+  .scroll-item-title { font-family:'New Rocker',cursive; font-size:1.1rem; color:var(--ink); margin-bottom:0.2rem; }
+  .scroll-item-meta { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); margin-bottom:0.4rem; letter-spacing:0.05em; }
+  .scroll-item-preview { font-size:0.82rem; color:var(--muted); line-height:1.55; font-style:italic; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .scroll-tags { display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.5rem; }
+  .scroll-tag { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.08em; background:var(--accent-faint); color:var(--accent); border-radius:20px; padding:0.1rem 0.5rem; }
+
+  .empty-state { text-align:center; padding:3rem 1rem; color:var(--faint); font-style:italic; }
+  .empty-icon { font-size:2.5rem; margin-bottom:0.75rem; opacity:0.4; }
+
+  /* VIEW MODAL */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,38,40,0.55); z-index:200; align-items:flex-start; justify-content:center; padding:2rem 1rem; overflow-y:auto; }
+  .modal-overlay.show { display:flex; }
+  .modal { background:var(--bg); border:1px solid var(--border); border-radius:10px; width:100%; max-width:680px; margin:auto; }
+  .modal-header { padding:1.25rem 1.5rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; }
+  .modal-title { font-family:'New Rocker',cursive; font-size:1.5rem; color:var(--ink); }
+  .modal-meta { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); margin-top:0.2rem; }
+  .modal-close { background:none; border:none; font-size:1.25rem; cursor:pointer; color:var(--faint); line-height:1; }
+  .modal-body { padding:1.5rem; font-size:0.92rem; color:var(--ink); line-height:1.85; white-space:pre-wrap; }
+  .modal-footer { padding:0.75rem 1.5rem; border-top:1px solid var(--border); display:flex; gap:0.5rem; }
+
+  /* SETTINGS */
+  .settings-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin-bottom:1.25rem; }
+  .settings-title { font-family:'New Rocker',cursive; font-size:1.4rem; color:var(--accent); margin-bottom:0.2rem; }
+  .settings-sub { font-size:0.8rem; color:var(--muted); font-style:italic; margin-bottom:1.25rem; line-height:1.6; }
+  .s-field { margin-bottom:0.85rem; }
+  .s-field label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:0.4rem; }
+  .s-field input { width:100%; background:white; border:1px solid var(--border); border-radius:4px; padding:0.6rem 0.85rem; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .s-field input:focus { border-color:var(--accent); }
+  .s-field input::placeholder { color:var(--border); }
+  .status-msg { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); margin-top:0.65rem; min-height:16px; }
+  .status-msg.ok { color:var(--green); } .status-msg.err { color:var(--red); }
+</style>
+</head>
+<body>
+
+<a class="home-btn" href="index.html">← Home</a>
+
+<div class="header">
+  <div class="header-label">Notes</div>
+  <h1>Shaun's Scrolls</h1>
+  <div class="header-sub">Quick notes, thoughts & fragments — saved to GitHub</div>
+</div>
+<nav class="tabs">
+  <div class="tab active" onclick="showTab('write',this)">Write</div>
+  <div class="tab" onclick="showTab('scrolls',this)">Scrolls</div>
+  <div class="tab" onclick="showTab('settings',this)">Settings</div>
+</nav>
+
+<main>
+
+  <!-- WRITE -->
+  <div class="panel active" id="panel-write">
+    <div class="write-card">
+      <div class="field">
+        <label>Title</label>
+        <input type="text" id="scrollTitle" placeholder="Give this scroll a name…" maxlength="120">
+      </div>
+      <div class="field">
+        <label>Body</label>
+        <textarea id="scrollBody" placeholder="Write anything — a thought, note, observation, fragment…" oninput="updateCharCount()"></textarea>
+        <div class="char-count" id="charCount">0 characters</div>
+      </div>
+      <div class="field">
+        <label>Tags</label>
+        <div class="tag-input-wrap" id="tagWrap" onclick="document.getElementById('tagRaw').focus()">
+          <input type="text" id="tagRaw" class="tag-raw" placeholder="Add tag…" onkeydown="handleTagKey(event)">
+        </div>
+        <div class="tag-hint">Press Enter or comma to add a tag</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="saveScroll()" id="saveBtn">Save scroll</button>
+        <button class="btn-ghost" onclick="clearWrite()">Clear</button>
+        <span class="save-status" id="saveStatus"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCROLLS LIST -->
+  <div class="panel" id="panel-scrolls">
+    <div class="search-bar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search scrolls…" oninput="renderScrollList()">
+    </div>
+    <div class="scroll-list" id="scrollList"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="panel" id="panel-settings">
+    <div class="settings-card">
+      <div class="settings-title">GitHub Settings</div>
+      <div class="settings-sub">Scrolls are saved as JSON files under <code style="font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--surface2);padding:0.1rem 0.4rem;border-radius:3px;">scrolls/</code> in your repo. Your token stays in localStorage only.</div>
+      <div class="s-field"><label>Personal Access Token</label><input type="password" id="ghToken" placeholder="ghp_…"></div>
+      <div class="s-field"><label>Repository (owner/repo)</label><input type="text" id="ghRepo" placeholder="sh4unn/shaunzen"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="saveSettings()">Save</button>
+        <button class="btn-ghost" onclick="testGitHub()">Test connection</button>
+      </div>
+      <div class="status-msg" id="settingsStatus"></div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-title">Local data</div>
+      <div class="settings-sub">Scrolls are also cached locally in your browser for offline reading.</div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="exportLocal()">Export JSON</button>
+        <button class="btn-ghost" style="color:var(--red);border-color:rgba(122,32,32,0.3)" onclick="clearLocal()">Clear local cache</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- VIEW MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-meta" id="modalMeta"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="editFromModal()">Edit</button>
+      <button class="btn-ghost" style="color:var(--red);border-color:rgba(122,32,32,0.3)" onclick="deleteFromModal()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:0.75rem 1.5rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--faint);text-align:center;"><a href="index.html" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo; Shaun's Scrolls</div>
+
+<script>
+  let scrolls = JSON.parse(localStorage.getItem('shaunsScrolls') || '[]');
+  let currentTags = [];
+  let viewingId = null;
+
+  // ── TAG INPUT ──
+  function handleTagKey(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = e.target.value.trim().replace(/,/g,'');
+      if (val && !currentTags.includes(val)) addTag(val);
+      e.target.value = '';
+    } else if (e.key === 'Backspace' && !e.target.value && currentTags.length) {
+      removeTag(currentTags[currentTags.length - 1]);
+    }
+  }
+
+  function addTag(val) {
+    currentTags.push(val);
+    renderTagPills();
+  }
+
+  function removeTag(val) {
+    currentTags = currentTags.filter(t => t !== val);
+    renderTagPills();
+  }
+
+  function renderTagPills() {
+    const wrap = document.getElementById('tagWrap');
+    const raw = document.getElementById('tagRaw');
+    wrap.innerHTML = '';
+    currentTags.forEach(tag => {
+      const pill = document.createElement('span');
+      pill.className = 'tag-pill';
+      pill.innerHTML = `${esc(tag)}<button onclick="removeTag('${esc(tag)}')" type="button">×</button>`;
+      wrap.appendChild(pill);
+    });
+    wrap.appendChild(raw);
+  }
+
+  // ── CHAR COUNT ──
+  function updateCharCount() {
+    const len = document.getElementById('scrollBody').value.length;
+    document.getElementById('charCount').textContent = len.toLocaleString() + ' characters';
+  }
+
+  // ── SAVE SCROLL ──
+  async function saveScroll() {
+    const title = document.getElementById('scrollTitle').value.trim();
+    const body = document.getElementById('scrollBody').value.trim();
+    if (!title) { setSaveStatus('Add a title first', 'err'); return; }
+    if (!body) { setSaveStatus('Write something first', 'err'); return; }
+
+    const scroll = {
+      id: Date.now().toString(),
+      title,
+      body,
+      tags: [...currentTags],
+      created: new Date().toISOString(),
+      updated: new Date().toISOString()
+    };
+
+    // Add to local store
+    scrolls.unshift(scroll);
+    saveLocal();
+
+    // Try to save to GitHub
+    const token = localStorage.getItem('scrolls_token');
+    const repo = localStorage.getItem('scrolls_repo');
+    if (token && repo) {
+      setSaveStatus('Saving to GitHub…', '');
+      document.getElementById('saveBtn').disabled = true;
+      try {
+        await ghPut(token, repo, `scrolls/${scroll.id}.json`, JSON.stringify(scroll, null, 2), `Scroll: ${title}`);
+        setSaveStatus('Saved to GitHub ✓', 'ok');
+      } catch(e) {
+        setSaveStatus('Saved locally — GitHub failed: ' + e.message, 'err');
+      }
+      document.getElementById('saveBtn').disabled = false;
+    } else {
+      setSaveStatus('Saved locally (add GitHub token in Settings to sync)', 'ok');
+    }
+
+    clearWrite(false);
+  }
+
+  function clearWrite(resetStatus = true) {
+    document.getElementById('scrollTitle').value = '';
+    document.getElementById('scrollBody').value = '';
+    currentTags = [];
+    renderTagPills();
+    updateCharCount();
+    if (resetStatus) setSaveStatus('', '');
+  }
+
+  // ── SCROLLS LIST ──
+  function renderScrollList() {
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    const filtered = q ? scrolls.filter(s =>
+      s.title.toLowerCase().includes(q) ||
+      s.body.toLowerCase().includes(q) ||
+      (s.tags || []).some(t => t.toLowerCase().includes(q))
+    ) : scrolls;
+
+    const list = document.getElementById('scrollList');
+    if (!filtered.length) {
+      list.innerHTML = `<div class="empty-state"><div class="empty-icon">📜</div>${q ? 'No scrolls match "' + esc(q) + '"' : 'No scrolls yet — write your first one.'}</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(s => `
+      <div class="scroll-item" onclick="viewScroll('${s.id}')">
+        <div class="scroll-item-title">${esc(s.title)}</div>
+        <div class="scroll-item-meta">${formatDate(s.created)}</div>
+        <div class="scroll-item-preview">${esc(s.body)}</div>
+        ${s.tags && s.tags.length ? `<div class="scroll-tags">${s.tags.map(t => `<span class="scroll-tag">${esc(t)}</span>`).join('')}</div>` : ''}
+      </div>`).join('');
+  }
+
+  // ── VIEW MODAL ──
+  function viewScroll(id) {
+    const s = scrolls.find(s => s.id === id);
+    if (!s) return;
+    viewingId = id;
+    document.getElementById('modalTitle').textContent = s.title;
+    document.getElementById('modalMeta').textContent = formatDate(s.created) + (s.tags && s.tags.length ? ' · ' + s.tags.join(', ') : '');
+    document.getElementById('modalBody').textContent = s.body;
+    document.getElementById('modalOverlay').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(e) {
+    if (e && e.target !== document.getElementById('modalOverlay')) return;
+    document.getElementById('modalOverlay').classList.remove('show');
+    document.body.style.overflow = '';
+    viewingId = null;
+  }
+
+  function editFromModal() {
+    const s = scrolls.find(s => s.id === viewingId);
+    if (!s) return;
+    document.getElementById('scrollTitle').value = s.title;
+    document.getElementById('scrollBody').value = s.body;
+    currentTags = [...(s.tags || [])];
+    renderTagPills();
+    updateCharCount();
+    // Remove original
+    scrolls = scrolls.filter(x => x.id !== s.id);
+    saveLocal();
+    closeModal();
+    showTab('write', document.querySelectorAll('.tab')[0]);
+  }
+
+  function deleteFromModal() {
+    if (!viewingId) return;
+    if (!confirm('Delete this scroll?')) return;
+    scrolls = scrolls.filter(s => s.id !== viewingId);
+    saveLocal();
+    closeModal();
+    renderScrollList();
+  }
+
+  // ── SETTINGS ──
+  function loadSettings() {
+    const t = localStorage.getItem('scrolls_token');
+    const r = localStorage.getItem('scrolls_repo');
+    if (t) document.getElementById('ghToken').value = t;
+    if (r) document.getElementById('ghRepo').value = r;
+  }
+
+  function saveSettings() {
+    const t = document.getElementById('ghToken').value.trim();
+    const r = document.getElementById('ghRepo').value.trim();
+    if (!t || !r) { setSettingsStatus('Fill in both fields', 'err'); return; }
+    localStorage.setItem('scrolls_token', t);
+    localStorage.setItem('scrolls_repo', r);
+    setSettingsStatus('Saved ✓', 'ok');
+  }
+
+  async function testGitHub() {
+    const t = document.getElementById('ghToken').value.trim() || localStorage.getItem('scrolls_token');
+    const r = document.getElementById('ghRepo').value.trim() || localStorage.getItem('scrolls_repo');
+    if (!t || !r) { setSettingsStatus('Fill in both fields first', 'err'); return; }
+    setSettingsStatus('Testing…', '');
+    try {
+      const res = await fetch(`https://api.github.com/repos/${r}`, { headers: { Authorization: `token ${t}` } });
+      res.ok ? setSettingsStatus('Connected ✓ — ' + r, 'ok') : setSettingsStatus('Failed (' + res.status + ')', 'err');
+    } catch(e) { setSettingsStatus('Error: ' + e.message, 'err'); }
+  }
+
+  function exportLocal() {
+    const blob = new Blob([JSON.stringify(scrolls, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'shauns-scrolls.json';
+    a.click();
+  }
+
+  function clearLocal() {
+    if (!confirm('Clear all locally cached scrolls? This cannot be undone.')) return;
+    scrolls = [];
+    localStorage.removeItem('shaunsScrolls');
+    renderScrollList();
+  }
+
+  // ── GITHUB PUT ──
+  async function ghPut(token, repo, path, content, message) {
+    // Get existing SHA if file exists
+    let sha;
+    const check = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+      headers: { Authorization: `token ${token}` }
+    });
+    if (check.ok) { const d = await check.json(); sha = d.sha; }
+
+    const body = { message, content: btoa(unescape(encodeURIComponent(content))) };
+    if (sha) body.sha = sha;
+
+    const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error('GitHub ' + res.status);
+  }
+
+  // ── HELPERS ──
+  function saveLocal() { localStorage.setItem('shaunsScrolls', JSON.stringify(scrolls)); }
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function formatDate(iso) { try { return new Date(iso).toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' }); } catch { return iso; } }
+  function setSaveStatus(msg, type) { const el = document.getElementById('saveStatus'); el.textContent = msg; el.className = 'save-status' + (type ? ' ' + type : ''); }
+  function setSettingsStatus(msg, type) { const el = document.getElementById('settingsStatus'); el.textContent = msg; el.className = 'status-msg' + (type ? ' ' + type : ''); }
+
+  function showTab(id, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    if (el) el.classList.add('active');
+    if (id === 'scrolls') renderScrollList();
+    if (id === 'settings') loadSettings();
+  }
+
+  renderScrollList();
+</script>
+</body>
+</html>
