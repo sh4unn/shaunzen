@@ -431,7 +431,7 @@
     return lines.slice(1).map((line,i)=>{
       const vals=parseCSVLine(line); const obj={}; headers.forEach((h,j)=>obj[h]=(vals[j]||'').trim());
       if(!obj.title) return null;
-      return { id:Date.now()+i, title:obj.title, author:obj.authors||obj.author||'', status:obj.read_status==='read'?'read':obj.read_status==='currently-reading'?'reading':'to-read', year:obj.date_read?parseInt(obj.date_read.split('-')[0]):(obj.date_added?parseInt(obj.date_added.split('-')[0]):new Date().getFullYear()), rating:obj.star_rating?Math.round(parseFloat(obj.star_rating)):0, genre:obj.genres?obj.genres.split(',')[0].trim():'Other', pages:parseInt(obj.num_pages||obj.pages||0)||0, notes:'', cover:null, added:obj.date_added||new Date().toISOString().split('T')[0] };
+      return { id:Date.now()+i, title:obj.title, author:obj.authors||obj.author||'', status:obj.read_status==='read'?'read':obj.read_status==='currently-reading'?'reading':'to-read', year:obj.date_read?parseInt(obj.date_read.split('-')[0]):(obj.date_added?parseInt(obj.date_added.split('-')[0]):new Date().getFullYear()), rating:obj.star_rating?Math.round(parseFloat(obj.star_rating)):0, pages:parseInt(obj.num_pages||obj.pages||0)||0, notes:'', cover:null, added:obj.date_added||new Date().toISOString().split('T')[0] };
     }).filter(Boolean);
   }
 
