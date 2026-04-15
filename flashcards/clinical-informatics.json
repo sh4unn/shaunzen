@@ -1,0 +1,180 @@
+{
+  "created": "2026-04-15T00:00:00.000Z",
+  "cards": [
+    {
+      "id": "ci001",
+      "front": "What is the DIKW hierarchy and why does it matter in health informatics?",
+      "back": "Data → Information → Knowledge → Wisdom. Raw data (e.g. a blood glucose value) becomes information when contextualised (elevated for this patient), knowledge when a pattern is recognised, and wisdom when a clinical decision is made. Informatics tools must support movement up this hierarchy."
+    },
+    {
+      "id": "ci002",
+      "front": "Name the five dimensions of data quality in healthcare.",
+      "back": "Accuracy (correct values), Completeness (all required fields present), Consistency (same value across systems), Timeliness (available when needed), and Validity (conforms to defined formats/ranges). Some frameworks also add Uniqueness (no duplicate records)."
+    },
+    {
+      "id": "ci003",
+      "front": "What is data governance and what are its three pillars?",
+      "back": "Data governance is the framework of policies, standards and accountabilities that ensures data is managed as a valued organisational asset. Three pillars: People (roles/responsibilities), Processes (policies, standards, workflows), Technology (tools, systems, infrastructure)."
+    },
+    {
+      "id": "ci004",
+      "front": "Distinguish between a Data Owner, Data Steward, and Data Custodian.",
+      "back": "Data Owner: accountable for the data asset (usually a senior leader). Data Steward: responsible for day-to-day quality and governance of the data. Data Custodian: technically responsible for storage and protection of the data (usually IT). These roles can overlap in smaller organisations."
+    },
+    {
+      "id": "ci005",
+      "front": "What is the difference between an EHR and an EMR?",
+      "back": "EMR (Electronic Medical Record): digital version of a patient's chart within a single practice or provider — not easily shared externally. EHR (Electronic Health Record): designed to be shared across multiple providers and settings; includes the full longitudinal health record. EHR is the broader, interoperable concept."
+    },
+    {
+      "id": "ci006",
+      "front": "What are the three levels of interoperability in healthcare?",
+      "back": "1. Technical: systems can exchange data (e.g. using the same transport protocol). 2. Semantic: the meaning of exchanged data is understood (e.g. same coding standard). 3. Organisational (or Process): governance, policies and stakeholder buy-in allow data to be used effectively across organisations."
+    },
+    {
+      "id": "ci007",
+      "front": "What is HL7 FHIR and why is it significant?",
+      "back": "Fast Healthcare Interoperability Resources — a modern standard from Health Level 7 that uses RESTful APIs and web-based technologies to exchange health data. Significant because it enables easier integration between disparate systems, supports mobile apps, and is mandated in many national digital health strategies including Australia's."
+    },
+    {
+      "id": "ci008",
+      "front": "What is SNOMED CT and how does it differ from ICD-10-AM?",
+      "back": "SNOMED CT (Systematized Nomenclature of Medicine Clinical Terms): a comprehensive clinical terminology used for describing clinical findings, diagnoses, and procedures at the point of care. ICD-10-AM (Australian Modification): a classification system used primarily for administrative coding, billing, and epidemiology — less granular but standardised globally for morbidity reporting."
+    },
+    {
+      "id": "ci009",
+      "front": "What is LOINC and what is it used for?",
+      "back": "Logical Observation Identifiers Names and Codes — an international standard for identifying laboratory tests, clinical observations, and measurements (e.g. a specific pathology test result). Enables consistent identification and exchange of lab data between systems, especially important for EHR integration."
+    },
+    {
+      "id": "ci010",
+      "front": "Describe the three types of clinical decision support systems (CDSS).",
+      "back": "1. Alert/Reminder systems: proactive notifications (drug allergy alerts, overdue screenings). 2. Order Facilitators: support clinical ordering (dosing calculators, order sets). 3. Information Retrieval: provide relevant reference content at point of care (drug references, protocols). Can be active (unsolicited) or passive (on request)."
+    },
+    {
+      "id": "ci011",
+      "front": "What is alert fatigue and what are strategies to reduce it?",
+      "back": "Alert fatigue occurs when clinicians become desensitised to CDSS alerts due to excessive, irrelevant, or poorly targeted notifications — leading to override of important alerts. Strategies: tiered alert severity, evidence-based alert thresholds, removing low-value alerts, contextualising alerts to patient/provider, interruptive vs non-interruptive alerting."
+    },
+    {
+      "id": "ci012",
+      "front": "What are the three types of clinical dashboards and their primary purpose?",
+      "back": "1. Operational dashboards: real-time monitoring of day-to-day operations (bed occupancy, wait times). 2. Tactical dashboards: tracking progress against short-to-medium term targets (monthly KPIs). 3. Strategic dashboards: high-level organisational performance aligned to strategic goals. Each has different update frequency and audience."
+    },
+    {
+      "id": "ci013",
+      "front": "What are the HIMSS EMRAM stages and what does Stage 7 represent?",
+      "back": "The Electronic Medical Record Adoption Model (EMRAM) rates hospital EMR adoption from 0–7. Stage 0: no EMR. Stage 7: complete paperless environment with data analytics, interoperability, and continuous quality improvement. Most Australian hospitals sit at stages 4–6. HIMSS recognition at stage 6/7 is a significant achievement."
+    },
+    {
+      "id": "ci014",
+      "front": "What Australian legislation primarily governs health data privacy?",
+      "back": "The Privacy Act 1988 (Cth) and its Australian Privacy Principles (APPs) — especially APP 6 (use/disclosure), APP 11 (security), and APP 12 (access). The My Health Records Act 2012 governs the national My Health Record system. The Notifiable Data Breaches (NDB) scheme (2018) requires notification of eligible data breaches."
+    },
+    {
+      "id": "ci015",
+      "front": "What is de-identification and what risk remains after it?",
+      "back": "De-identification is the process of removing or altering personal identifiers so individuals cannot reasonably be identified. Risk of re-identification remains — especially with rich clinical datasets that can be linked to other data sources (e.g. rare diagnoses + postcode + age can re-identify). Data must be treated as 'de-identified' on a risk continuum, not binary."
+    },
+    {
+      "id": "ci016",
+      "front": "Name and describe the four stages of the PDSA quality improvement cycle.",
+      "back": "Plan: identify the problem, form a hypothesis, plan the change. Do: implement the change on a small scale. Study: analyse results against predictions. Act: adopt, adapt, or abandon based on findings. PDSA is iterative — cycles repeat with refinements. Also called Plan-Do-Check-Act (PDCA)."
+    },
+    {
+      "id": "ci017",
+      "front": "What is Lean methodology in healthcare and what is its core aim?",
+      "back": "Lean (derived from the Toyota Production System) aims to maximise value by eliminating waste (muda) in processes. The eight wastes in healthcare include defects, overproduction, waiting, unnecessary motion, transport, inventory, overprocessing, and unused talent. Tools include value stream mapping, 5S, and Kaizen events."
+    },
+    {
+      "id": "ci018",
+      "front": "What is Six Sigma and what does DMAIC stand for?",
+      "back": "Six Sigma is a data-driven quality improvement methodology aiming to reduce process variation and defects to fewer than 3.4 per million opportunities. DMAIC: Define (the problem and goals), Measure (current performance), Analyse (root causes), Improve (implement solutions), Control (sustain improvements)."
+    },
+    {
+      "id": "ci019",
+      "front": "What is the purpose of a data dictionary in healthcare?",
+      "back": "A data dictionary is a centralised repository that defines the meaning, format, source, relationships, and usage rules for each data element in a system. In healthcare it ensures consistent interpretation of data across systems and clinicians — e.g. defining exactly what 'admission date' means across different departments."
+    },
+    {
+      "id": "ci020",
+      "front": "What is a Master Patient Index (MPI) and why is it critical?",
+      "back": "An MPI is a database that maintains a unique identifier for every patient across all systems in a healthcare organisation (or network). Critical because duplicate or mislinked patient records lead to patient safety incidents (wrong medication, missed history). The MPI ensures one patient = one record regardless of where they are seen."
+    },
+    {
+      "id": "ci021",
+      "front": "What does My Health Record contain and who controls access?",
+      "back": "My Health Record (Australia) is an online summary of an individual's health information including medications, allergies, immunisations, discharge summaries, pathology results, and imaging reports. The individual controls access — they can set access controls, restrict provider access, and request deletion. Opt-out model introduced nationally in 2018."
+    },
+    {
+      "id": "ci022",
+      "front": "What is a KPI and how should clinical KPIs be designed?",
+      "back": "Key Performance Indicator — a measurable value that demonstrates how effectively an organisation achieves key objectives. Clinical KPIs should be SMART (Specific, Measurable, Achievable, Relevant, Time-bound), evidence-based, and aligned to clinical standards. Examples: medication error rate, readmission within 28 days, time-to-treatment for sepsis."
+    },
+    {
+      "id": "ci023",
+      "front": "What is clinical informatics? How does it differ from health informatics?",
+      "back": "Clinical informatics focuses on the intersection of information science and clinical practice — improving patient care through the use of data and technology at the point of care. Health informatics is broader, encompassing population health, public health informatics, and health system administration. Clinical informatics is a subspecialty within health informatics."
+    },
+    {
+      "id": "ci024",
+      "front": "What are the key principles of ethical data use in healthcare?",
+      "back": "Autonomy (patient consent and control), Beneficence (data used for patient/population benefit), Non-maleficence (avoid harm from data misuse), Justice (equitable data access and representation), Transparency (clear about how data is used), and Accountability (clear governance and responsibility)."
+    },
+    {
+      "id": "ci025",
+      "front": "What is a Health Information Exchange (HIE) and what are its three models?",
+      "back": "HIE enables electronic movement of health information between organisations. Three models: 1. Centralised (federated repository stores all data). 2. Decentralised/Federated (data stays at source, accessed via queries). 3. Hybrid (combination). HIEs support care coordination, reduce duplicate testing, and improve safety."
+    },
+    {
+      "id": "ci026",
+      "front": "What is data linkage and what are its uses and risks in healthcare?",
+      "back": "Data linkage connects records from multiple datasets about the same individual (e.g. hospital + pharmacy + Medicare data) using identifiers. Uses: population health research, chronic disease management, health service planning. Risks: re-identification, privacy breach, data quality errors propagating across linked datasets."
+    },
+    {
+      "id": "ci027",
+      "front": "What is the role of the Australian Digital Health Agency (ADHA)?",
+      "back": "The ADHA is the national agency responsible for national digital health strategy and implementation in Australia. Key responsibilities include: overseeing My Health Record, developing national digital health standards, coordinating national digital health programs, and partnering with states/territories and health providers on digital health reform."
+    },
+    {
+      "id": "ci028",
+      "front": "Describe three key features of culturally safe data management practice.",
+      "back": "1. Co-design with affected communities (especially First Nations peoples) in data collection and governance. 2. Community control over data about their communities (OCAP principles: Ownership, Control, Access, Possession). 3. Recognition that data collection can replicate systemic biases — actively designing to prevent this. Cultural safety goes beyond awareness to structural change."
+    },
+    {
+      "id": "ci029",
+      "front": "What is DICOM and what is it used for?",
+      "back": "Digital Imaging and Communications in Medicine — the international standard for medical imaging data (X-rays, CT, MRI, ultrasound). Defines how images are stored, transmitted and displayed. DICOM files contain both the image data and metadata (patient ID, acquisition parameters). PACS (Picture Archiving and Communication Systems) use DICOM."
+    },
+    {
+      "id": "ci030",
+      "front": "What is the difference between structured and unstructured data in healthcare, and why does it matter?",
+      "back": "Structured: organised in predefined fields/formats (lab results, vital signs in flowsheets, coded diagnoses). Unstructured: free text, images, audio (clinical notes, discharge summaries, pathology narratives). ~80% of healthcare data is unstructured. Matters because structured data is easily queried/analysed; unstructured requires NLP (Natural Language Processing) to extract value."
+    },
+    {
+      "id": "ci031",
+      "front": "What is a clinical dashboard and what are three principles of effective dashboard design?",
+      "back": "A visual display of the most important information needed to achieve one or more objectives, consolidated on a single screen. Effective design principles: 1. Right information at the right time for the right audience. 2. Use visual hierarchy — most critical data most prominent. 3. Minimise cognitive load — avoid clutter, use appropriate chart types, enable drill-down."
+    },
+    {
+      "id": "ci032",
+      "front": "What is metadata and give two healthcare examples.",
+      "back": "Metadata is 'data about data' — descriptive information that provides context for a data element. Healthcare examples: (1) the timestamp and ordering clinician attached to a pathology result, (2) the version number and approval date of a clinical guideline. Metadata is critical for data provenance, audit trails, and governance."
+    },
+    {
+      "id": "ci033",
+      "front": "What are the CHIA and HIMSS certifications and what do they test?",
+      "back": "CHIA (Certified Health Informatician Australasia): Australian/NZ certification testing knowledge of health informatics practice, data governance, standards, and systems. HIMSS Certifications (CPHIMS, CAHIMS): international certifications covering health IT management, informatics principles, and leadership. Both validate professional competency in health informatics."
+    },
+    {
+      "id": "ci034",
+      "front": "What is a data warehouse vs a data lake in a healthcare context?",
+      "back": "Data warehouse: structured repository of cleaned, integrated data optimised for reporting and analytics (e.g. historical admissions for board reports). Data lake: stores raw data in its native format — structured, semi-structured, and unstructured — at scale (e.g. storing all EHR notes, imaging, and device data). Data lakes are more flexible but require robust governance to avoid 'data swamps'."
+    },
+    {
+      "id": "ci035",
+      "front": "What is evidence-based practice and how does health informatics support it?",
+      "back": "Evidence-based practice integrates best available research evidence, clinical expertise, and patient values for decision-making. Health informatics supports it by: embedding clinical guidelines into CDSS, providing point-of-care access to evidence (drug references, protocols), enabling audit of practice against evidence, and facilitating research through data analytics."
+    }
+  ]
+}
