@@ -1,0 +1,180 @@
+{
+  "created": "2026-04-15T00:00:00.000Z",
+  "cards": [
+    {
+      "id": "dhl001",
+      "front": "What are the four functions of management (Fayol) and how do they apply to digital health leadership?",
+      "back": "Planning (setting digital health strategy and objectives), Organising (structuring teams, systems, and resources), Leading/Directing (motivating clinicians and IT staff through change), Controlling (monitoring KPIs, auditing system performance). In digital health, these functions must span both clinical and technical domains simultaneously."
+    },
+    {
+      "id": "dhl002",
+      "front": "Distinguish transformational from transactional leadership. Which is more suited to digital health change programs and why?",
+      "back": "Transactional: exchange-based — reward/punish based on performance. Effective for stable, routine tasks. Transformational: inspires through vision, intellectual stimulation, and individualised consideration — fosters innovation and buy-in. Digital health implementations are change-heavy and require clinician engagement beyond compliance, making transformational leadership more effective. Hybrid approaches are often used."
+    },
+    {
+      "id": "dhl003",
+      "front": "What is servant leadership and why is it relevant in clinical settings?",
+      "back": "Servant leadership (Greenleaf) prioritises serving followers' needs — removing obstacles, developing staff capability, and building trust — rather than exercising authority. Relevant in clinical settings because clinicians respond poorly to top-down mandates; a leader who enables clinicians to deliver better care through technology builds more durable adoption than one who imposes compliance."
+    },
+    {
+      "id": "dhl004",
+      "front": "What is the Kotter 8-Step Change Model and how does it apply to EHR implementation?",
+      "back": "1. Create urgency, 2. Form a guiding coalition, 3. Develop a strategic vision, 4. Communicate the vision, 5. Remove barriers, 6. Generate short-term wins, 7. Sustain acceleration, 8. Institute change. EHR application: urgency = patient safety/efficiency gap; coalition = CMIO + CNO + IT; short-term wins = go-live of one ward before full rollout."
+    },
+    {
+      "id": "dhl005",
+      "front": "What is ADKAR and when is it used in digital health change management?",
+      "back": "ADKAR (Prosci) is an individual-focused change model: Awareness (of the need to change), Desire (to support and participate), Knowledge (of how to change), Ability (to implement), Reinforcement (to sustain). Used in digital health when individual adoption is the barrier — e.g. training roll-out for a new EMR system. Complements Kotter which is organisational-level."
+    },
+    {
+      "id": "dhl006",
+      "front": "What is clinical governance and how does it intersect with digital health governance?",
+      "back": "Clinical governance is the framework through which health organisations are accountable for continuously improving quality of care and maintaining high standards. Digital health governance intersects by ensuring that systems (EHRs, CDSS, AI tools) are safe, effective, and evidence-based; that data governance supports clinical decision-making; and that digital risks (downtime, data errors) are managed within the broader safety framework."
+    },
+    {
+      "id": "dhl007",
+      "front": "Define digital health governance and list its four key domains.",
+      "back": "Digital health governance is the set of policies, roles, processes and accountabilities that ensure digital health systems are deployed and used safely, effectively and equitably. Four key domains: 1. Data governance (quality, privacy, access), 2. System governance (procurement, maintenance, clinical safety), 3. Cybersecurity governance (risk management, incident response), 4. Workforce governance (training, competency, scope of use)."
+    },
+    {
+      "id": "dhl008",
+      "front": "What is the role of a Chief Medical Information Officer (CMIO)?",
+      "back": "The CMIO is a senior clinician-leader who bridges clinical practice and health information technology. Responsibilities include: clinical representation in IT governance, championing safe and effective EHR use, clinical decision support oversight, training and change management for clinical staff, and ensuring that digital systems serve patient care outcomes. Often a physician with informatics training."
+    },
+    {
+      "id": "dhl009",
+      "front": "What is Australia's National Digital Health Strategy and what are its key goals?",
+      "back": "Australia's National Digital Health Strategy (currently 'Safe, Seamless and Secure: Evolving health and care to meet the needs of modern Australia') sets the national roadmap for digital health. Key goals include: seamless, connected care via My Health Record; empowering consumers with digital tools; supporting clinicians with evidence at point of care; advancing analytics for population health; and ensuring security and privacy of health data."
+    },
+    {
+      "id": "dhl010",
+      "front": "What is the difference between policy, procedure, and guideline in health organisations?",
+      "back": "Policy: mandatory, high-level statement of intent and organisational position (e.g. 'All patients must have a unique identifier in the EHR'). Procedure: step-by-step instructions for how to implement a policy. Guideline: recommended best practice — not mandatory, used to inform professional judgment. In digital health, these distinctions matter for compliance, auditing, and staff accountability."
+    },
+    {
+      "id": "dhl011",
+      "front": "What is continuous quality improvement (CQI) and how does it differ from audit?",
+      "back": "CQI is an ongoing, proactive process of systematically identifying, testing and implementing improvements to healthcare processes. Audit is retrospective — measuring current practice against a standard. CQI is prospective and iterative (using PDSA cycles). Audit feeds CQI by identifying gaps, but CQI goes further by closing those gaps and monitoring whether improvements are sustained."
+    },
+    {
+      "id": "dhl012",
+      "front": "What are the four principles of the balanced scorecard and how can it be applied in digital health?",
+      "back": "The Balanced Scorecard (Kaplan & Norton) measures organisational performance across: 1. Financial (costs, ROI), 2. Customer/Patient (satisfaction, outcomes), 3. Internal Processes (efficiency, quality), 4. Learning & Growth (staff capability, innovation). In digital health: e.g. Financial = cost per transaction; Patient = portal adoption rate; Process = time-to-result for pathology; Learning = EHR training completion rates."
+    },
+    {
+      "id": "dhl013",
+      "front": "What is stakeholder analysis and what tool is commonly used to prioritise stakeholders?",
+      "back": "Stakeholder analysis identifies individuals or groups who are affected by or can influence a project. The Power/Interest Grid (or Influence/Interest Matrix) categorises stakeholders into four quadrants: High power/high interest (manage closely), High power/low interest (keep satisfied), Low power/high interest (keep informed), Low power/low interest (monitor). Critical in digital health implementations where clinician resistance can derail projects."
+    },
+    {
+      "id": "dhl014",
+      "front": "What is a business case and what are its core components in a digital health context?",
+      "back": "A business case justifies investment in a project by demonstrating value. Core components: 1. Problem/opportunity statement, 2. Proposed solution and options considered, 3. Costs (capital, ongoing, implementation), 4. Benefits (financial, clinical, operational), 5. Risks and mitigation, 6. Implementation timeline, 7. ROI/BCR analysis. In digital health, benefits are often non-financial (patient safety, staff time) — these require quantification."
+    },
+    {
+      "id": "dhl015",
+      "front": "What is a benefits realisation framework and why is it important post-go-live?",
+      "back": "A benefits realisation framework defines expected benefits of a project, assigns ownership, and tracks whether they are achieved after implementation. Important post-go-live because technology projects often deliver the system but fail to capture the benefits (e.g. an EHR is deployed but medication error rates don't improve because workflows weren't redesigned). BRF ensures accountability and drives adoption."
+    },
+    {
+      "id": "dhl016",
+      "front": "What are the three levels of healthcare funding in Australia?",
+      "back": "1. Federal (Commonwealth): funds Medicare, Pharmaceutical Benefits Scheme, public hospital activity-based funding via the Independent Hospital and Aged Care Pricing Authority (IHACPA), and national digital health programs. 2. State/Territory: directly operates and manages public hospitals and community health services. 3. Private: private health insurers and patient co-payments fund private hospital care."
+    },
+    {
+      "id": "dhl017",
+      "front": "What is Activity-Based Funding (ABF) and what is a National Weighted Activity Unit (NWAU)?",
+      "back": "ABF is a hospital funding model where payment is linked to the type and volume of clinical activity, rather than block grants. A NWAU is the unit of measurement — it represents the average resource cost of treating one patient. Complex cases have a NWAU > 1; simple cases < 1. ABF incentivises efficiency but can disadvantage hospitals with complex patient populations if casemix adjustment is inadequate."
+    },
+    {
+      "id": "dhl018",
+      "front": "What is Diagnosis-Related Groups (DRG) classification?",
+      "back": "DRGs classify hospital inpatients into groups that are clinically coherent and have similar resource use. Used as the basis for ABF — each DRG has an assigned NWAU/cost weight. In Australia, the AR-DRG (Australian Refined DRG) system is used. Accurate clinical coding (ICD-10-AM/ACHI) directly determines DRG assignment and therefore hospital revenue — making coding quality a clinical governance issue."
+    },
+    {
+      "id": "dhl019",
+      "front": "What is the difference between effectiveness, efficiency, and equity in health systems?",
+      "back": "Effectiveness: achieving the desired health outcome (did the treatment work?). Efficiency: achieving outcomes with minimum waste of resources (technical efficiency = same output with less input; allocative efficiency = resources going to highest-value uses). Equity: fairness in access, treatment, and outcomes — horizontal (equal treatment of equal need) and vertical (unequal treatment of unequal need). Digital health tools can improve all three but also risk widening equity gaps."
+    },
+    {
+      "id": "dhl020",
+      "front": "What is health technology assessment (HTA) and what body conducts it in Australia?",
+      "back": "HTA is the systematic evaluation of the properties, effects, and impacts of health technology — including clinical effectiveness, safety, cost-effectiveness, and ethical implications. In Australia, the Medical Services Advisory Committee (MSAC) assesses medical services/devices for public funding, and the Pharmaceutical Benefits Advisory Committee (PBAC) assesses medications. Digital health technologies are increasingly subject to HTA frameworks."
+    },
+    {
+      "id": "dhl021",
+      "front": "What are the key principles of effective communication in health leadership?",
+      "back": "Clarity (plain language, avoiding jargon for non-technical audiences), Transparency (honest about challenges and uncertainty), Two-way engagement (listening and feedback channels), Tailoring to audience (clinicians vs patients vs board), Timeliness, Consistency of message across levels. In digital health change: over-communicate the 'why', address concerns early, and use clinical champions as trusted messengers."
+    },
+    {
+      "id": "dhl022",
+      "front": "What is the SBAR communication framework?",
+      "back": "SBAR: Situation (what is happening now), Background (context and relevant history), Assessment (what you think the problem is), Recommendation (what you want to happen). Used in clinical handovers and escalation. In digital health, SBAR is often embedded into EHR handover tools and communication templates to improve structured information transfer and reduce omission errors."
+    },
+    {
+      "id": "dhl023",
+      "front": "What are the key components of a project charter?",
+      "back": "A project charter formally authorises a project. Key components: project purpose and objectives, scope (in and out), deliverables, key stakeholders, roles and responsibilities (sponsor, PM, team), timeline and milestones, budget, risks and assumptions, success criteria. In digital health, a charter is the foundation that prevents scope creep — a major cause of health IT project failure."
+    },
+    {
+      "id": "dhl024",
+      "front": "What is risk management in healthcare organisations and what is the risk matrix used for?",
+      "back": "Risk management identifies, assesses, treats, and monitors risks that could prevent an organisation from achieving its objectives. The risk matrix plots Likelihood × Consequence to score and prioritise risks (low, medium, high, extreme). In digital health: risks include system downtime, data breach, poor adoption, and patient safety incidents from system errors. Treatment options: avoid, reduce, transfer (insurance), accept."
+    },
+    {
+      "id": "dhl025",
+      "front": "What is a SWOT analysis and how is it used in health strategic planning?",
+      "back": "SWOT analyses internal Strengths and Weaknesses, and external Opportunities and Threats. Used in strategic planning to align organisational capabilities with the environment. In digital health strategy: Strengths = existing EMR infrastructure; Weaknesses = low digital literacy among clinicians; Opportunities = ADHA funding programs; Threats = cybersecurity risks, vendor lock-in. Informs where to invest and where to partner."
+    },
+    {
+      "id": "dhl026",
+      "front": "What are the hallmarks of a psychologically safe team and why does it matter for digital health implementation?",
+      "back": "Psychological safety (Amy Edmondson) is the shared belief that the team is safe for interpersonal risk-taking — speaking up, admitting errors, challenging assumptions without fear. Hallmarks: openness to questions, non-punitive error reporting, inclusive input from all levels. Matters in digital health: clinicians must feel safe to report EHR usability issues, near-misses, and workflow problems — if they don't, risks compound silently."
+    },
+    {
+      "id": "dhl027",
+      "front": "What is the Donabedian model and how is it used to evaluate digital health interventions?",
+      "back": "The Donabedian model evaluates healthcare quality through three components: Structure (the inputs — staffing, systems, facilities), Process (what is done — workflows, protocols), Outcome (the result — patient outcomes, satisfaction). Applied to digital health: Structure = is the EHR available/functional? Process = are clinicians using it as intended? Outcome = has it reduced medication errors or improved documentation?"
+    },
+    {
+      "id": "dhl028",
+      "front": "What does 'clinician engagement' mean in the context of digital health, and what strategies promote it?",
+      "back": "Clinician engagement = active, meaningful participation of clinicians in designing, implementing, and improving digital health systems — not just passive compliance. Strategies: involve clinicians in co-design from the start; designate clinical champions per ward/unit; provide protected time for training; use iterative feedback loops post-go-live; show clinicians how the system benefits their patients. Engagement reduces workarounds and improves data quality."
+    },
+    {
+      "id": "dhl029",
+      "front": "What is the Digital Health Capability Framework and what does it describe?",
+      "back": "A capability framework for digital health describes the knowledge, skills and behaviours expected of the workforce at different levels — from frontline staff (basic digital literacy) to informatics specialists (advanced analytics, system design) to leaders (governance, strategy). In Australia, frameworks such as ADHA's Digital Health Workforce Capability Framework guide workforce development and training needs analysis."
+    },
+    {
+      "id": "dhl030",
+      "front": "What is co-design and how does it differ from consultation?",
+      "back": "Co-design (participatory design) involves end users as active partners in the design process — they shape the solution, not just respond to options. Consultation gives stakeholders a voice but the design remains in the hands of the project team. In digital health, co-design with clinicians and patients produces systems that fit actual workflows and needs, reducing post-implementation failure. First Nations co-design is particularly important in culturally safe health services."
+    },
+    {
+      "id": "dhl031",
+      "front": "What are the key elements of a digital health implementation plan?",
+      "back": "1. Governance structure (sponsor, steering committee, clinical leads), 2. Scope and phasing (pilot then scale), 3. Workflow redesign (not just software installation), 4. Training strategy (role-based, sufficient before go-live), 5. Go-live support (super users, at-elbow support), 6. Cutover/downtime plan, 7. Benefits realisation framework, 8. Post-go-live review schedule. Skipping any element is a common cause of costly remediation."
+    },
+    {
+      "id": "dhl032",
+      "front": "What is a sentinel event and how should digital health leaders respond to one?",
+      "back": "A sentinel event is an unexpected occurrence involving death or serious injury where the outcome signals the need for an immediate investigation. Digital health leaders must: ensure patient safety is the immediate priority, preserve relevant system logs/data, conduct a root cause analysis (RCA), implement interim safety measures, report to appropriate bodies (e.g. ACSQHC), and redesign systems or workflows to prevent recurrence. Transparency is non-negotiable."
+    },
+    {
+      "id": "dhl033",
+      "front": "What is the Australian Commission on Safety and Quality in Health Care (ACSQHC) and what are the National Safety and Quality Health Service (NSQHS) Standards?",
+      "back": "ACSQHC (the Commission) leads national improvements in safety and quality of healthcare. The NSQHS Standards (8 standards) define minimum safety and quality requirements for healthcare services: Clinical Governance, Partnering with Consumers, Preventing and Controlling Infections, Medication Safety, Comprehensive Care, Communicating for Safety, Blood Management, Recognising and Responding. Accreditation against these standards is mandatory for most health services."
+    },
+    {
+      "id": "dhl034",
+      "front": "What is health equity and how can digital health either advance or undermine it?",
+      "back": "Health equity means every person has a fair opportunity to attain their full health potential. Digital health can advance equity by: improving access to care in remote areas (telehealth), providing decision support that reduces variation, enabling population-level monitoring of disparities. Digital health can undermine equity by: assuming patients have devices/internet (digital divide), designing systems in English only, creating algorithms trained on unrepresentative data that embed bias against minority populations."
+    },
+    {
+      "id": "dhl035",
+      "front": "What is the difference between leadership and management? Why do digital health initiatives need both?",
+      "back": "Management: doing things right — planning, organising, controlling, maintaining stability. Leadership: doing the right things — setting vision, inspiring change, navigating uncertainty. Digital health initiatives need management to keep projects on scope/time/budget and governance rigorous, and leadership to build the coalition for change, maintain clinician engagement, and navigate the political and cultural resistance that technology-driven transformation inevitably encounters."
+    }
+  ]
+}

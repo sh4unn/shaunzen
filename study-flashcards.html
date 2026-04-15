@@ -157,6 +157,11 @@
 
   <!-- DECKS -->
   <div class="panel" id="panel-decks">
+    <div class="btn-row" style="margin-bottom:1rem;">
+      <button class="btn-ghost" onclick="document.getElementById('importFileInput').click()">Import JSON deck</button>
+      <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importDeckFile(this)">
+      <span class="status-msg" id="importStatus"></span>
+    </div>
     <div class="deck-list" id="deckList"></div>
   </div>
 
@@ -457,6 +462,57 @@
       setSettingsStatus('All decks synced ✓', 'ok');
     } catch(e) { setSettingsStatus('Sync error: ' + e.message, 'err'); }
   }
+
+  // ── IMPORT ──
+  function importDeckFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    // Derive deck name from filename: "clinical-informatics.json" → "Clinical Informatics"
+    const derivedName = file.name.replace(/\.json$/i, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      let data;
+      try { data = JSON.parse(e.target.result); } catch(err) { setImportStatus('Invalid JSON', 'err'); return; }
+      // Support two formats:
+      // 1. Single deck: { "created": "...", "cards": [...] }
+      // 2. Multi-deck export: { "DeckName": { "created": "...", "cards": [...] }, ... }
+      if (data.cards && Array.isArray(data.cards)) {
+        // Single deck
+        const name = prompt(`Import as deck named:`, derivedName);
+        if (!name) { input.value=''; return; }
+        const trimmed = name.trim();
+        if (!trimmed) { setImportStatus('Deck name cannot be empty', 'err'); input.value=''; return; }
+        const existing = decks[trimmed] ? decks[trimmed].cards.length : 0;
+        if (existing && !confirm(`"${trimmed}" already has ${existing} card(s). Merge the imported cards in?`)) { input.value=''; return; }
+        if (!decks[trimmed]) decks[trimmed] = { cards: [], created: data.created || new Date().toISOString() };
+        const newCards = data.cards.map(c => ({ id: c.id || Date.now().toString() + Math.random(), front: c.front || '', back: c.back || '' }));
+        decks[trimmed].cards.push(...newCards);
+        saveDecks();
+        renderDeckList();
+        populateDeckSelect();
+        setImportStatus(`Imported ${newCards.length} cards into "${trimmed}" ✓`, 'ok');
+      } else if (typeof data === 'object' && !Array.isArray(data)) {
+        // Multi-deck format
+        let total = 0;
+        for (const [dName, dData] of Object.entries(data)) {
+          if (!dData.cards) continue;
+          if (!decks[dName]) decks[dName] = { cards: [], created: dData.created || new Date().toISOString() };
+          decks[dName].cards.push(...dData.cards.map(c => ({ id: c.id || Date.now().toString() + Math.random(), front: c.front || '', back: c.back || '' })));
+          total += dData.cards.length;
+        }
+        saveDecks();
+        renderDeckList();
+        populateDeckSelect();
+        setImportStatus(`Imported ${total} cards across ${Object.keys(data).length} deck(s) ✓`, 'ok');
+      } else {
+        setImportStatus('Unrecognised format', 'err');
+      }
+      input.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  function setImportStatus(msg, type) { const el = document.getElementById('importStatus'); el.textContent = msg; el.className = 'status-msg' + (type ? ' ' + type : ''); }
 
   function exportDecks() {
     const blob = new Blob([JSON.stringify(decks, null, 2)], { type: 'application/json' });
