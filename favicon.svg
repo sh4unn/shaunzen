@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <style>@import url('https://fonts.googleapis.com/css2?family=New+Rocker&amp;display=swap');</style>
+  </defs>
+  <rect width="32" height="32" rx="6" fill="#1a2628"/>
+  <text x="16" y="25" font-family="'New Rocker', cursive" font-size="24" fill="#f0f4f5" text-anchor="middle">S</text>
+</svg>
