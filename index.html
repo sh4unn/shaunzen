@@ -38,6 +38,7 @@
   .orb2 { width:45vw; height:45vw; background:radial-gradient(circle,#2a5a6a,transparent 70%); bottom:-15%; right:-15%; animation-duration:32s; animation-delay:-12s; }
   @keyframes drift { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(3vw,-3vh) scale(1.03)} 100%{transform:translate(-2vw,2vh) scale(0.98)} }
 
+  .site-mark { font-family:'New Rocker',cursive; font-size:2.2rem; color:var(--accent); display:inline-block; width:3rem; height:3rem; line-height:3rem; border:1.5px solid var(--border); border-radius:50%; margin-bottom:1.1rem; opacity:0; animation:up 0.7s ease forwards; }
   header { position:relative; z-index:2; text-align:center; padding:5rem 2rem 3rem; border-bottom:1px solid var(--border); }
   .eyebrow { font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:300; letter-spacing:0.4em; text-transform:uppercase; color:var(--faint); margin-bottom:0.9rem; opacity:0; animation:up 0.7s ease forwards 0.1s; }
   h1 { font-family:'New Rocker',cursive; font-size:clamp(3.5rem,12vw,8rem); font-weight:400; line-height:1; color:var(--ink); text-shadow:0 2px 16px rgba(26,38,40,0.12); opacity:0; animation:up 0.9s ease forwards 0.3s; margin-bottom:0.5rem; letter-spacing:0.02em; }
@@ -96,6 +97,7 @@
 <div class="bg-layer"><div class="orb orb1"></div><div class="orb orb2"></div></div>
 
 <header>
+  <div class="site-mark">S</div>
   <div class="eyebrow">Personal Toolkit — Toowoomba</div>
   <h1>Shaunzen</h1>
   <div class="subtitle">Clinical reference, practice & everyday tools</div>
@@ -184,6 +186,7 @@
   function generateCard(){const name=document.getElementById('toolName').value.trim(),file=document.getElementById('toolFile').value.trim(),color=document.getElementById('toolColor').value.trim()||'#2a5a6a';if(!name||!file){alert('Need a name and filename.');return;}const[r,g,b]=hexToRgb(color);document.getElementById('codeOut').textContent=`<a class="tool-card" href="${file}" style="--card-color:${color};--card-tint:rgba(${r},${g},${b},0.05);">\n  <div class="card-name">${name}</div>\n</a>`;document.getElementById('codeWrap').style.display='block';}
   function copyCode(){navigator.clipboard.writeText(document.getElementById('codeOut').textContent).then(()=>{const b=document.querySelector('.copy-btn');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2000);});}
   if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  document.fonts.ready.then(()=>{const c=document.createElement('canvas');c.width=64;c.height=64;const x=c.getContext('2d');x.fillStyle='#1a2628';x.beginPath();x.roundRect(0,0,64,64,10);x.fill();x.fillStyle='#f0f4f5';x.font="52px 'New Rocker'";x.textAlign='center';x.textBaseline='middle';x.fillText('S',32,35);const l=document.createElement('link');l.rel='icon';l.href=c.toDataURL();document.head.appendChild(l);});
   function clearForm(){document.getElementById('toolName').value='';document.getElementById('toolFile').value='';document.getElementById('toolColor').value='#2a5a6a';document.getElementById('codeWrap').style.display='none';}
 </script>
 </body>
