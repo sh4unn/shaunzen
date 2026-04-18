@@ -114,8 +114,14 @@
   .tab.bentall.active { border-bottom-color: white; }
   .tab.avr.active { border-bottom-color: white; }
   .tab.mvr.active { border-bottom-color: white; }
+  .tab.liver.active { border-bottom-color: white; }
+  .tab.crani.active { border-bottom-color: white; }
+  .tab.oeso.active { border-bottom-color: white; }
   .procedure-title.avr { color: var(--accent-blue); }
   .procedure-title.mvr { color: var(--green, #3a6a2a); }
+  .procedure-title.liver { color: #3a6a2a; }
+  .procedure-title.crani { color: #5a3a7a; }
+  .procedure-title.oeso { color: #c45e2a; }
 
   .main {
     max-width: 1100px;
@@ -404,6 +410,9 @@
       <button class="tab bentall" onclick="showProcedure('bentall', this)">Bentall Procedure</button>
       <button class="tab avr" onclick="showProcedure('avr', this)">Aortic Valve Replacement</button>
       <button class="tab mvr" onclick="showProcedure('mvr', this)">Mitral Valve Repair / Replacement</button>
+      <button class="tab liver" onclick="showProcedure('liver', this)">Liver Transplant</button>
+      <button class="tab crani" onclick="showProcedure('crani', this)">Decompressive Craniectomy</button>
+      <button class="tab oeso" onclick="showProcedure('oeso', this)">Ivor Lewis Oesophagectomy</button>
     </div>
   </div>
 </div>
@@ -1511,6 +1520,800 @@
     </div>
 
   </div><!-- end MVR -->
+
+
+
+<!-- ============================================================ -->
+<!-- 1. ORTHOTOPIC LIVER TRANSPLANT                               -->
+<!-- ============================================================ -->
+<div class="procedure" id="proc-liver">
+  <div class="procedure-header">
+    <div class="procedure-title liver">Orthotopic Liver Transplant (OLT)</div>
+    <p class="procedure-desc">Replacement of native diseased liver with donor allograft via orthotopic implantation. Piggyback or conventional technique. Duration 6–12 hours.</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot anaes"></div> Anaesthetist</div>
+    <div class="legend-item"><div class="legend-dot surg"></div> Surgeon</div>
+  </div>
+
+  <!-- Stage 1 -->
+  <div class="stage open" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">01</span>
+      <span class="stage-name">Pre-op Assessment & Setup</span>
+      <div class="stage-tags"><span class="tag induction">PRE-OP</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Review MELD score, aetiology of liver failure (alcoholic, viral, NASH, acute fulminant), prior encephalopathy grade</li>
+            <li>Assess coagulation: INR, fibrinogen, platelet count, TEG/ROTEM if available — expect baseline coagulopathy</li>
+            <li>Review renal function: hepatorenal syndrome (HRS) type, creatinine trend, urine output, need for CRRT</li>
+            <li>Check electrolytes — hyponatraemia common; correct Na slowly (target &ge;130 mmol/L pre-op, avoid rapid correction)</li>
+            <li>Pulmonary assessment: hepatopulmonary syndrome, portopulmonary hypertension, pleural effusions</li>
+            <li>Confirm large-bore access plan: bilateral large-bore IVs, rapid infusion catheter (RIC/Level 1), arterial line, large-bore CVC</li>
+            <li>Ensure blood bank alert: massive transfusion protocol activated, FFP, cryo, platelets, pRBCs cross-matched (min 10 units pRBC)</li>
+            <li>Confirm cell salvage, ROTEM, and point-of-care testing available in theatre</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Confirm donor organ logistics: cold ischaemia time, organ quality (DCD vs DBD), back-table preparation timeline</li>
+            <li>Review recipient anatomy: prior abdominal surgery, portal vein thrombosis (PVT) grade, hepatic artery anatomy</li>
+            <li>Plan technique: conventional (IVC clamping + venovenous bypass) vs piggyback (PVVB preservation)</li>
+            <li>If significant PVT: plan thrombectomy or alternative inflow (jump graft, renoportal anastomosis)</li>
+            <li>Brief team: perfusionist if VVBP planned, scrub nurse, haematology liaison</li>
+            <li>Confirm back-table bench surgery: flush, inspect allograft, trim hepatic artery and bile duct</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 2 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">02</span>
+      <span class="stage-name">Induction & Vascular Access</span>
+      <div class="stage-tags"><span class="tag induction">INDUCTION</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>RSI in most patients (ascites, gastroparesis, raised aspiration risk) — ketamine or etomidate preferred to avoid hypotension</li>
+            <li>Avoid succinylcholine if severe hyperkalaemia; rocuronium acceptable with sugammadex reversal available</li>
+            <li>Insert arterial line (radial) pre-induction; aim MAP &ge;65 mmHg throughout</li>
+            <li>Large-bore CVC (right internal jugular preferred, 8.5Fr introducer) — avoid subclavian (coagulopathy risk)</li>
+            <li>Consider PA catheter or TOE for haemodynamic monitoring — hyperdynamic circulation typical (high CO, low SVR)</li>
+            <li>Insert urinary catheter with temperature probe; oesophageal temperature probe</li>
+            <li>Active warming: forced air blanket, fluid warmer (Level 1 or Belmont) — hypothermia greatly worsens coagulopathy</li>
+            <li>Baseline ROTEM (EXTEM, INTEM, FIBTEM, APTEM) to guide product use throughout</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Position supine, arms abducted; ensure bilateral subcostal access</li>
+            <li>If VVBP planned: insert axillary and femoral cannulae prior to skin incision</li>
+            <li>Prep and drape widely: bilateral subcostal to xiphisternum (Mercedes or bilateral subcostal incision)</li>
+            <li>Insert self-retaining retractor system (Thompson or Bookwalter) once abdomen open</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 3 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">03</span>
+      <span class="stage-name">Native Hepatectomy (Dissection Phase)</span>
+      <div class="stage-tags"><span class="tag critical">CRITICAL</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Expect significant haemorrhage, especially with portal hypertension and varices — maintain MAP &ge;65, transfuse to Hb &ge;80 g/L</li>
+            <li>ROTEM-guided coagulation: FIBTEM &lt;10 mm → cryoprecipitate; EXTEM CT prolonged → FFP; platelet count &lt;50 → pool</li>
+            <li>Avoid aggressive fluid resuscitation — crystalloid worsens coagulopathy and congests future graft</li>
+            <li>Vasopressors (noradrenaline) to maintain MAP without volume overload; target CVP 5–10</li>
+            <li>Monitor for compression of IVC during dissection — may cause acute haemodynamic instability; communicate with surgeon</li>
+            <li>Maintain normothermia aggressively — hypothermia potentiates coagulopathy exponentially</li>
+            <li>Blood gas every 30–60 min: track pH, lactate, Ca2+, K+, glucose</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Divide falciform and triangular ligaments; free hepatic flexure of colon if adherent</li>
+            <li>Dissect hepatoduodenal ligament: isolate and divide hepatic artery, portal vein (preserve length for anastomosis)</li>
+            <li>Skeletonise common bile duct; divide at appropriate level for duct-to-duct reconstruction</li>
+            <li>Mobilise retrohepatic IVC — conventional: circumferential dissection; piggyback: preserve IVC, develop hepatic venous cuff</li>
+            <li>If significant PVT: perform thrombectomy of portal vein; notify anaesthetist of anticipated blood loss</li>
+            <li>Control short hepatic veins meticulously before IVC clamping; haemostatic clips or suture ties</li>
+            <li>Notify anaesthetist 5 minutes before portal clamp: "Approaching anhepatic phase"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 4 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">04</span>
+      <span class="stage-name">Anhepatic Phase & Vascular Anastomoses</span>
+      <div class="stage-tags"><span class="tag critical">CRITICAL</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Portal + IVC clamping → dramatic reduction in venous return; anticipate 30–50% drop in CO</li>
+            <li>If no VVBP: pre-load with 500–1000 mL; increase vasopressors (noradrenaline ± vasopressin); accept MAP 50–55 transiently</li>
+            <li>If VVBP running: ensure adequate flows (&ge;1 L/min); monitor for VVBP-related complications (air embolism, thrombosis, limb ischaemia)</li>
+            <li>Anhepatic phase = no hepatic metabolism: avoid drugs heavily liver-metabolised; succinylcholine contraindicated; citrate accumulation with blood products → calcium gluconate boluses PRN</li>
+            <li>Hyperkalaemia often worsens: K+ every 15–20 min; treat if &gt;5.5 mmol/L (insulin-dextrose, calcium, consider CVVH)</li>
+            <li>Metabolic acidosis expected — limit bicarbonate; allow permissive pH 7.20–7.25 until reperfusion</li>
+            <li>Prepare vasopressin infusion for reperfusion; draw up methylprednisolone (500 mg) per protocol</li>
+            <li>Ensure defibrillator immediately available, atropine drawn up, adrenaline at hand</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Clamp portal vein, hepatic artery, supra- and infra-hepatic IVC (conventional) or hepatic veins (piggyback)</li>
+            <li>Remove native liver; achieve haemostasis of retroperitoneal bed</li>
+            <li>Piggyback: construct triangular venous cuff from hepatic veins; anastomose to donor suprahepatic IVC (side-to-side or end-to-side)</li>
+            <li>Conventional: end-to-end supra-hepatic and infra-hepatic IVC anastomoses with 3-0 or 4-0 prolene</li>
+            <li>Portal vein anastomosis (end-to-end, 5-0 prolene); leave growth factor if size discrepancy</li>
+            <li>Flush graft via portal vein with albumin solution prior to reperfusion to clear preservation fluid</li>
+            <li>Alert anaesthetist: "Reperfusion in 2 minutes — portal clamp coming off"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 5 — Reperfusion: alert box -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">05</span>
+      <span class="stage-name">Reperfusion</span>
+      <div class="stage-tags"><span class="tag critical">CRITICAL</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="alert-box warning"><strong>⚠ Post-Reperfusion Syndrome (PRS)</strong> Defined as &gt;30% drop in MAP for &gt;1 min within 5 min of reperfusion. Incidence ~30%. Driven by cold, acidotic, hyperkalaemic preservation fluid entering systemic circulation + ischaemia-reperfusion mediator release. May cause severe bradycardia, asystole, or VF.</div>
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>At portal clamp release: simultaneously give vasopressin 0.5–1 unit IV bolus (± infusion 0.03–0.04 units/min)</li>
+            <li>Bolus adrenaline 50–100 mcg IV if severe PRS; escalate to chest compressions if asystole</li>
+            <li>Methylprednisolone 500 mg IV at reperfusion per immunosuppression protocol</li>
+            <li>Treat hyperkalaemia aggressively: calcium gluconate 10 mL of 10% IV stat, insulin-dextrose; repeat K+ at 2 minutes post-reperfusion</li>
+            <li>Correct acidosis: sodium bicarbonate 50–100 mmol if pH &lt;7.15; monitor response with serial gas</li>
+            <li>Active warming: raise room temperature, warm all IV fluids, warm irrigation — target core temp &ge;36°C</li>
+            <li>ROTEM immediately post-reperfusion: expect fibrinolysis (APTEM vs EXTEM); if LI30 &lt;85%: tranexamic acid 1 g IV</li>
+            <li>Monitor for return of bile production (amber bile in cholangiocath) as early indicator of graft function</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Release portal clamp first (lower K+ load than arterial); observe graft colour and turgor</li>
+            <li>Immediately assess for anastomotic bleeding; place haemostatic sutures while anaesthetist manages haemodynamics</li>
+            <li>Construct hepatic artery anastomosis (6-0 or 7-0 prolene, end-to-end, with operative loupes or microscope)</li>
+            <li>Confirm hepatic artery Doppler flow post-anastomosis before proceeding</li>
+            <li>Release arterial clamp; observe graft for arterialisation (pinking, pulsatile bile)</li>
+            <li>Achieve meticulous haemostasis of all raw surfaces; argon beam coagulation, topical agents PRN</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 6 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">06</span>
+      <span class="stage-name">Biliary Reconstruction & Haemostasis</span>
+      <div class="stage-tags"><span class="tag induction">POST-REPERFUSION</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Continue ROTEM-guided product administration; target fibrinogen &ge;2 g/L, INR &lt;2, platelets &gt;50</li>
+            <li>Reassess renal function: urine output, creatinine — HRS may persist despite reperfusion</li>
+            <li>Begin weaning vasopressors as haemodynamics stabilise; avoid excessive noradrenaline (hepatic arterial vasoconstriction)</li>
+            <li>Titrate immunosuppression per protocol: tacrolimus target levels, mycophenolate, steroid taper plan documented</li>
+            <li>Monitor for primary non-function (PNF): no bile, persistent coagulopathy, worsening acidosis, transaminases &gt;5000 — escalate urgently</li>
+            <li>Ensure warm, stable, and haemostatic before considering ICU transfer</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Duct-to-duct biliary anastomosis (6-0 PDS): end-to-end choledochocholedochostomy; T-tube optional (usually avoided)</li>
+            <li>If duct-to-duct not feasible (PSC, size mismatch, diseased recipient duct): Roux-en-Y hepaticojejunostomy</li>
+            <li>Intraoperative cholangiogram or fluoroscopy to confirm biliary continuity and absence of leak</li>
+            <li>Systematic haemostasis: liver bed, ligamentum teres stump, drain sites, abdominal wall</li>
+            <li>Place surgical drains: Blake drain near bile duct anastomosis and subhepatic space</li>
+            <li>Inspect bowel viability if prolonged anhepatic phase with splanchnic congestion</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 7 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">07</span>
+      <span class="stage-name">Closure & ICU Handover</span>
+      <div class="stage-tags"><span class="tag emergence">EMERGENCE</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Most patients intubated to ICU; extubation only if: minimal transfusion, warm, haemostatic, haemodynamically stable, GCS adequate, encephalopathy resolved</li>
+            <li>Final blood gas, electrolytes, lactate, ROTEM before departure — document trajectory</li>
+            <li>Ensure vasopressor requirements documented and ICU infusions prepared for transfer</li>
+            <li>Handover includes: cold ischaemia time, total blood product use, intraoperative events (PRS, arrhythmias), current immunosuppression, renal status, drain output</li>
+            <li>ICU targets communicated: MAP &ge;65, urine output &ge;0.5 mL/kg/hr, normoglycaemia (BGL 6–10), normothermia</li>
+            <li>Early tacrolimus levels, LFTs, coag, and Doppler USS of hepatic vasculature within 2 hours of ICU arrival</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Mass closure of fascia (looped PDS #1); skin clips or subcuticular suture</li>
+            <li>If abdominal compartment syndrome risk (oedematous bowel, high closure tension): consider temporary abdominal closure (VAC/Bogota bag)</li>
+            <li>Document drain positions; secure drain to skin</li>
+            <li>Handover: anastomotic details, Doppler flow findings, bile output, any intraoperative technical concerns</li>
+            <li>Post-op imaging plan: Doppler USS hepatic vasculature at 2–4 hrs; CT angiography if Doppler inadequate</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 2. DECOMPRESSIVE CRANIECTOMY                                 -->
+<!-- ============================================================ -->
+<div class="procedure" id="proc-crani">
+  <div class="procedure-header">
+    <div class="procedure-title crani">Decompressive Craniectomy</div>
+    <p class="procedure-desc">Surgical removal of a large bone flap to allow brain expansion in refractory raised intracranial pressure. Indicated for severe TBI, malignant MCA infarction, or refractory intracranial hypertension. Duration 1.5–3 hours.</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot anaes"></div> Anaesthetist</div>
+    <div class="legend-item"><div class="legend-dot surg"></div> Surgeon</div>
+  </div>
+
+  <!-- Stage 1 -->
+  <div class="stage open" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">01</span>
+      <span class="stage-name">Pre-op Assessment & ICP Optimisation</span>
+      <div class="stage-tags"><span class="tag induction">PRE-OP</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Review CT imaging: midline shift, herniation (uncal, central, transtentorial), contusion burden, oedema pattern</li>
+            <li>Review ICP monitor data if inserted: current ICP, CPP (target &ge;60 mmHg), waveform morphology, plateau waves</li>
+            <li>Assess GCS trajectory; note pupillary changes (unilateral dilation = uncal herniation — emergency)</li>
+            <li>Tier 1–2 ICP management already in progress: HOB 30°, head midline, sedation (propofol/midazolam + fentanyl), normoventilation (PaCO2 35–40)</li>
+            <li>If acute herniation in progress: hyperventilate to PaCO2 32–35 mmHg temporarily as bridge to theatre; mannitol 0.5–1 g/kg IV or hypertonic saline (3% NaCl 250 mL or 23.4% NaCl 30 mL)</li>
+            <li>Confirm serum Na — avoid hyponatraemia (&lt;135 mmol/L worsens cerebral oedema); target 140–150 for ICP management</li>
+            <li>Normoglycaemia: target BGL 6–10 mmol/L; hypoglycaemia and hyperglycaemia both worsen neurological outcome</li>
+            <li>Confirm arterial line in situ or insert pre-induction; establish reliable IV access × 2</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Review imaging: determine side (dominant vs non-dominant hemisphere; malignant MCA → ipsilateral to infarct; TBI → side of greater mass effect)</li>
+            <li>Plan craniectomy size: minimum 12 × 15 cm decompression recommended (smaller = ineffective and risks cortical herniation over edge)</li>
+            <li>Discuss bone flap preservation: cryopreservation (&minus;80°C, available if facility supports) vs subcutaneous abdominal pocket</li>
+            <li>Confirm consent (if obtainable): risks include contralateral deterioration, paradoxical herniation (sinking skin flap syndrome), infection, CSF leak</li>
+            <li>Brief team for positioning: head fixation (Mayfield pins vs horseshoe), lateral vs supine positioning</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 2 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">02</span>
+      <span class="stage-name">Positioning & Induction</span>
+      <div class="stage-tags"><span class="tag induction">INDUCTION</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="alert-box warning"><strong>⚠ Induction Risk</strong> Loss of sympathetic drive and positive-pressure ventilation at induction can precipitously lower CPP. Have vasopressors immediately available. Target MAP 80–100 throughout — permissive hypertension to maintain CPP &ge;60 with ICP likely elevated.</div>
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Pre-oxygenate thoroughly; RSI if GCS &le;8 or aspiration risk (most TBI patients)</li>
+            <li>Induction agents: ketamine (1–1.5 mg/kg) acceptable — evidence no longer supports avoidance in raised ICP; thiopentone (3–5 mg/kg) if available for ICP-lowering effect; avoid propofol bolus if haemodynamically unstable</li>
+            <li>Rocuronium (1.2 mg/kg) for RSI; maintain neuromuscular blockade throughout (coughing raises ICP acutely)</li>
+            <li>Maintain MAP 80–100 from induction: phenylephrine or noradrenaline infusion pre-emptively commenced</li>
+            <li>Intubate and confirm ETCO2; target PaCO2 35–40 (unless acute herniation, then 32–35 temporarily)</li>
+            <li>Isoflurane or sevoflurane &lt;1 MAC (all volatiles cause cerebral vasodilation and raise ICP at higher doses); TIVA with propofol/remifentanil preferred by many centres</li>
+            <li>Insert IDC (urinary catheter) — monitor output for mannitol diuresis; monitor for diabetes insipidus (TBI)</li>
+            <li>Head of bed 20–30° throughout; ensure venous drainage not impeded by neck position or collar</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Position: supine (frontal/fronto-temporal) or lateral decubitus (temporal/temporoparietal); head fixed in Mayfield clamp or horseshoe</li>
+            <li>Mayfield pins: infiltrate with LA; coordinate application with anaesthetist (causes acute MAP surge — deepen anaesthesia 60 sec prior)</li>
+            <li>Contralateral shoulder roll if lateral; ensure all pressure points padded (case may run 2+ hours)</li>
+            <li>Mark surgical landmarks: temporal fossa, pterion, coronal suture, sagittal suture, ear</li>
+            <li>Wide prep and drape; mark question-mark (trauma) or reverse question-mark incision depending on pathology</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 3 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">03</span>
+      <span class="stage-name">Craniotomy & Bone Flap Removal</span>
+      <div class="stage-tags"><span class="tag critical">CRITICAL</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Maintain MAP 80–100 during scalp incision (LA with 1:200,000 adrenaline infiltrated by surgeon reduces bleeding)</li>
+            <li>Before dural opening: position optimised, mannitol given if not already, ETCO2 dialled to target, adequate depth of anaesthesia confirmed</li>
+            <li>Prepare for acute haemorrhage if contusion or extradural haematoma decompresses rapidly on dural opening</li>
+            <li>Monitor for Cushing's response during dissection (hypertension + bradycardia + irregular respiration) — indicates critical ICP elevation</li>
+            <li>Continue neuromuscular blockade monitoring (TOF); ensure full block maintained</li>
+            <li>Anticipate blood loss from temporalis muscle and diploic veins; ensure adequate IV access</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Question-mark or trauma flap incision through scalp to periosteum; Raney clips for haemostasis</li>
+            <li>Elevate temporalis muscle and periosteum; retract with fishhooks or self-retaining retractor</li>
+            <li>Burr holes × 4–6 (standard positions: keyhole, temporal squama, posterior temporal, parietal); connect with craniotome</li>
+            <li>Ensure temporal extension to the floor of the middle fossa (≤1 cm above zygomatic arch) — inadequate temporal decompression is a common technical error</li>
+            <li>Bone flap size minimum 12 × 15 cm; larger is generally safer</li>
+            <li>Epidural haematoma if present: evacuate before dural opening</li>
+            <li>Preserve bone flap: label, wrap in saline gauze for cryopreservation or prepare abdominal pocket</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 4 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">04</span>
+      <span class="stage-name">Dural Opening & Brain Decompression</span>
+      <div class="stage-tags"><span class="tag critical">CRITICAL</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="alert-box warning"><strong>⚠ Dural Opening</strong> Acute decompression may cause rapid brain herniation through dural opening, tearing bridging veins, or catastrophic haemorrhage from contused cortex. Have bipolar, saline irrigation, and haemostatic agents immediately available. Surgeon must be prepared for swollen brain to prolapse.</div>
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>At surgeon's warning of dural opening: ensure MAP at higher end (90–100 mmHg) to maintain CPP as ICP drops precipitously</li>
+            <li>If brain tense and bulging despite mannitol and hyperventilation: consider additional 20% mannitol 100 mL, or furosemide 20–40 mg IV</li>
+            <li>TIVA agents can reduce cerebral metabolic rate: propofol infusion increase; thiopentone burst suppression if extreme ICP</li>
+            <li>Maintain normothermia — therapeutic hypothermia not recommended for routine TBI but avoid hyperthermia (&gt;37.5°C worsens outcome)</li>
+            <li>Continue blood gas monitoring; correct any hypercarbia immediately</li>
+            <li>Document and communicate ICP trend if external monitor still in situ</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Open dura in stellate or cruciate fashion — maximise decompression; hitch dura to pericranium to prevent epidural haematoma</li>
+            <li>If MCA infarct: no surgical evacuation needed; aim is simply decompressive expansion space</li>
+            <li>If TBI with intracerebral haematoma: evacuate accessible contusions under direct vision or with gentle suction/irrigation; avoid blind deep evacuation</li>
+            <li>Bipolar diathermy of all cortical bleeding vessels; avoid manipulation of eloquent cortex</li>
+            <li>Duraplasty: patch dura with pericranium, fascia lata, or synthetic dural substitute — large patch to accommodate expected further swelling</li>
+            <li>Watertight dural closure of patch with 4-0 Nurolon or prolene; tack-up sutures to reduce epidural dead space</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 5 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">05</span>
+      <span class="stage-name">Bone Flap Preservation & Closure</span>
+      <div class="stage-tags"><span class="tag induction">CLOSURE</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Assess post-decompression haemodynamics: MAP may fall as ICP-mediated Cushing's response resolves — titrate vasopressors accordingly</li>
+            <li>Final arterial blood gas: confirm PaCO2 35–40, pH &gt;7.35, normoglycaemia, normothermia</li>
+            <li>Anti-epileptic prophylaxis if indicated (levetiracetam 1 g IV for TBI patients)</li>
+            <li>Plan for post-op destination: neurosurgical ICU; patient remains intubated and sedated</li>
+            <li>Dexamethasone: indicated for malignant MCA infarct (vasogenic oedema component); not recommended for TBI (no benefit, may worsen outcome)</li>
+            <li>Document: estimated blood loss, fluids in/out, vasoactive agents, ICP values, any intraoperative events</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Bone flap — option A (cryopreservation): wrap in saline-soaked gauze, double-bag labelled specimen, store at &minus;80°C for delayed cranioplasty (6–12 weeks)</li>
+            <li>Bone flap — option B (subcutaneous abdominal pocket): create subcutaneous pocket in left lower quadrant, insert bone, close with absorbable suture — avoids cold chain but adds abdominal wound</li>
+            <li>Replace temporalis muscle anatomically with absorbable sutures; reduces temporal hollowing at cranioplasty</li>
+            <li>Scalp closure in layers: galea with 0 Vicryl, skin with staples</li>
+            <li>Subgaleal drain if significant ooze; remove within 24–48 hours</li>
+            <li>Head dressing; document bone flap location clearly in operation note and alert system</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 6 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">06</span>
+      <span class="stage-name">ICU Transfer & Neuroprotective Management</span>
+      <div class="stage-tags"><span class="tag emergence">ICU HANDOVER</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Transfer intubated and sedated; portable monitoring including ETCO2 and arterial line transduced throughout transfer</li>
+            <li>Handover to ICU team: indication, bone flap storage location, intraoperative ICP values, current vasoactive medications, blood gas results, anti-epileptic drugs given</li>
+            <li>ICU targets: MAP 80–100, CPP &ge;60 (if ICP monitor in situ), PaCO2 35–40, PaO2 &gt;80, normoglycaemia, core temp 36–37°C</li>
+            <li>Head of bed 30°; midline head position; avoid tight ET tube ties compressing jugular veins</li>
+            <li>Plan: repeat CT head within 2–4 hours post-op to assess decompression adequacy and exclude new haemorrhage</li>
+            <li>Sedation protocol: propofol ± fentanyl infusion; daily sedation hold when ICP controlled to assess neurology</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Dictate operative note immediately: incision type, bone flap dimensions, dural opening technique, duraplasty material, bone flap storage method and location</li>
+            <li>Alert bone bank or abdominal ward (if subcutaneous) of flap storage</li>
+            <li>Plan cranioplasty timing: typically 6–12 weeks post-craniectomy when swelling resolved, infection excluded, nutritional status optimised</li>
+            <li>Family communication: explain procedure, expected course, cranioplasty plan, importance of helmet for scalp protection</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 3. IVOR LEWIS OESOPHAGECTOMY                                 -->
+<!-- ============================================================ -->
+<div class="procedure" id="proc-oeso">
+  <div class="procedure-header">
+    <div class="procedure-title oeso">Ivor Lewis Oesophagectomy</div>
+    <p class="procedure-desc">Two-phase resection of the oesophagus for cancer or high-grade dysplasia: abdominal phase (laparoscopic or open gastric mobilisation and conduit formation) followed by right thoracotomy (oesophageal resection, lymphadenectomy, and intrathoracic anastomosis). Duration 4–7 hours.</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot anaes"></div> Anaesthetist</div>
+    <div class="legend-item"><div class="legend-dot surg"></div> Surgeon</div>
+  </div>
+
+  <!-- Stage 1 -->
+  <div class="stage open" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">01</span>
+      <span class="stage-name">Pre-op Assessment & Optimisation</span>
+      <div class="stage-tags"><span class="tag induction">PRE-OP</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Cardiopulmonary risk stratification: spirometry (FEV1, FVC, DLCO), CPET (VO2max &lt;15 mL/kg/min = high risk), echocardiogram if indicated</li>
+            <li>Assess aspiration risk: dysphagia grade, weight loss (&gt;10% significant malnutrition), pre-op nasojejunal feeding or TPN if severely malnourished</li>
+            <li>Chemotherapy effects: bleomycin (pulmonary toxicity — limit FiO2 intraop; target SpO2 94–96% with FiO2 as low as safe), cisplatin (nephrotoxicity, hypomagnesaemia, peripheral neuropathy)</li>
+            <li>Plan airway management: double-lumen ETT (DLT) or single-lumen + bronchial blocker (BB); right DLT or left DLT — know the anatomy and plan</li>
+            <li>Thoracic epidural catheter (TEA): gold standard analgesia — insert T5–T8 interspace pre-operatively; test with 3 mL 2% lignocaine + adrenaline; confirm dermatomal level</li>
+            <li>Arterial line pre-induction; large-bore IV access × 2; CVC (right IJ or subclavian)</li>
+            <li>Confirm cross-match, cell salvage availability; FFP and platelets available but major haemorrhage less common than in liver/cardiac surgery</li>
+            <li>Mark epidural before positioning; document sensory level and epidural infusion rate plan</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Review staging: CT chest/abdomen/pelvis, PET, endoscopic ultrasound (EUS) for T and N stage</li>
+            <li>Confirm resectability: no involvement of aorta, trachea, or vertebral bodies; no distant metastases</li>
+            <li>Review prior neoadjuvant therapy (FLOT or CROSS protocol); assess nutritional status and co-morbidities</li>
+            <li>Plan abdominal approach: laparoscopic (MIS) vs open midline/upper midline</li>
+            <li>Plan conduit: gastric tube (preferred — single vascular pedicle on right gastroepiploic artery); colon interposition if prior gastrectomy</li>
+            <li>Brief team: position changes required (supine → left lateral), confirm thoracic scrub set available, stapler sizes, anastomotic technique (circular stapler vs hand-sewn)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 2 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">02</span>
+      <span class="stage-name">Induction & Double-Lumen Tube Placement</span>
+      <div class="stage-tags"><span class="tag induction">INDUCTION</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>RSI mandatory: oesophageal obstruction = high aspiration risk; use cricoid pressure</li>
+            <li>DLT selection: left DLT (37–41 Fr depending on patient size) most commonly used; right DLT only if left mainstem pathology; confirm DLT size using height-based formula or CT airway measurement</li>
+            <li>Insert DLT; confirm bilateral ventilation with auscultation and capnography; advance to feel slight resistance then inflate bronchial cuff</li>
+            <li>Fibreoptic bronchoscope (FOB) confirmation mandatory: visualise carina, confirm bronchial lumen in left mainstem, cuff just below carina without herniating</li>
+            <li>FOB of right lumen: confirm clear view of right upper lobe bronchus take-off not obscured by cuff</li>
+            <li>Document DLT position at teeth; re-confirm with FOB after any position change</li>
+            <li>Commence thoracic epidural infusion: 0.1–0.125% bupivacaine + fentanyl 2 mcg/mL at 6–10 mL/hr; confirm haemodynamic stability</li>
+            <li>TIVA or balanced volatile anaesthesia; avoid high FiO2 if prior bleomycin (target SpO2 94–96%)</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Position supine for abdominal phase; arms abducted; ensure access for bilateral subcostal ports if laparoscopic</li>
+            <li>For laparoscopic approach: confirm table position (reverse Trendelenburg for upper abdominal access), monitor CO2 insufflation pressure (ETCO2 will rise — communicate with anaesthetist)</li>
+            <li>Confirm DLT position will not be disturbed by abdominal phase positioning before draping</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 3 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">03</span>
+      <span class="stage-name">Abdominal Phase — Gastric Mobilisation & Conduit Formation</span>
+      <div class="stage-tags"><span class="tag induction">ABDOMINAL</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Laparoscopic insufflation: anticipate ETCO2 rise (increase MV by 10–20%); monitor for CO2 embolism (sudden ETCO2 drop, haemodynamic collapse)</li>
+            <li>Haemodynamic effects of pneumoperitoneum: increased SVR, reduced venous return — vasopressor (phenylephrine) often required</li>
+            <li>Fluid restriction strategy: target zero balance to slightly negative; avoid oedematous anastomosis and interstitial lung fluid — restrict to 5–6 mL/kg/hr crystalloid max; vasopressors to maintain MAP rather than volume loading</li>
+            <li>Monitor urine output: accept 0.3–0.5 mL/kg/hr during abdominal phase with fluid restriction; not an indication to bolus fluids unless oliguric and hypovolaemic</li>
+            <li>Epidural top-up not typically required during abdominal phase if GETA maintained; will be crucial post-op</li>
+            <li>Communicate ETCO2 and respiratory compliance trends to surgical team for pneumoperitoneum pressure adjustments</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Laparoscopic ports: camera umbilical, working ports bilateral upper quadrant; liver retractor port</li>
+            <li>Divide greater omentum preserving right gastroepiploic artery (RGEA); ligate and divide short gastric vessels with LigaSure or ultrasonic shears</li>
+            <li>Divide lesser omentum; define and preserve right gastric artery; ligate left gastric artery and vein at origin (lymphadenectomy nodes 7, 8, 9)</li>
+            <li>Kocher manoeuvre to mobilise duodenum and allow stomach to reach chest</li>
+            <li>Pyloromyotomy or pyloroplasty (or botox injection) — gastric drainage procedure to prevent post-vagotomy gastroparesis</li>
+            <li>Form gastric conduit: linear stapler along lesser curve, creating tube 4–5 cm diameter based on RGEA; preserve conduit length and vascularity</li>
+            <li>Feeding jejunostomy insertion for post-op enteral nutrition (standard of care)</li>
+            <li>Pass conduit through oesophageal hiatus (posterior mediastinal route); attach with stay suture to oesophageal specimen for thoracic retrieval</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 4 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">04</span>
+      <span class="stage-name">Position Change & One-Lung Ventilation Initiation</span>
+      <div class="stage-tags"><span class="tag critical">CRITICAL</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="alert-box warning"><strong>⚠ DLT Position Change</strong> Re-confirm DLT position with FOB after every position change. Left lateral decubitus causes cephalad shift of the mediastinum and can displace the DLT. Failure to reconfirm is a leading cause of intraoperative hypoxaemia during OLV.</div>
+      <div class="alert-box info"><strong>ℹ One-Lung Ventilation Strategy</strong> Use lung-protective OLV: TV 4–6 mL/kg IBW, PEEP 5 cmH2O to dependent lung, FiO2 titrated to SpO2 &ge;94%, Pplat &lt;30 cmH2O. Permit permissive hypercapnia (PaCO2 50–55) if needed to maintain plateau pressure. Hypoxic pulmonary vasoconstriction (HPV) is the primary mechanism maintaining oxygenation — avoid vasodilators (nitric oxide, GTN) which blunt HPV unless treating refractory hypoxaemia.</div>
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Co-ordinate position change: supine to left lateral decubitus with surgeon and scrub; protect arms, head, and pressure points</li>
+            <li>FOB re-confirmation of DLT immediately post-positioning; adjust if displaced</li>
+            <li>Initiate OLV: clamp and open right lumen (non-dependent lung); confirm adequate left lung ventilation</li>
+            <li>OLV settings: TV 4–5 mL/kg IBW, RR 14–18, PEEP 5, FiO2 starting at 0.8 then titrate down; Pplat target &lt;28 cmH2O</li>
+            <li>Anticipate SpO2 fall in first 10–20 min of OLV (HPV takes 10–15 min to fully establish); intervene if SpO2 &lt;90%</li>
+            <li>If refractory hypoxaemia: apply CPAP 5 cmH2O to non-dependent (operative) lung; recruitment manoeuvres to dependent lung; increase FiO2; notify surgeon to request intermittent two-lung ventilation if critical</li>
+            <li>Arterial blood gas at 15–20 min of OLV; document PaO2/FiO2 ratio</li>
+            <li>Ensure epidural working well; analgesic synergy important for post-op respiratory function</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Left lateral decubitus positioning: right arm on arm board, axillary roll, bean bag or hip bolsters</li>
+            <li>Flex table slightly at waist to open right thorax; ensure hip and shoulder stable</li>
+            <li>Mark and prep right posterolateral thoracotomy; prep to midline anteriorly and scapular tip posteriorly</li>
+            <li>Allow 10–15 minutes for anaesthetist to confirm OLV before incision</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 5 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">05</span>
+      <span class="stage-name">Thoracic Phase — Oesophageal Resection & Lymphadenectomy</span>
+      <div class="stage-tags"><span class="tag critical">CRITICAL</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Continuous SpO2 monitoring; act promptly on desaturation — communicate timing with surgeon for brief two-lung ventilation if SpO2 &lt;88%</li>
+            <li>Haemodynamic monitoring during thoracic dissection: aortic manipulation, mediastinal retraction, and atrial compression can cause arrhythmias and hypotension</li>
+            <li>Maintain MAP &ge;65; vasopressor titration (noradrenaline preferred); caution with large fluid boluses (lung protective strategy)</li>
+            <li>Fluid balance: strict fluid restriction continues — goal-directed therapy (arterial waveform variation, oesophageal Doppler) preferred over fixed rate crystalloid</li>
+            <li>Monitor for thoracic duct injury (chylothorax): assess drain fluid post-op; inform surgeon if unexpected clear high-volume drain output</li>
+            <li>Temperature management: open thorax causes heat loss; maintain warming blanket to dependent side, warm IV fluids</li>
+            <li>Arterial blood gas hourly during OLV; document PaCO2, pH, lactate, K+</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Posterolateral thoracotomy: 5th or 6th intercostal space; divide latissimus dorsi and serratus anterior; rib spreader</li>
+            <li>Incise inferior pulmonary ligament; retract right lung anteriorly to expose posterior mediastinum</li>
+            <li>Incise mediastinal pleura over oesophagus; encircle with tape at mid-oesophagus</li>
+            <li>En bloc resection: oesophagus with perioesophageal tissue, subcarinal nodes (station 7), right and left paratracheal nodes, para-oesophageal nodes (stations 8 and 9)</li>
+            <li>Identify and protect right recurrent laryngeal nerve (courses around right subclavian artery) and left RLN (around aortic arch); injury causes hoarseness and aspiration</li>
+            <li>Thoracic duct: ligate at diaphragmatic hiatus to prevent chylothorax (mass ligation of tissue between aorta and azygos vein)</li>
+            <li>Divide azygos vein with stapler if required for exposure</li>
+            <li>Pass gastric conduit into thorax; deliver specimen and attached conduit; divide oesophagus at target level</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 6 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">06</span>
+      <span class="stage-name">Intrathoracic Anastomosis</span>
+      <div class="stage-tags"><span class="tag critical">CRITICAL</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="alert-box info"><strong>ℹ Anastomotic Leak Risk</strong> Anastomotic leak (5–15% incidence) is the most feared complication — associated with 30–50% mortality. Risk factors: conduit ischaemia (tension, poor vascularisation), technical error, malnutrition, prior radiotherapy, contaminated field. Ensure conduit lies without tension or torsion.</div>
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Maintain MAP &ge;65 during anastomosis — conduit perfusion pressure is critical to anastomotic healing</li>
+            <li>Avoid vasoconstrictors that significantly reduce splanchnic flow (high-dose phenylephrine); noradrenaline preferred</li>
+            <li>Ensure adequate FiO2 and SpO2 &ge;95% during anastomosis: tissue oxygenation supports healing</li>
+            <li>Nasogastric tube (NGT): surgeon will request NGT advanced through anastomosis into conduit; advance gently under guidance — do NOT force blindly</li>
+            <li>Monitor for aspiration at anastomosis: keep circuit maintained, suction available</li>
+            <li>Document time of anastomosis completion (relevant for early post-op anastomotic leak surveillance)</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Assess conduit perfusion: colour, mesenteric pulse, Doppler signal of right gastroepiploic pedicle at tip of conduit; ischaemic tip must be resected</li>
+            <li>Circular stapled anastomosis (most common): anvil in oesophageal end, stapler via conduit apex; fire at appropriate diameter (25–28 mm); inspect donuts for completeness</li>
+            <li>Hand-sewn anastomosis (alternative): single-layer end-to-side or end-to-end with absorbable suture (PDS 3-0); interrupted or continuous</li>
+            <li>Check anastomosis for tension: conduit must sit without redundancy or stretching; ensure no torsion of conduit pedicle</li>
+            <li>Leak test: air insufflation via NGT with anastomosis submerged in saline — bubbles indicate leak requiring reinforcement</li>
+            <li>Wrap anastomosis with intercostal muscle flap or omentum if available (vascularised reinforcement)</li>
+            <li>Position NGT 40–45 cm at teeth (tip in conduit, not across anastomosis); confirm radiologically post-op</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 7 -->
+  <div class="stage" onclick="toggleStage(this)">
+    <div class="stage-header">
+      <span class="stage-num">07</span>
+      <span class="stage-name">Closure & Extubation Planning</span>
+      <div class="stage-tags"><span class="tag emergence">EMERGENCE</span></div>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="stage-body">
+      <div class="roles">
+        <div class="role-panel anaes">
+          <div class="role-label anaes"><div class="role-dot anaes"></div>Anaesthetist</div>
+          <ul class="task-list">
+            <li>Resume two-lung ventilation after chest closure; recruitment manoeuvre (sustained inflation 30 cmH2O × 30 sec) to re-expand atelectatic right lung</li>
+            <li>Extubation criteria: warm, haemostatic, SpO2 &ge;95% on FiO2 0.4, adequate reversal of neuromuscular blockade (TOF ratio &ge;0.9), cooperative (if not sedated), pain controlled via epidural</li>
+            <li>Thoracic epidural: confirm working bilaterally before extubation — inadequate analgesia is a primary cause of post-op respiratory failure; NRS pain score &le;3 on coughing</li>
+            <li>Change DLT to single-lumen ETT if remaining intubated (e.g. ICU post-op); DLTs are not designed for prolonged ventilation</li>
+            <li>If bleomycin history: maintain lowest FiO2 consistent with SpO2 &ge;94% post-op; document O2 exposure duration</li>
+            <li>Post-op plan: HDU or ICU; chest drain management (water seal, not suction immediately); NGT on free drainage; jejunostomy feeds commenced at 6–12 hours</li>
+            <li>Anti-emetic prophylaxis: ondansetron + dexamethasone + droperidol (PONV risks post-oesophagectomy are high; vomiting risks anastomotic strain)</li>
+            <li>Document: total fluids in/out, estimated blood loss, drain outputs, epidural level and infusion rate, NGT position</li>
+          </ul>
+        </div>
+        <div class="role-panel surg">
+          <div class="role-label surg"><div class="role-dot surg"></div>Surgeon</div>
+          <ul class="task-list">
+            <li>Intercostal drains × 2 (apical and basal) via separate stab incisions; ensure not compressing conduit pedicle</li>
+            <li>Thoracotomy closure: pericostal sutures (0 Vicryl), intercostal muscle, fascial layers (0 PDS), subcutaneous (2-0 Vicryl), skin (3-0 monocryl or staples)</li>
+            <li>Confirm chest drains swinging and draining before dressing</li>
+            <li>Post-op imaging: CXR in recovery (lung re-expansion, drain positions, NGT position)</li>
+            <li>Feeding protocol: jejunostomy free water at 6 hours; jejunostomy feeds at 12–24 hours; contrast swallow day 5–7 to assess anastomotic integrity before oral intake</li>
+            <li>Dictate operative note: anastomotic technique, stapler size, conduit perfusion assessment, drain positions, NGT depth</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 </div><!-- end main -->
 
