@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#5a3a7a">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Shaun's Ledger</title>
+<title>Reading Log</title>
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
@@ -82,8 +82,6 @@
   .search-result-item { display:flex; gap:0.85rem; padding:0.85rem 1rem; border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.15s; align-items:flex-start; }
   .search-result-item:last-child { border-bottom:none; }
   .search-result-item:hover { background:var(--purple-faint); }
-  .book-cover { width:42px; height:60px; object-fit:cover; border-radius:3px; flex-shrink:0; background:var(--surface2); }
-  .book-cover-placeholder { width:42px; height:60px; background:var(--surface2); border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.1rem; opacity:0.4; }
   .result-info { flex:1; min-width:0; }
   .result-title { font-family:'Spectral',serif; font-size:0.9rem; color:var(--ink); margin-bottom:0.2rem; line-height:1.3; }
   .result-author { font-size:0.78rem; color:var(--muted); font-style:italic; margin-bottom:0.2rem; }
@@ -94,8 +92,6 @@
 
   .selected-book-preview { background:var(--purple-faint); border:1px solid rgba(90,58,122,0.2); border-radius:6px; padding:1rem; margin-bottom:1rem; display:flex; gap:1rem; align-items:flex-start; display:none; }
   .selected-book-preview.show { display:flex; }
-  .preview-cover { width:48px; height:68px; object-fit:cover; border-radius:3px; flex-shrink:0; }
-  .preview-cover-placeholder { width:48px; height:68px; background:var(--surface2); border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.2rem; opacity:0.4; }
   .preview-info { flex:1; }
   .preview-title { font-family:'Spectral',serif; font-size:1rem; color:var(--purple); margin-bottom:0.15rem; }
   .preview-author { font-size:0.82rem; color:var(--muted); font-style:italic; }
@@ -121,8 +117,6 @@
   .book-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:1rem; }
   .book-card { background:var(--surface); border:1px solid var(--border); border-radius:6px; overflow:hidden; transition:border-color 0.2s, transform 0.15s; }
   .book-card:hover { border-color:var(--purple); transform:translateY(-2px); }
-  .book-card-cover { width:100%; height:120px; object-fit:cover; display:block; }
-  .book-card-cover-ph { width:100%; height:120px; background:linear-gradient(135deg,var(--surface2),var(--surface)); display:flex; align-items:center; justify-content:center; font-size:2rem; opacity:0.35; }
   .book-card-body { padding:0.85rem; }
   .book-card-title { font-family:'Spectral',serif; font-size:0.85rem; color:var(--ink); margin-bottom:0.15rem; line-height:1.35; }
   .book-card-author { font-size:0.72rem; color:var(--muted); font-style:italic; margin-bottom:0.4rem; }
@@ -154,7 +148,7 @@
 <a class="home-btn" href="index.html">← Home</a>
 <div class="header">
   <div class="header-label">Reading Log</div>
-  <h1>Shaun's Ledger</h1>
+  <h1>Reading Log</h1>
   <div class="header-sub">Every book, every year</div>
 </div>
 <nav class="tabs">
@@ -184,7 +178,6 @@
       </div>
       <div class="search-results" id="searchResults"></div>
       <div class="selected-book-preview" id="selectedPreview">
-        <div id="previewCoverWrap"></div>
         <div class="preview-info">
           <div class="preview-title" id="previewTitle"></div>
           <div class="preview-author" id="previewAuthor"></div>
@@ -258,7 +251,7 @@
   </div>
 
 </main>
-<div class="breadcrumb"><a href="index.html">Home</a> &rsaquo; Shaun's Ledger</div>
+<div class="breadcrumb"><a href="index.html">Home</a> &rsaquo; Reading Log</div>
 <script>
   let currentRating = 0;
   let allBooks = [];
@@ -319,9 +312,7 @@
       const author = b.author_name ? b.author_name[0] : 'Unknown';
       const year = b.first_publish_year || '';
       const pages = b.number_of_pages_median || '';
-      const imgHtml = cover ? `<img class="book-cover" src="${cover}" alt="" onerror="this.parentNode.innerHTML='<div class=book-cover-placeholder>📖</div>'">` : `<div class="book-cover-placeholder">📖</div>`;
       return `<div class="search-result-item">
-        ${imgHtml}
         <div class="result-info">
           <div class="result-title">${b.title}</div>
           <div class="result-author">${author}</div>
@@ -341,9 +332,6 @@
     document.getElementById('bookPages').value = book.pages || '';
     document.getElementById('bookSearch').value = '';
     hideSearchResults();
-    const coverWrap = document.getElementById('previewCoverWrap');
-    if(book.cover) { coverWrap.innerHTML = `<img class="preview-cover" src="https://covers.openlibrary.org/b/id/${book.cover}-M.jpg" alt="" onerror="this.parentNode.innerHTML='<div class=preview-cover-placeholder>📖</div>'">`; }
-    else { coverWrap.innerHTML = '<div class="preview-cover-placeholder">📖</div>'; }
     document.getElementById('previewTitle').textContent = book.title;
     document.getElementById('previewAuthor').textContent = book.author;
     document.getElementById('selectedPreview').classList.add('show');
@@ -401,7 +389,6 @@
     document.getElementById('statsRow').innerHTML = `
       <div class="stat-box"><div class="stat-num">${readBooks.length}</div><div class="stat-label">Books read</div></div>
       <div class="stat-box"><div class="stat-num">${totalPages>0?Math.round(totalPages/1000)+'k':'—'}</div><div class="stat-label">Pages</div></div>
-      <div class="stat-box"><div class="stat-num">${avgRating}</div><div class="stat-label">Avg rating</div></div>
       <div class="stat-box"><div class="stat-num">${allBooks.filter(b=>b.status==='to-read').length}</div><div class="stat-label">To read</div></div>`;
     const allYears = ['All',...years];
     document.getElementById('yearTabs').innerHTML = allYears.map(y=>`<div class="year-chip${y==activeYear?' active':''}" onclick="setYear(${JSON.stringify(y)})">${y}</div>`).join('');
@@ -409,9 +396,8 @@
     const container = document.getElementById('bookContent');
     if(!filtered.length) { container.innerHTML='<div class="empty-state">No books yet — add your first one.</div>'; return; }
     container.innerHTML = `<div class="book-grid">${filtered.map(b=>{
-      const coverHtml = b.cover ? `<img class="book-card-cover" src="https://covers.openlibrary.org/b/id/${b.cover}-M.jpg" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="book-card-cover-ph" style="display:none">📖</div>` : `<div class="book-card-cover-ph">📖</div>`;
       const stars = b.rating ? '★'.repeat(b.rating)+'☆'.repeat(5-b.rating) : '';
-      return `<div class="book-card">${coverHtml}<div class="book-card-body"><div class="book-card-title">${b.title}</div><div class="book-card-author">${b.author||''}</div>${stars?`<div class="book-card-stars">${stars}</div>`:''}<div class="book-card-meta">${b.year||''}${b.pages?' · '+b.pages+'p':''}</div>${b.notes?`<div class="book-card-notes">"${b.notes.slice(0,80)}${b.notes.length>80?'…':''}"</div>`:''}</div></div>`;
+      return `<div class="book-card"><div class="book-card-body"><div class="book-card-title">${b.title}</div><div class="book-card-author">${b.author||''}</div>${stars?`<div class="book-card-stars">${stars}</div>`:''}<div class="book-card-meta">${b.year||''}${b.pages?' · '+b.pages+'p':''}</div>${b.notes?`<div class="book-card-notes">"${b.notes.slice(0,80)}${b.notes.length>80?'…':''}"</div>`:''}</div></div>`;
     }).join('')}</div>`;
   }
 
