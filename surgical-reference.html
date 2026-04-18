@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cardiac Surgery Reference</title>
+<title>Surgical Reference</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap');
@@ -89,7 +89,11 @@
     max-width: 1100px;
     margin: 1.5rem auto 0;
     border-bottom: none;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .tabs::-webkit-scrollbar { display: none; }
 
   .tab {
     padding: 0.75rem 1.75rem;
@@ -401,9 +405,9 @@
 <div class="header">
   <div class="site-mark">S</div>
   <div class="header-inner">
-    <div class="header-label">Cardiothoracic Surgery · Clinical Reference</div>
+    <div class="header-label">Surgery · Clinical Reference</div>
     <h1>Operative Role Reference</h1>
-    <p class="subtitle">Staged breakdown of anaesthetic and surgical responsibilities — CABG and Bentall procedure</p>
+    <p class="subtitle">Staged breakdown of anaesthetic and surgical responsibilities across major procedures</p>
 
     <div class="tabs">
       <button class="tab cabg active" onclick="showProcedure('cabg', this)">Coronary Artery Bypass Graft</button>
