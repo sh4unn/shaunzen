@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cabin 12V — Shopping List</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f0f4f5; --surface:#e4ecee; --surface2:#dde7ea;
+  --border:#c0ced2; --slate:#bfcbce;
+  --ink:#1a2628; --muted:#4a6068; --faint:#8fa0a5;
+  --accent:#2a5a6a; --accent-light:#3a7a8c; --accent-faint:#e0ecf0;
+  --warm:#c45e2a; --gold:#8a6a20; --green:#3a6a2a; --red:#7a2020; --purple:#5a3a7a;
+  --cream:#f0f4f5; --parchment:#e4ecee; --teal:#2a5a6a; --teal-light:#3a7a8c; --teal-faint:#e0ecf0;
+  --burnt:#c45e2a; --burnt-faint:#f5ede8;
+  --g:#3a6a2a; --g-light:#4a8a3a; --g-faint:#e8f0e4;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--ink); font-family:'Spectral',serif; font-weight:300; min-height:100vh; }
+
+.home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--g); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; }
+.home-btn:hover { background:var(--g-light); }
+
+.header { background:var(--g); padding:3.5rem 2rem 2rem; text-align:center; }
+.header-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,255,255,0.6); margin-bottom:0.75rem; }
+.header h1 { font-family:'New Rocker',cursive; font-size:clamp(2rem,5vw,3.5rem); color:white; line-height:1.1; }
+.header-sub { font-family:'Spectral',serif; font-style:italic; font-size:1rem; color:rgba(255,255,255,0.7); margin-top:0.5rem; }
+.header-pills { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin-top:1rem; }
+.pill { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:rgba(255,255,255,0.65); padding:0.3rem 0.75rem; border:1px solid rgba(255,255,255,0.25); border-radius:2px; }
+
+.drawings-bar { background:var(--g-faint); border-bottom:1px solid #c0d4ba; padding:0.7rem 1.5rem; text-align:center; }
+.drawings-link { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--g); text-decoration:none; border:1px solid var(--g); padding:0.35rem 1rem; border-radius:2px; display:inline-block; transition:background 0.2s, color 0.2s; }
+.drawings-link:hover { background:var(--g); color:white; }
+
+.total-bar { background:var(--surface); border-bottom:1px solid var(--border); padding:1rem 1.5rem; }
+.total-bar-inner { max-width:860px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem; }
+.total-label { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); }
+.total-amount { font-family:'IBM Plex Mono',monospace; font-size:1.35rem; color:var(--ink); margin-top:0.15rem; }
+.total-note { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); }
+.checked-count { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--g); }
+
+main { max-width:860px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+.section { margin-bottom:3rem; }
+.section-header { display:flex; align-items:baseline; gap:1rem; margin-bottom:0.5rem; padding-bottom:0.75rem; border-bottom:2px solid var(--border); flex-wrap:wrap; }
+.section-number { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); }
+.section-title { font-family:'New Rocker',cursive; font-size:1.5rem; color:var(--ink); }
+.section-subtotal { margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--g); }
+.section-note { font-family:'Spectral',serif; font-style:italic; font-size:0.9rem; color:var(--muted); margin-bottom:0.75rem; line-height:1.55; }
+
+.item { display:grid; grid-template-columns:22px 1fr auto; align-items:start; gap:0.85rem; padding:0.85rem 0.5rem; border-bottom:1px solid var(--border); cursor:pointer; border-radius:2px; transition:background 0.15s; }
+.item:hover { background:var(--surface); }
+.item.checked { background:var(--surface2); }
+.item.checked .item-name { text-decoration:line-through; color:var(--faint); }
+.item.checked .item-desc { opacity:0.45; }
+.item.featured { background:var(--g-faint); border-left:3px solid var(--g); padding-left:0.75rem; }
+.item.featured .item-name { color:var(--g); }
+
+.cb { width:18px; height:18px; border:1.5px solid var(--slate); border-radius:2px; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+.item.checked .cb { background:var(--g); border-color:var(--g); }
+.item.checked .cb::after { content:'✓'; color:white; font-size:11px; }
+
+.item-name { font-family:'Spectral',serif; font-size:0.95rem; color:var(--ink); line-height:1.3; }
+.item-desc { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); margin-top:0.25rem; line-height:1.55; }
+.item-badge { display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.08em; text-transform:uppercase; padding:1px 6px; border-radius:2px; margin-left:0.5rem; background:var(--g-faint); color:var(--g); vertical-align:middle; }
+.item-badge.diy { background:var(--burnt-faint); color:var(--warm); }
+.item-badge.licensed { background:var(--surface2); color:var(--muted); }
+.item-badge.hero { background:var(--g); color:white; }
+
+.item-price { text-align:right; flex-shrink:0; }
+.price-main { font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink); white-space:nowrap; }
+.price-qty { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); margin-top:2px; }
+
+@media (max-width:600px) { main, .total-bar, .drawings-bar { padding-left:1rem; padding-right:1rem; } .item { gap:0.6rem; } }
+</style>
+</head>
+<body>
+
+<a class="home-btn" href="index.html">← Home</a>
+
+<div class="header">
+  <div class="header-label">Off-grid build · 12V DC system · SE Queensland</div>
+  <h1>Cabin Power<br>Shopping List</h1>
+  <div class="header-sub">Groomsville block — Victron ecosystem</div>
+  <div class="header-pills">
+    <span class="pill">Victron ecosystem</span>
+    <span class="pill">LiFePO4 storage</span>
+    <span class="pill">~2.4kWh usable</span>
+    <span class="pill">800VA inverter</span>
+  </div>
+</div>
+
+<div class="drawings-bar">
+  <a class="drawings-link" href="bush-cabin-drawings.html" target="_blank">↗ View / Print Working Drawings</a>
+</div>
+
+<div class="total-bar">
+  <div class="total-bar-inner">
+    <div>
+      <p class="total-label">Estimated Total</p>
+      <p class="total-amount">$4,890 – $6,650</p>
+    </div>
+    <div style="text-align:right">
+      <p class="checked-count" id="checkedCount">0 of 43 items ticked</p>
+      <p class="total-note">AUD · excludes licensed labour (~$1,200–1,600)</p>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- 01 · SOLAR GENERATION -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <h2 class="section-title">Solar Generation</h2>
+      <span class="section-subtotal">~$700–1,000</span>
+    </div>
+    <p class="section-note">2 × 400W gives ~800W peak — well matched to the 40A MPPT. Buy panels locally to avoid freight damage.</p>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Solar Panels 400W Mono PERC <span class="item-badge diy">DIY mount</span></p><p class="item-desc">× 2 — Risen, Jinko or Canadian Solar. Buy locally to avoid freight damage on glass panels.</p></div><div class="item-price"><p class="price-main">$280–350</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Victron SmartSolar MPPT 100/40</p><p class="item-desc">Handles 2 × 400W. Bluetooth built-in, VictronConnect app. 12V/24V auto-detect.</p></div><div class="item-price"><p class="price-main">$250–290</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">MC4 Y-branch Connectors (pair)</p><p class="item-desc">Parallel your 2 panels before the MPPT. Buy quality — cheap MC4s corrode in Queensland weather.</p></div><div class="item-price"><p class="price-main">$15–25</p><p class="price-qty">pair</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Solar PV Cable 6mm² red + black (per 5m)</p><p class="item-desc">UV-rated, double-insulated. Roof to MPPT run. Size up, not down — heat kills cable.</p></div><div class="item-price"><p class="price-main">$20–30</p><p class="price-qty">per 5m</p></div></div>
+  </div>
+
+  <!-- 02 · BATTERIES -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <h2 class="section-title">Battery Storage</h2>
+      <span class="section-subtotal">~$1,000–1,600</span>
+    </div>
+    <p class="section-note">2 × 100Ah = 200Ah / ~2.4kWh usable at 80% DoD. LiFePO4 only — AGM is dead weight for a cabin build.</p>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">LiFePO4 100Ah 12V Battery with BMS</p><p class="item-desc">× 2 — Epoch, Ampere Time, or Battle Born. Ensure BMS is rated for parallel. 4000+ cycles, 10-year lifespan.</p></div><div class="item-price"><p class="price-main">$500–800</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">ANL Fuse Holder + 100A Fuse</p><p class="item-desc">Main overcurrent protection inline on positive cable between battery and bus. Blue Sea or Victron.</p></div><div class="item-price"><p class="price-main">$35–50</p><p class="price-qty">set</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Battery Interconnect Cable 50mm² (300mm)</p><p class="item-desc">Flexible tinned copper with lugs. Connects two batteries in parallel. Pre-made is fine.</p></div><div class="item-price"><p class="price-main">$25–40</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Battery Cable 50mm² red + black (per metre)</p><p class="item-desc">Battery to inverter and bus bar. Keep these runs as short as physically possible.</p></div><div class="item-price"><p class="price-main">$12–18</p><p class="price-qty">per m</p></div></div>
+  </div>
+
+  <!-- 03 · INVERTER -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <h2 class="section-title">Inverter / Charger</h2>
+      <span class="section-subtotal">~$550–700</span>
+    </div>
+    <p class="section-note">MultiPlus is inverter + battery charger combined. If you ever add a generator or grid tie, it passthrough charges too.</p>
+    <div class="item featured" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Victron MultiPlus-II 12/800/35 <span class="item-badge hero">recommended</span></p><p class="item-desc">800VA continuous, 1600VA surge. Handles power tool startup. Pure sine wave. Inverter + charger in one unit.</p></div><div class="item-price"><p class="price-main">$550–700</p><p class="price-qty">each</p></div></div>
+  </div>
+
+  <!-- 04 · DC DISTRIBUTION -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <h2 class="section-title">DC Distribution</h2>
+      <span class="section-subtotal">~$150–220</span>
+    </div>
+    <p class="section-note">Fuse every circuit at source — this is your safety layer on the DC side. No RCDs needed here, fuses only.</p>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Blue Sea 5026 ST Blade Fuse Block (12-circuit)</p><p class="item-desc">12-way fused distribution with common bus. Cover included. Industry standard for off-grid installs.</p></div><div class="item-price"><p class="price-main">$70–90</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Negative Bus Bar (6–10 terminal)</p><p class="item-desc">Common negative return for all 12V circuits. Mount near fuse block. Keeps everything tidy and testable.</p></div><div class="item-price"><p class="price-main">$20–35</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Blade Fuse Assortment ATC/ATO 5–30A</p><p class="item-desc">Buy a 100-piece mixed kit. You'll use 7.5A, 10A, 15A, 20A across different circuits.</p></div><div class="item-price"><p class="price-main">$15–20</p><p class="price-qty">kit</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Lug / Ring Terminal Kit (4–50mm²)</p><p class="item-desc">Copper tinned, various sizes. Get a ratchet crimper — hammer crimps fail in vibration and heat.</p></div><div class="item-price"><p class="price-main">$25–40</p><p class="price-qty">kit</p></div></div>
+  </div>
+
+  <!-- 05 · BATTERY MONITOR -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <h2 class="section-title">Battery Monitor</h2>
+      <span class="section-subtotal">~$160–200</span>
+    </div>
+    <div class="item featured" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Victron BMV-712 Smart <span class="item-badge hero">essential</span></p><p class="item-desc">State of charge, amps in/out, time remaining, full history. Bluetooth to app. Flying blind without it.</p></div><div class="item-price"><p class="price-main">$160–200</p><p class="price-qty">each</p></div></div>
+  </div>
+
+  <!-- 06 · 240V AC SUB-BOARD -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">06</span>
+      <h2 class="section-title">240V AC Sub-board</h2>
+      <span class="section-subtotal">~$150–250</span>
+    </div>
+    <p class="section-note">Materials only — sparky installs off the inverter AC output. Labour ~$500–800 on top. Don't skip the RCD.</p>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">4-Way Consumer Unit Clipsal or Hager <span class="item-badge licensed">licensed</span></p><p class="item-desc">Small DIN rail enclosure. Your sparky will spec the exact model. Mount near the inverter.</p></div><div class="item-price"><p class="price-main">$60–90</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">30mA RCD Clipsal or Hager <span class="item-badge licensed">licensed</span></p><p class="item-desc">Protects all 240V circuits off the inverter. Non-negotiable — trips if you touch something live.</p></div><div class="item-price"><p class="price-main">$55–80</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">10A MCB Circuit Breaker × 2 <span class="item-badge licensed">licensed</span></p><p class="item-desc">One per GPO circuit. Clipsal or Hager to match the board. Sparky confirms exact rating.</p></div><div class="item-price"><p class="price-main">$20–30</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Clipsal Double GPO 10A × 2 <span class="item-badge licensed">licensed</span></p><p class="item-desc">240V power points off the inverter. One near the bench, one near the door. Iconic or Saturn range.</p></div><div class="item-price"><p class="price-main">$20–35</p><p class="price-qty">each</p></div></div>
+  </div>
+
+  <!-- 07 · 12V LIGHTING -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">07</span>
+      <h2 class="section-title">12V Lighting</h2>
+      <span class="section-subtotal">~$150–280</span>
+    </div>
+    <p class="section-note">All lighting native 12V DC — zero inverter draw. 2700K only, not 4000K. Cabin lighting should feel warm, not clinical.</p>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">12V LED Downlights 5W warm white × 4</p><p class="item-desc">2700K. Surface mount easier in timber framing. 4 lights = 20W total draw — barely registers.</p></div><div class="item-price"><p class="price-main">$15–25</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">12V PWM Dimmer Switch × 2</p><p class="item-desc">Wall-mount or in-line. One for main lights, one for bench/task area. Get 8A rated minimum.</p></div><div class="item-price"><p class="price-main">$20–35</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">12V LED Strip 2700K warm white (5m roll)</p><p class="item-desc">Under bench, shelf accent, or porch soffit. IP20 inside, IP65 under eaves. Low draw, high ambience.</p></div><div class="item-price"><p class="price-main">$30–50</p><p class="price-qty">roll</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">12V LED Strip PWM Dimmer Controller</p><p class="item-desc">Separate dimmer for the strip lights. In-line rotary or wall panel. Keep independent of downlight circuit.</p></div><div class="item-price"><p class="price-main">$15–25</p><p class="price-qty">each</p></div></div>
+  </div>
+
+  <!-- 08 · 12V OUTLETS + USB -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">08</span>
+      <h2 class="section-title">12V Outlets &amp; USB</h2>
+      <span class="section-subtotal">~$100–180</span>
+    </div>
+    <p class="section-note">USB-C outlets run direct off the 12V bus — phones, tablets, laptops. No inverter draw for daily charging.</p>
+    <div class="item featured" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Flush Mount USB-C + USB-A Dual Outlet × 3 <span class="item-badge hero">key item</span></p><p class="item-desc">NARVA, Projecta or Merit Pro. USB-C PD minimum 18W. Near bed, bench, and entry. Panel-cut flush install.</p></div><div class="item-price"><p class="price-main">$30–45</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">12V Accessory Socket Anderson/cig style × 1</p><p class="item-desc">For portable 12V gear — air compressor, portable fridge, etc. Flush or surface mount.</p></div><div class="item-price"><p class="price-main">$15–25</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Anderson SB50 Connector + Housing (external)</p><p class="item-desc">Outside the cabin for direct battery top-up from a solar trailer or second vehicle. Very useful off-grid.</p></div><div class="item-price"><p class="price-main">$15–25</p><p class="price-qty">each</p></div></div>
+  </div>
+
+  <!-- 09 · WIRING & CABLE -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">09</span>
+      <h2 class="section-title">Wiring &amp; Cable</h2>
+      <span class="section-subtotal">~$150–250</span>
+    </div>
+    <p class="section-note">Buy more than you think you need. Voltage drop is your enemy at 12V — size up, never down.</p>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">4mm² Twin-Core Sheathed Cable (per 10m)</p><p class="item-desc">Fridge, Starlink adapter, fan — any circuit drawing over 10A or running more than 3m. Buy 20–30m minimum.</p></div><div class="item-price"><p class="price-main">$30–45</p><p class="price-qty">per 10m</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">2.5mm² Twin-Core Sheathed Cable (per 10m)</p><p class="item-desc">Lighting circuits, USB outlets. Buy 20m minimum. Don't go thinner — voltage drop at 12V is real.</p></div><div class="item-price"><p class="price-main">$20–30</p><p class="price-qty">per 10m</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Heat Shrink Assortment Kit</p><p class="item-desc">All joins get heat shrink. No exposed terminals. Get multisize 3:1 ratio kit — covers everything from 2.5mm to 50mm.</p></div><div class="item-price"><p class="price-main">$15–25</p><p class="price-qty">kit</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Cable Conduit + Clips</p><p class="item-desc">Split loom under floor. PVC oval conduit for exposed wall runs. Cable clips for stapling twin-core to framing.</p></div><div class="item-price"><p class="price-main">$30–50</p><p class="price-qty">lot</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Ratchet Crimping Tool 4–50mm²</p><p class="item-desc">If you don't have one. Hammer crimps fail. A ratchet crimper is $40 you use for the rest of your life.</p></div><div class="item-price"><p class="price-main">$35–55</p><p class="price-qty">each</p></div></div>
+  </div>
+
+  <!-- 10 · WATER SYSTEM -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">10</span>
+      <h2 class="section-title">Water System</h2>
+      <span class="section-subtotal">~$600–900</span>
+    </div>
+    <p class="section-note">Tank → 12V pump → cabin. Joolca for hot water on demand. Licensed gas fitter for the LPG connection only.</p>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Shurflo 2088 12V Pressure Pump</p><p class="item-desc">Self-priming, pressure-switch controlled. 11.3L/min. Workhorse of off-grid water. Strainer included.</p></div><div class="item-price"><p class="price-main">$120–160</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Accumulator Tank 0.75L</p><p class="item-desc">Stops pump rapid cycling, smooths pressure. Small, cheap, makes the pump last years longer.</p></div><div class="item-price"><p class="price-main">$35–55</p><p class="price-qty">each</p></div></div>
+    <div class="item featured" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Joolca Hottap 2.0 Portable Hot Water <span class="item-badge licensed">gas fitter</span></p><p class="item-desc">LPG, 12V fan ignition, 3.5L/min. Hang outside near the shower. No wall plumbing, no hot water system in the walls.</p></div><div class="item-price"><p class="price-main">$380–420</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">20mm PN12.5 Poly Pipe (per 10m)</p><p class="item-desc">Tank to cabin. UV stable. Bury 300mm under any vehicle path, surface clip elsewhere.</p></div><div class="item-price"><p class="price-main">$20–30</p><p class="price-qty">per 10m</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">15mm PEX Pipe + Push Fittings (internal)</p><p class="item-desc">Internal supply from pump to sink and shower cold feed. Easier than copper in a timber cabin build.</p></div><div class="item-price"><p class="price-main">$50–80</p><p class="price-qty">lot</p></div></div>
+  </div>
+
+  <!-- 11 · CONNECTIVITY -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">11</span>
+      <h2 class="section-title">Connectivity</h2>
+      <span class="section-subtotal">~$750–900</span>
+    </div>
+    <p class="section-note">Starlink Gen 3 + Cowfish Cosmo = full connectivity direct from your 12V bank. No inverter in this loop at all.</p>
+    <div class="item featured" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Starlink Standard Kit (Gen 3) <span class="item-badge hero">key item</span></p><p class="item-desc">~$599 hardware, ~$139/mo Regional plan. Works everywhere in SE Qld. Clear sky view — no trees on the horizon.</p></div><div class="item-price"><p class="price-main">~$599</p><p class="price-qty">hardware</p></div></div>
+    <div class="item featured" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Cowfish Technologies Cosmo — 12V Starlink Gen 3 Adapter <span class="item-badge hero">key item</span></p><p class="item-desc">Powers Starlink Gen 3 directly from your 12V battery — no inverter required. Lower draw than a 240V inverter setup. Purpose-built Australian product.</p></div><div class="item-price"><p class="price-main">~$120–180</p><p class="price-qty">each</p></div></div>
+  </div>
+
+  <!-- 12 · CONSUMABLES -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-number">12</span>
+      <h2 class="section-title">Consumables &amp; Tools</h2>
+      <span class="section-subtotal">~$60–100</span>
+    </div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Cable Ties Assorted (pack of 100)</p><p class="item-desc">You will never have enough. Black UV-rated for external, white inside. Get both packs.</p></div><div class="item-price"><p class="price-main">$10–15</p><p class="price-qty">pack</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Self-Amalgamating Tape × 2 rolls</p><p class="item-desc">Weatherproof any outdoor cable joint. MC4 connectors, pump inlet, external runs. Sticks to itself, no mess.</p></div><div class="item-price"><p class="price-main">$10–15</p><p class="price-qty">each</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">Dielectric Grease (small tube)</p><p class="item-desc">On every DC terminal before you torque it. Stops corrosion for years — especially anything near weather.</p></div><div class="item-price"><p class="price-main">$8–12</p><p class="price-qty">tube</p></div></div>
+    <div class="item" onclick="toggle(this)"><div class="cb"></div><div class="item-body"><p class="item-name">DC Clamp Meter (KAIWEETS or Uni-T)</p><p class="item-desc">Measures DC amps without breaking the circuit. Invaluable for commissioning and fault-finding. Under $50.</p></div><div class="item-price"><p class="price-main">$35–55</p><p class="price-qty">each</p></div></div>
+  </div>
+
+</main>
+
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:0.75rem 1.5rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--faint);text-align:center;">
+  <a href="index.html" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo; Cabin Power Shopping List
+</div>
+
+<script>
+  function toggle(el) {
+    el.classList.toggle('checked');
+    const all = document.querySelectorAll('.item').length;
+    const done = document.querySelectorAll('.item.checked').length;
+    document.getElementById('checkedCount').textContent = done + ' of ' + all + ' items ticked';
+  }
+</script>
+</body>
+</html>
