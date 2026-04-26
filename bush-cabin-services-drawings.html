@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bush Cabin — Services Drawings Sheets 4–5</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  .site-bar { background:#3a6a2a; padding:0.6rem 1.2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+  .site-bar a { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.85); text-decoration:none; }
+  .site-bar a:hover { color:white; }
+  .site-bar-title { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.55); }
+  .print-btn { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; background:transparent; color:rgba(255,255,255,0.85); border:1px solid rgba(255,255,255,0.35); padding:0.3rem 0.8rem; border-radius:2px; cursor:pointer; }
+  .print-btn:hover { background:rgba(255,255,255,0.1); }
+  @media print { .site-bar { display:none; } body { background:white !important; padding:0 !important; } }
+  body { background:#2a2a2a; margin:0; padding:24px; font-family:Arial,sans-serif; }
+  .sheet-wrap { margin:0 auto 32px auto; width:1122px; }
+  .sheet { background:#fff; width:1122px; height:794px; position:relative; box-shadow:0 6px 18px rgba(0,0,0,0.6); box-sizing:border-box; }
+  .border-line { position:absolute; top:10px; left:10px; right:10px; bottom:10px; border:2px solid #000; pointer-events:none; z-index:10; }
+  .title-block { position:absolute; bottom:12px; right:12px; width:290px; border:1.5px solid #000; font-size:8.5px; font-family:Arial,sans-serif; background:#fff; z-index:11; }
+  .title-block table { width:100%; border-collapse:collapse; }
+  .title-block td { border:0.5px solid #000; padding:2px 4px; line-height:1.3; }
+  .title-block .proj { font-size:10.5px; font-weight:bold; text-align:center; padding:3px 4px; }
+  .title-block .drwtitle { font-size:9.5px; font-weight:bold; text-align:center; padding:2px 4px; }
+  .title-block .shnum { font-size:9px; font-weight:bold; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="site-bar">
+  <a href="index.html">← Home</a>
+  <span class="site-bar-title">Bush Cabin — Services Drawings · Sheets 4–5</span>
+  <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SHEET 4 — ELECTRICAL SERVICES PLAN                                 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="sheet-wrap">
+<div class="sheet">
+<div class="border-line"></div>
+
+<svg width="1095" height="766" viewBox="0 0 1095 766" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;">
+<defs>
+  <marker id="arrowB" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+    <path d="M0,0 L6,3 L0,6 Z" fill="#333"/>
+  </marker>
+  <marker id="arrowN" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto">
+    <path d="M0,0 L5,2.5 L0,5 Z" fill="#000"/>
+  </marker>
+</defs>
+
+<!-- ─── SHEET TITLE ─── -->
+<text x="18" y="30" font-size="13" font-weight="bold" fill="#000">SHEET 4 — ELECTRICAL SERVICES PLAN</text>
+<text x="18" y="43" font-size="8.5" fill="#555">Off-Grid 12V/240V System — Bush Cabin, Groomsville Block, SE Qld — Scale 1:50 — Not for Regulatory Approval</text>
+<line x1="18" y1="48" x2="490" y2="48" stroke="#000" stroke-width="0.8"/>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- FLOOR PLAN AREA                                        -->
+<!-- Cabin outer: x=160–380, y=185–515 (4000×6000mm@1:50) -->
+<!-- ══════════════════════════════════════════════════════ -->
+
+<!-- Verandah outline (N face, 4000×2000mm = 220×110px) -->
+<rect x="160" y="75" width="220" height="110" fill="#f5f5f5" stroke="#aaa" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="270" y="130" font-size="7.5" fill="#888" text-anchor="middle">VERANDAH</text>
+<text x="270" y="140" font-size="7" fill="#888" text-anchor="middle">4000 × 2000</text>
+
+<!-- Cabin outer walls -->
+<rect x="160" y="185" width="220" height="330" fill="#eeeeee" stroke="#000" stroke-width="8"/>
+
+<!-- Cabin inner fill -->
+<rect x="169" y="194" width="202" height="312" fill="#fafafa" stroke="none"/>
+
+<!-- LOFT ZONE (S 3000mm = 165px, y=350–515) — hatched -->
+<rect x="169" y="350" width="202" height="156" fill="none" stroke="#bbb" stroke-width="0.5"/>
+<!-- hatch lines for loft floor -->
+<g stroke="#ccc" stroke-width="0.5">
+  <line x1="169" y1="360" x2="371" y2="360"/>
+  <line x1="169" y1="372" x2="371" y2="372"/>
+  <line x1="169" y1="384" x2="371" y2="384"/>
+  <line x1="169" y1="396" x2="371" y2="396"/>
+  <line x1="169" y1="408" x2="371" y2="408"/>
+  <line x1="169" y1="420" x2="371" y2="420"/>
+  <line x1="169" y1="432" x2="371" y2="432"/>
+  <line x1="169" y1="444" x2="371" y2="444"/>
+  <line x1="169" y1="456" x2="371" y2="456"/>
+  <line x1="169" y1="468" x2="371" y2="468"/>
+  <line x1="169" y1="480" x2="371" y2="480"/>
+  <line x1="169" y1="492" x2="371" y2="492"/>
+</g>
+<text x="270" y="356" font-size="7" fill="#888" text-anchor="middle" font-style="italic">LOFT ABOVE — FFL +2000mm</text>
+
+<!-- Loft line indicator -->
+<line x1="160" y1="350" x2="380" y2="350" stroke="#666" stroke-width="1" stroke-dasharray="8,3"/>
+
+<!-- Kitchen bench (W wall N half — 550mm deep × ~2800mm long) -->
+<!-- 550mm = 30px, bench x=160–190, y=194–350 -->
+<rect x="169" y="194" width="21" height="156" fill="#d4c9b0" stroke="#888" stroke-width="0.8"/>
+<text x="179" y="265" font-size="6" fill="#666" text-anchor="middle" transform="rotate(-90,179,265)">KITCHEN BENCH 550dp</text>
+
+<!-- Sink symbol on bench -->
+<rect x="171" y="216" width="16" height="18" fill="#aaccdd" stroke="#555" stroke-width="0.8" rx="1"/>
+<line x1="179" y1="217" x2="179" y2="233" stroke="#555" stroke-width="0.5"/>
+<line x1="171" y1="225" x2="187" y2="225" stroke="#555" stroke-width="0.5"/>
+
+<!-- Stove symbol (2-burner) -->
+<rect x="171" y="240" width="16" height="16" fill="#e8e0d0" stroke="#555" stroke-width="0.8"/>
+<circle cx="175" cy="244" r="3" fill="none" stroke="#555" stroke-width="0.8"/>
+<circle cx="183" cy="244" r="3" fill="none" stroke="#555" stroke-width="0.8"/>
+<circle cx="175" cy="252" r="3" fill="none" stroke="#555" stroke-width="0.8"/>
+<circle cx="183" cy="252" r="3" fill="none" stroke="#555" stroke-width="0.8"/>
+
+<!-- Fridge -->
+<rect x="171" y="261" width="16" height="30" fill="#dde8ee" stroke="#555" stroke-width="0.8"/>
+<text x="179" y="279" font-size="5" fill="#555" text-anchor="middle">FRG</text>
+
+<!-- Wood stove (circle) -->
+<circle cx="179" cy="322" r="11" fill="#c8a070" stroke="#555" stroke-width="1"/>
+<text x="179" y="325" font-size="5.5" fill="#333" text-anchor="middle">WS</text>
+
+<!-- North door (820mm = 45px, centered x=270 → x=247–293) -->
+<rect x="247" y="185" width="46" height="9" fill="#fff" stroke="none"/>
+<!-- door opening gap -->
+<line x1="247" y1="185" x2="247" y2="194" stroke="#000" stroke-width="2"/>
+<line x1="293" y1="185" x2="293" y2="194" stroke="#000" stroke-width="2"/>
+<!-- door swing arc (schematic) -->
+<path d="M247,194 A46,46 0 0,1 293,194" fill="none" stroke="#000" stroke-width="0.8" stroke-dasharray="2,2"/>
+
+<!-- West window (900mm = 50px, center y≈330) -->
+<rect x="160" y="305" width="9" height="50" fill="#cce4f0" stroke="#000" stroke-width="1.5"/>
+<line x1="160" y1="330" x2="169" y2="330" stroke="#000" stroke-width="0.5"/>
+
+<!-- East window (900mm = 50px) -->
+<rect x="371" y="305" width="9" height="50" fill="#cce4f0" stroke="#000" stroke-width="1.5"/>
+<line x1="371" y1="330" x2="380" y2="330" stroke="#000" stroke-width="0.5"/>
+
+<!-- South window (600mm = 33px, centered) -->
+<rect x="253" y="506" width="33" height="9" fill="#cce4f0" stroke="#000" stroke-width="1.5"/>
+<line x1="269" y1="506" x2="269" y2="515" stroke="#000" stroke-width="0.5"/>
+
+<!-- Stairs (E side, x=333–371, y=218–346) -->
+<rect x="333" y="218" width="38" height="128" fill="#e8e8e8" stroke="#666" stroke-width="0.8"/>
+<!-- stair treads -->
+<g stroke="#888" stroke-width="0.5">
+  <line x1="333" y1="232" x2="371" y2="232"/>
+  <line x1="333" y1="246" x2="371" y2="246"/>
+  <line x1="333" y1="260" x2="371" y2="260"/>
+  <line x1="333" y1="274" x2="371" y2="274"/>
+  <line x1="333" y1="288" x2="371" y2="288"/>
+  <line x1="333" y1="302" x2="371" y2="302"/>
+  <line x1="333" y1="316" x2="371" y2="316"/>
+  <line x1="333" y1="330" x2="371" y2="330"/>
+</g>
+<text x="352" y="287" font-size="6" fill="#666" text-anchor="middle">UP</text>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- POWER CENTRE BOX (E wall N, x=335–371, y=197–252) -->
+<!-- ══════════════════════════════════════════════ -->
+<!-- Shown left of stair block, upper E section -->
+<!-- Shift slightly to fit: x=315–335, y=197–252 (in wall zone) -->
+<rect x="315" y="200" width="18" height="48" fill="#fff9d4" stroke="#cc8800" stroke-width="1.5"/>
+<text x="324" y="211" font-size="4.5" fill="#885500" text-anchor="middle" font-weight="bold">PWR</text>
+<text x="324" y="218" font-size="4.5" fill="#885500" text-anchor="middle" font-weight="bold">CTR</text>
+<text x="324" y="228" font-size="4" fill="#885500" text-anchor="middle">MPPT</text>
+<text x="324" y="235" font-size="4" fill="#885500" text-anchor="middle">INV</text>
+<text x="324" y="242" font-size="4" fill="#885500" text-anchor="middle">RCD</text>
+<text x="324" y="248" font-size="4" fill="#885500" text-anchor="middle">12V DB</text>
+
+<!-- Solar array annotation (on roof, dashed) -->
+<rect x="260" y="60" width="100" height="46" fill="none" stroke="#e8a000" stroke-width="1" stroke-dasharray="4,2"/>
+<text x="310" y="76" font-size="7" fill="#c07000" text-anchor="middle" font-weight="bold">2 × 200W SOLAR</text>
+<text x="310" y="87" font-size="6.5" fill="#c07000" text-anchor="middle">ROOF MOUNT — E FACE</text>
+<text x="310" y="97" font-size="6" fill="#c07000" text-anchor="middle">Victron SmartSolar MPPT 40A</text>
+
+<!-- Solar cable (yellow dashed) from array down to PWR CTR -->
+<line x1="310" y1="106" x2="324" y2="200" stroke="#e8a000" stroke-width="1.5" stroke-dasharray="4,2"/>
+<text x="316" y="158" font-size="6" fill="#c07000" transform="rotate(-75,316,158)">SOLAR CABLE 6mm²</text>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- CIRCUIT ROUTES                                                     -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<!-- L1 — Ground floor lighting (blue dashed) -->
+<g stroke="#1155cc" stroke-width="1.2" stroke-dasharray="5,2" fill="none">
+  <!-- trunk from PWR CTR west along y=213 -->
+  <line x1="315" y1="213" x2="210" y2="213"/>
+  <!-- south branch y=213→y=315 at x=210 -->
+  <line x1="210" y1="213" x2="210" y2="315"/>
+  <!-- cross trunk east along y=315 -->
+  <line x1="210" y1="315" x2="320" y2="315"/>
+  <!-- smoke alarm spur -->
+  <line x1="262" y1="213" x2="262" y2="263"/>
+</g>
+
+<!-- L1 downlight symbols -->
+<!-- DL at (220,213) -->
+<circle cx="220" cy="213" r="5" fill="#ffffcc" stroke="#1155cc" stroke-width="1"/>
+<line x1="217" y1="210" x2="223" y2="216" stroke="#1155cc" stroke-width="0.8"/>
+<line x1="217" y1="216" x2="223" y2="210" stroke="#1155cc" stroke-width="0.8"/>
+<!-- DL at (310,213) -->
+<circle cx="305" cy="213" r="5" fill="#ffffcc" stroke="#1155cc" stroke-width="1"/>
+<line x1="302" y1="210" x2="308" y2="216" stroke="#1155cc" stroke-width="0.8"/>
+<line x1="302" y1="216" x2="308" y2="210" stroke="#1155cc" stroke-width="0.8"/>
+<!-- DL at (210,315) -->
+<circle cx="210" cy="315" r="5" fill="#ffffcc" stroke="#1155cc" stroke-width="1"/>
+<line x1="207" y1="312" x2="213" y2="318" stroke="#1155cc" stroke-width="0.8"/>
+<line x1="207" y1="318" x2="213" y2="312" stroke="#1155cc" stroke-width="0.8"/>
+<!-- DL at (320,315) -->
+<circle cx="320" cy="315" r="5" fill="#ffffcc" stroke="#1155cc" stroke-width="1"/>
+<line x1="317" y1="312" x2="323" y2="318" stroke="#1155cc" stroke-width="0.8"/>
+<line x1="317" y1="318" x2="323" y2="312" stroke="#1155cc" stroke-width="0.8"/>
+<!-- Smoke alarm at (262,263) -->
+<circle cx="262" cy="263" r="5" fill="#ffd0d0" stroke="#cc2200" stroke-width="1"/>
+<text x="262" y="266" font-size="4.5" fill="#cc2200" text-anchor="middle" font-weight="bold">SD</text>
+
+<!-- L2 — Loft lighting (blue dashed, slightly different dash) -->
+<g stroke="#2288ee" stroke-width="1.2" stroke-dasharray="3,2" fill="none">
+  <line x1="315" y1="238" x2="315" y2="430"/>
+  <line x1="315" y1="430" x2="215" y2="430"/>
+</g>
+<!-- Loft DL at (310,430) -->
+<circle cx="315" cy="430" r="5" fill="#ffffcc" stroke="#2288ee" stroke-width="1"/>
+<line x1="312" y1="427" x2="318" y2="433" stroke="#2288ee" stroke-width="0.8"/>
+<line x1="312" y1="433" x2="318" y2="427" stroke="#2288ee" stroke-width="0.8"/>
+<!-- Loft DL at (215,430) -->
+<circle cx="215" cy="430" r="5" fill="#ffffcc" stroke="#2288ee" stroke-width="1"/>
+<line x1="212" y1="427" x2="218" y2="433" stroke="#2288ee" stroke-width="0.8"/>
+<line x1="212" y1="433" x2="218" y2="427" stroke="#2288ee" stroke-width="0.8"/>
+<text x="270" y="445" font-size="6" fill="#2288ee" text-anchor="middle">(L2 — LOFT)</text>
+
+<!-- L3 — 12V Fridge outlet (blue solid) -->
+<g stroke="#004499" stroke-width="1.2" stroke-dasharray="7,2" fill="none">
+  <line x1="315" y1="220" x2="190" y2="220"/>
+  <line x1="190" y1="220" x2="190" y2="275"/>
+</g>
+<!-- 12V outlet symbol -->
+<rect x="185" y="272" width="10" height="7" fill="#e8f0ff" stroke="#004499" stroke-width="0.8"/>
+<text x="190" y="278" font-size="4.5" fill="#004499" text-anchor="middle">12V</text>
+<text x="168" y="285" font-size="6" fill="#004499">FRIDGE</text>
+
+<!-- L4 — Starlink 12V (exits E wall) -->
+<g stroke="#006688" stroke-width="1.2" stroke-dasharray="4,2" fill="none">
+  <line x1="333" y1="208" x2="380" y2="208"/>
+</g>
+<text x="384" y="211" font-size="6" fill="#006688">STARLINK 12V →</text>
+
+<!-- L5 — USB outlets -->
+<g stroke="#3366aa" stroke-width="1" stroke-dasharray="2,2" fill="none">
+  <!-- bench USB -->
+  <line x1="315" y1="225" x2="193" y2="225"/>
+  <!-- loft USB spur -->
+  <line x1="315" y1="252" x2="315" y2="395"/>
+  <line x1="315" y1="395" x2="371" y2="395"/>
+</g>
+<!-- USB symbol bench -->
+<rect x="189" y="222" width="10" height="7" fill="#e8f4ff" stroke="#3366aa" stroke-width="0.8"/>
+<text x="194" y="228" font-size="4" fill="#3366aa" text-anchor="middle">USB</text>
+<!-- USB loft -->
+<rect x="363" y="392" width="10" height="7" fill="#e8f4ff" stroke="#3366aa" stroke-width="0.8"/>
+<text x="368" y="397" font-size="4" fill="#3366aa" text-anchor="middle">USB</text>
+
+<!-- L6 — Pump supply (exits W wall) -->
+<g stroke="#004488" stroke-width="1.5" stroke-dasharray="6,2" fill="none">
+  <line x1="315" y1="232" x2="169" y2="232"/>
+  <line x1="169" y1="232" x2="160" y2="232"/>
+</g>
+<text x="140" y="229" font-size="6" fill="#004488" text-anchor="end">← PUMP 6mm²</text>
+<text x="140" y="237" font-size="5.5" fill="#004488" text-anchor="end">UG TO TANK</text>
+
+<!-- VD — Verandah circuit (green dashed) -->
+<g stroke="#007722" stroke-width="1.2" stroke-dasharray="4,2" fill="none">
+  <line x1="324" y1="200" x2="272" y2="200"/>
+  <line x1="272" y1="200" x2="272" y2="135"/>
+  <!-- branch to ext GPO -->
+  <line x1="272" y1="150" x2="355" y2="150"/>
+</g>
+<!-- Verandah light -->
+<circle cx="272" cy="130" r="5" fill="#ffffcc" stroke="#007722" stroke-width="1"/>
+<line x1="269" y1="127" x2="275" y2="133" stroke="#007722" stroke-width="0.8"/>
+<line x1="269" y1="133" x2="275" y2="127" stroke="#007722" stroke-width="0.8"/>
+<text x="279" y="128" font-size="5.5" fill="#007722">VD-L1</text>
+<!-- Ext WP GPO -->
+<rect x="350" y="146" width="10" height="8" fill="#e8ffe8" stroke="#007722" stroke-width="0.8"/>
+<text x="355" y="153" font-size="4" fill="#007722" text-anchor="middle">WP</text>
+<text x="365" y="153" font-size="5.5" fill="#007722">EXT GPO</text>
+
+<!-- A1 — AC GPO circuit (red dashed, LICENSED) -->
+<g stroke="#cc2200" stroke-width="1.5" stroke-dasharray="5,2" fill="none">
+  <!-- E wall GPO -->
+  <line x1="315" y1="249" x2="371" y2="249"/>
+  <!-- W wall bench GPO -->
+  <line x1="315" y1="249" x2="193" y2="249"/>
+</g>
+<!-- E wall GPO symbol -->
+<rect x="366" y="244" width="9" height="10" fill="#ffe8e8" stroke="#cc2200" stroke-width="1"/>
+<text x="371" y="252" font-size="4" fill="#cc2200" text-anchor="middle">GPO</text>
+<text x="381" y="249" font-size="5.5" fill="#cc2200">240V ★</text>
+<!-- W bench GPO -->
+<rect x="187" y="244" width="9" height="10" fill="#ffe8e8" stroke="#cc2200" stroke-width="1"/>
+<text x="191" y="252" font-size="4" fill="#cc2200" text-anchor="middle">GPO</text>
+<text x="168" y="248" font-size="5.5" fill="#cc2200" text-anchor="end">240V ★</text>
+
+<!-- A2 — AC GPO loft (red dashed, LICENSED) -->
+<g stroke="#cc2200" stroke-width="1.5" stroke-dasharray="3,3" fill="none">
+  <line x1="315" y1="253" x2="271" y2="253"/>
+  <line x1="271" y1="253" x2="271" y2="490"/>
+  <line x1="271" y1="490" x2="271" y2="506"/>
+</g>
+<!-- S wall GPO loft -->
+<rect x="265" y="501" width="11" height="10" fill="#ffe8e8" stroke="#cc2200" stroke-width="1"/>
+<text x="270" y="509" font-size="4" fill="#cc2200" text-anchor="middle">GPO</text>
+<text x="253" y="498" font-size="5.5" fill="#cc2200" text-anchor="end">LOFT GPO★</text>
+
+<!-- ── CIRCUIT LABELS / CALL-OUTS ── -->
+<text x="185" y="209" font-size="5.5" fill="#1155cc">L1</text>
+<text x="185" y="320" font-size="5.5" fill="#1155cc">L1</text>
+<text x="302" y="425" font-size="5.5" fill="#2288ee">L2</text>
+<text x="214" y="420" font-size="5.5" fill="#2288ee">L2</text>
+
+<!-- ── COMPASS ROSE ── -->
+<g transform="translate(90,115)">
+  <circle cx="0" cy="0" r="14" fill="none" stroke="#444" stroke-width="0.8"/>
+  <polygon points="0,-13 3,-5 0,-7 -3,-5" fill="#000"/>
+  <polygon points="0,13 3,5 0,7 -3,5" fill="#ccc" stroke="#444" stroke-width="0.5"/>
+  <polygon points="-13,0 -5,3 -7,0 -5,-3" fill="#ccc" stroke="#444" stroke-width="0.5"/>
+  <polygon points="13,0 5,3 7,0 5,-3" fill="#ccc" stroke="#444" stroke-width="0.5"/>
+  <text x="0" y="-17" font-size="8" text-anchor="middle" font-weight="bold">N</text>
+</g>
+<text x="90" y="140" font-size="6" fill="#444" text-anchor="middle">TRUE NORTH</text>
+
+<!-- ── SCALE BAR ── -->
+<text x="18" y="554" font-size="7" fill="#333" font-weight="bold">SCALE 1:50</text>
+<g transform="translate(18,562)">
+  <rect x="0" y="0" width="55" height="5" fill="#000"/>
+  <rect x="55" y="0" width="55" height="5" fill="#fff" stroke="#000" stroke-width="0.5"/>
+  <rect x="110" y="0" width="55" height="5" fill="#000"/>
+  <rect x="165" y="0" width="55" height="5" fill="#fff" stroke="#000" stroke-width="0.5"/>
+  <line x1="0" y1="0" x2="0" y2="8" stroke="#000" stroke-width="0.8"/>
+  <line x1="55" y1="0" x2="55" y2="8" stroke="#000" stroke-width="0.8"/>
+  <line x1="110" y1="0" x2="110" y2="8" stroke="#000" stroke-width="0.8"/>
+  <line x1="165" y1="0" x2="165" y2="8" stroke="#000" stroke-width="0.8"/>
+  <line x1="220" y1="0" x2="220" y2="8" stroke="#000" stroke-width="0.8"/>
+  <text x="0" y="16" font-size="6" text-anchor="middle">0</text>
+  <text x="55" y="16" font-size="6" text-anchor="middle">1m</text>
+  <text x="110" y="16" font-size="6" text-anchor="middle">2m</text>
+  <text x="165" y="16" font-size="6" text-anchor="middle">3m</text>
+  <text x="220" y="16" font-size="6" text-anchor="middle">4m</text>
+</g>
+
+<!-- Dimension annotations -->
+<g fill="#444" stroke="#444" font-size="6.5">
+  <!-- Width 4000mm -->
+  <line x1="160" y1="580" x2="380" y2="580" stroke="#444" stroke-width="0.7"/>
+  <line x1="160" y1="575" x2="160" y2="585" stroke="#444" stroke-width="0.7"/>
+  <line x1="380" y1="575" x2="380" y2="585" stroke="#444" stroke-width="0.7"/>
+  <text x="270" y="576" text-anchor="middle">4000</text>
+  <!-- Height 6000mm -->
+  <line x1="130" y1="185" x2="130" y2="515" stroke="#444" stroke-width="0.7"/>
+  <line x1="125" y1="185" x2="135" y2="185" stroke="#444" stroke-width="0.7"/>
+  <line x1="125" y1="515" x2="135" y2="515" stroke="#444" stroke-width="0.7"/>
+  <text x="126" y="352" text-anchor="middle" transform="rotate(-90,126,352)">6000</text>
+</g>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- RIGHT PANEL — CIRCUIT SCHEDULE + LEGEND                          -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<line x1="505" y1="15" x2="505" y2="740" stroke="#aaa" stroke-width="0.8"/>
+
+<!-- CIRCUIT SCHEDULE heading -->
+<rect x="510" y="18" width="565" height="14" fill="#1a2a4a"/>
+<text x="793" y="29" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">CIRCUIT SCHEDULE</text>
+
+<!-- Column headers -->
+<rect x="510" y="32" width="565" height="11" fill="#e8ecf2"/>
+<text x="521" y="41" font-size="7" font-weight="bold" fill="#222">Ref</text>
+<text x="545" y="41" font-size="7" font-weight="bold" fill="#222">Description</text>
+<text x="720" y="41" font-size="7" font-weight="bold" fill="#222">Cable</text>
+<text x="780" y="41" font-size="7" font-weight="bold" fill="#222">Fuse</text>
+<text x="830" y="41" font-size="7" font-weight="bold" fill="#222">Protect</text>
+<text x="890" y="41" font-size="7" font-weight="bold" fill="#222">By</text>
+<text x="940" y="41" font-size="7" font-weight="bold" fill="#222">Notes</text>
+<line x1="510" y1="43" x2="1075" y2="43" stroke="#999" stroke-width="0.5"/>
+
+<!-- Circuit rows -->
+<!-- L1 -->
+<rect x="510" y="44" width="565" height="12" fill="#f0f4ff"/>
+<rect x="510" y="44" width="4" height="12" fill="#1155cc"/>
+<text x="521" y="53" font-size="6.5" fill="#1155cc" font-weight="bold">L1</text>
+<text x="545" y="53" font-size="6.5" fill="#222">GF Lighting — 4× LED downlights + smoke alarm</text>
+<text x="720" y="53" font-size="6.5" fill="#222">2.5mm² TPS</text>
+<text x="780" y="53" font-size="6.5" fill="#222">10A</text>
+<text x="830" y="53" font-size="6.5" fill="#222">12V DC</text>
+<text x="890" y="53" font-size="6.5" fill="#222">DIY</text>
+<text x="940" y="53" font-size="6.5" fill="#555">LED <5W ea, ≤20W total</text>
+
+<!-- L2 -->
+<rect x="510" y="56" width="565" height="12" fill="#fff"/>
+<rect x="510" y="56" width="4" height="12" fill="#2288ee"/>
+<text x="521" y="65" font-size="6.5" fill="#2288ee" font-weight="bold">L2</text>
+<text x="545" y="65" font-size="6.5" fill="#222">Loft Lighting — 2× LED downlights</text>
+<text x="720" y="65" font-size="6.5" fill="#222">2.5mm² TPS</text>
+<text x="780" y="65" font-size="6.5" fill="#222">10A</text>
+<text x="830" y="65" font-size="6.5" fill="#222">12V DC</text>
+<text x="890" y="65" font-size="6.5" fill="#222">DIY</text>
+<text x="940" y="65" font-size="6.5" fill="#555">Separate loft circuit</text>
+
+<!-- L3 -->
+<rect x="510" y="68" width="565" height="12" fill="#f0f4ff"/>
+<rect x="510" y="68" width="4" height="12" fill="#004499"/>
+<text x="521" y="77" font-size="6.5" fill="#004499" font-weight="bold">L3</text>
+<text x="545" y="77" font-size="6.5" fill="#222">12V Fridge outlet — dedicated circuit</text>
+<text x="720" y="77" font-size="6.5" fill="#222">4mm² TPS</text>
+<text x="780" y="77" font-size="6.5" fill="#222">20A</text>
+<text x="830" y="77" font-size="6.5" fill="#222">12V DC</text>
+<text x="890" y="77" font-size="6.5" fill="#222">DIY</text>
+<text x="940" y="77" font-size="6.5" fill="#555">12V compressor fridge ~4–6A</text>
+
+<!-- L4 -->
+<rect x="510" y="80" width="565" height="12" fill="#fff"/>
+<rect x="510" y="80" width="4" height="12" fill="#006688"/>
+<text x="521" y="89" font-size="6.5" fill="#006688" font-weight="bold">L4</text>
+<text x="545" y="89" font-size="6.5" fill="#222">Starlink 12V direct — E wall penetration</text>
+<text x="720" y="89" font-size="6.5" fill="#222">4mm² TPS</text>
+<text x="780" y="89" font-size="6.5" fill="#222">15A</text>
+<text x="830" y="89" font-size="6.5" fill="#222">12V DC</text>
+<text x="890" y="89" font-size="6.5" fill="#222">DIY</text>
+<text x="940" y="89" font-size="6.5" fill="#555">12V adapter ~3–4A</text>
+
+<!-- L5 -->
+<rect x="510" y="92" width="565" height="12" fill="#f0f4ff"/>
+<rect x="510" y="92" width="4" height="12" fill="#3366aa"/>
+<text x="521" y="101" font-size="6.5" fill="#3366aa" font-weight="bold">L5</text>
+<text x="545" y="101" font-size="6.5" fill="#222">USB outlets — bench ×1 + loft ×1</text>
+<text x="720" y="101" font-size="6.5" fill="#222">2.5mm² TPS</text>
+<text x="780" y="101" font-size="6.5" fill="#222">10A</text>
+<text x="830" y="101" font-size="6.5" fill="#222">12V DC</text>
+<text x="890" y="101" font-size="6.5" fill="#222">DIY</text>
+<text x="940" y="101" font-size="6.5" fill="#555">USB-A/C panel, ≤5A total</text>
+
+<!-- L6 -->
+<rect x="510" y="104" width="565" height="12" fill="#fff"/>
+<rect x="510" y="104" width="4" height="12" fill="#004488"/>
+<text x="521" y="113" font-size="6.5" fill="#004488" font-weight="bold">L6</text>
+<text x="545" y="113" font-size="6.5" fill="#222">Pump supply — exits W wall, underground to tank</text>
+<text x="720" y="113" font-size="6.5" fill="#222">6mm² TPS</text>
+<text x="780" y="113" font-size="6.5" fill="#222">20A</text>
+<text x="830" y="113" font-size="6.5" fill="#222">12V DC</text>
+<text x="890" y="113" font-size="6.5" fill="#222">DIY</text>
+<text x="940" y="113" font-size="6.5" fill="#555">Shurflo 5.5A; 6mm²=3.3% drop</text>
+
+<!-- VD -->
+<rect x="510" y="116" width="565" height="12" fill="#f0fff4"/>
+<rect x="510" y="116" width="4" height="12" fill="#007722"/>
+<text x="521" y="125" font-size="6.5" fill="#007722" font-weight="bold">VD</text>
+<text x="545" y="125" font-size="6.5" fill="#222">Verandah — 1× light + 1× WP ext GPO (12V)</text>
+<text x="720" y="125" font-size="6.5" fill="#222">2.5mm² TPS</text>
+<text x="780" y="125" font-size="6.5" fill="#222">10A</text>
+<text x="830" y="125" font-size="6.5" fill="#222">12V DC</text>
+<text x="890" y="125" font-size="6.5" fill="#222">DIY</text>
+<text x="940" y="125" font-size="6.5" fill="#555">WP GPO for tools/charging</text>
+
+<!-- A1 -->
+<rect x="510" y="128" width="565" height="12" fill="#fff8f8"/>
+<rect x="510" y="128" width="4" height="12" fill="#cc2200"/>
+<text x="521" y="137" font-size="6.5" fill="#cc2200" font-weight="bold">A1</text>
+<text x="545" y="137" font-size="6.5" fill="#222">240V GPO — E wall + W bench (2× outlets)</text>
+<text x="720" y="137" font-size="6.5" fill="#222">2.5mm² TPS</text>
+<text x="780" y="137" font-size="6.5" fill="#222">10A</text>
+<text x="830" y="137" font-size="6.5" fill="#222">240V + RCD</text>
+<text x="890" y="137" font-size="6.5" fill="#cc2200" font-weight="bold">LICENSED ★</text>
+<text x="940" y="137" font-size="6.5" fill="#555">From inverter RCD sub-board</text>
+
+<!-- A2 -->
+<rect x="510" y="140" width="565" height="12" fill="#fff8f8"/>
+<rect x="510" y="140" width="4" height="12" fill="#cc2200"/>
+<text x="521" y="149" font-size="6.5" fill="#cc2200" font-weight="bold">A2</text>
+<text x="545" y="149" font-size="6.5" fill="#222">240V GPO — loft S wall (1× outlet)</text>
+<text x="720" y="149" font-size="6.5" fill="#222">2.5mm² TPS</text>
+<text x="780" y="149" font-size="6.5" fill="#222">10A</text>
+<text x="830" y="149" font-size="6.5" fill="#222">240V + RCD</text>
+<text x="890" y="149" font-size="6.5" fill="#cc2200" font-weight="bold">LICENSED ★</text>
+<text x="940" y="149" font-size="6.5" fill="#555">Run cable in conduit in wall</text>
+
+<line x1="510" y1="152" x2="1075" y2="152" stroke="#999" stroke-width="0.5"/>
+
+<!-- POWER SYSTEM SUMMARY -->
+<rect x="510" y="157" width="565" height="14" fill="#1a2a4a"/>
+<text x="793" y="168" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">POWER SYSTEM SUMMARY</text>
+
+<!-- 2-column layout for power summary -->
+<g font-size="7" fill="#222">
+  <!-- Left col -->
+  <text x="515" y="184" font-weight="bold">GENERATION</text>
+  <text x="515" y="194">Solar Array: 2 × 200W = 400W peak (E-facing roof)</text>
+  <text x="515" y="204">Controller: Victron SmartSolar MPPT 40A</text>
+  <text x="515" y="214">Estimated daily harvest: 1.0–1.6kWh (SE Qld)</text>
+
+  <text x="515" y="228" font-weight="bold">STORAGE</text>
+  <text x="515" y="238">Battery: 2 × 100Ah 12V LiFePO4 = 200Ah / 2.4kWh usable</text>
+  <text x="515" y="248">Usable DOD 100% (LFP chemistry)</text>
+  <text x="515" y="258">Days autonomy (est. load 400Wh/day): ~6 days</text>
+
+  <!-- Right col -->
+  <text x="793" y="184" font-weight="bold">DISTRIBUTION</text>
+  <text x="793" y="194">12V DC: Blue Sea fused distribution block (main 12V loads)</text>
+  <text x="793" y="204">240V AC: 800–1000W pure sine inverter → RCD sub-board</text>
+  <text x="793" y="214">AC for convenience only — limit continuous loads (&lt;500W)</text>
+
+  <text x="793" y="228" font-weight="bold">ESTIMATED DAILY LOADS</text>
+  <text x="793" y="238">Lighting 4× 5W LED, 4h = 80Wh</text>
+  <text x="793" y="248">Fridge 12V 40W avg = 160Wh (40% duty)</text>
+  <text x="793" y="258">Starlink 12V ~30W, 4h = 120Wh   Total ≈ 360–450Wh</text>
+</g>
+<line x1="510" y1="264" x2="1075" y2="264" stroke="#ccc" stroke-width="0.5"/>
+
+<!-- LEGEND -->
+<rect x="510" y="268" width="565" height="14" fill="#2a3a2a"/>
+<text x="793" y="279" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">LEGEND — ELECTRICAL</text>
+
+<!-- Legend items row 1 -->
+<g font-size="7" fill="#222">
+  <!-- LED Downlight -->
+  <circle cx="522" cy="298" r="5" fill="#ffffcc" stroke="#1155cc" stroke-width="1"/>
+  <line x1="519" y1="295" x2="525" y2="301" stroke="#1155cc" stroke-width="0.8"/>
+  <line x1="519" y1="301" x2="525" y2="295" stroke="#1155cc" stroke-width="0.8"/>
+  <text x="531" y="301">LED Downlight (12V, ≤5W)</text>
+
+  <!-- Smoke alarm -->
+  <circle cx="680" cy="298" r="5" fill="#ffd0d0" stroke="#cc2200" stroke-width="1"/>
+  <text x="677" y="302" font-size="4.5" fill="#cc2200" text-anchor="middle" font-weight="bold">SD</text>
+  <text x="689" y="301">Smoke/Heat Alarm (mains-equivalent)</text>
+
+  <!-- GPO 240V -->
+  <rect x="848" cy="293" x="848" y="294" width="9" height="8" fill="#ffe8e8" stroke="#cc2200" stroke-width="1"/>
+  <text x="860" y="301">GPO 240V AC ★ Licensed</text>
+</g>
+
+<!-- Legend items row 2 -->
+<g font-size="7" fill="#222">
+  <!-- 12V outlet -->
+  <rect x="517" y="309" width="9" height="7" fill="#e8f0ff" stroke="#004499" stroke-width="0.8"/>
+  <text x="519" y="315" font-size="4.5" fill="#004499">12V</text>
+  <text x="531" y="315">12V DC Outlet</text>
+
+  <!-- USB -->
+  <rect x="676" y="309" width="9" height="7" fill="#e8f4ff" stroke="#3366aa" stroke-width="0.8"/>
+  <text x="679" y="315" font-size="4.5" fill="#3366aa">USB</text>
+  <text x="689" y="315">USB Outlet (12V powered)</text>
+
+  <!-- WP GPO -->
+  <rect x="846" y="309" width="9" height="8" fill="#e8ffe8" stroke="#007722" stroke-width="0.8"/>
+  <text x="850" y="315" font-size="4.5" fill="#007722">WP</text>
+  <text x="860" y="315">Weatherproof External GPO</text>
+</g>
+
+<!-- Legend circuit lines -->
+<g font-size="7" fill="#222">
+  <line x1="515" y1="327" x2="543" y2="327" stroke="#1155cc" stroke-width="1.5" stroke-dasharray="5,2"/>
+  <text x="548" y="330">12V DC circuit — DIY permitted</text>
+
+  <line x1="676" y1="327" x2="704" y2="327" stroke="#cc2200" stroke-width="1.5" stroke-dasharray="5,2"/>
+  <text x="709" y="330">240V AC circuit — ★ LICENSED ELECTRICIAN REQUIRED</text>
+
+  <line x1="515" y1="340" x2="543" y2="340" stroke="#e8a000" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="548" y="343">Solar cable (6mm² DC)</text>
+
+  <line x1="676" y1="340" x2="704" y2="340" stroke="#007722" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="709" y="343">Verandah/exterior circuit (12V)</text>
+</g>
+<line x1="510" y1="350" x2="1075" y2="350" stroke="#ccc" stroke-width="0.5"/>
+
+<!-- LICENSING NOTE -->
+<rect x="510" y="354" width="565" height="12" fill="#660000"/>
+<text x="793" y="364" font-size="8.5" font-weight="bold" fill="#fff" text-anchor="middle">★ LICENSING NOTE — READ BEFORE COMMENCING ELECTRICAL WORK</text>
+
+<g font-size="7" fill="#222">
+  <text x="515" y="380">All 240V AC wiring (circuits A1, A2) must be installed by a licensed electrical contractor (EC) in accordance with AS/NZS 3000:2018 (Wiring Rules).</text>
+  <text x="515" y="391">In Queensland, connection of any fixed 240V wiring is Electrical Contractor work under the Electrical Safety Act 2002 (Qld). A compliance certificate (CCEW) must be issued.</text>
+  <text x="515" y="402">12V DC wiring (circuits L1–L6, VD) may be owner-installed under Queensland exemptions for Extra-Low Voltage (ELV, ≤50V DC) systems. Maintain safe practices:</text>
+  <text x="515" y="413">use correctly rated cable, fuses/breakers, proper terminals, and conduit where cables pass through walls or subfloor. Retain as-built drawings.</text>
+  <text x="515" y="424">Solar PV panel installation on roof: roof penetrations and panel mounting should be assessed by EC or roofer. PV array itself (12V/24V system) is ELV — owner work permitted.</text>
+  <text x="515" y="435">Inverter connection to battery: ELV — owner work permitted. RCD sub-board and any 240V connections from inverter output: LICENSED ONLY.</text>
+</g>
+<line x1="510" y1="440" x2="1075" y2="440" stroke="#ccc" stroke-width="0.5"/>
+
+<!-- POWER CENTRE DETAIL BOX -->
+<rect x="510" y="444" width="265" height="14" fill="#cc8800"/>
+<text x="642" y="455" font-size="8.5" font-weight="bold" fill="#fff" text-anchor="middle">POWER CENTRE LAYOUT (SCHEMATIC)</text>
+
+<rect x="510" y="458" width="265" height="120" fill="#fffde8" stroke="#cc8800" stroke-width="1"/>
+<g font-size="7" fill="#333">
+  <text x="518" y="471" font-weight="bold">POWER CENTRE — WALL-MOUNT BOX, E WALL N END</text>
+  <text x="518" y="483">┌─────────────────────────────────────┐</text>
+  <text x="518" y="493">│  SOLAR IN ←  [MPPT 40A VICTRON]     │</text>
+  <text x="518" y="503">│  BAT + / –   [200Ah LFP 12V]         │</text>
+  <text x="518" y="513">│  DC LOADS →  [Blue Sea Fused DB]      │</text>
+  <text x="518" y="523">│  240V OUT →  [800W INV] → [RCD BOARD] │</text>
+  <text x="518" y="533">│  MONITOR:    [Victron SmartShunt]      │</text>
+  <text x="518" y="543">└─────────────────────────────────────┘</text>
+  <text x="518" y="556">Min box size: 600W×400H×200D mm. Vented.</text>
+  <text x="518" y="566">Batteries in adjacent vented cabinet.</text>
+  <text x="518" y="576">All cables labelled, fused at source.</text>
+</g>
+
+<!-- INSTALLATION NOTES -->
+<rect x="783" y="444" width="292" height="14" fill="#2a3a2a"/>
+<text x="929" y="455" font-size="8.5" font-weight="bold" fill="#fff" text-anchor="middle">INSTALLATION NOTES</text>
+
+<g font-size="7" fill="#222">
+  <text x="788" y="471" font-weight="bold">CABLE ROUTING:</text>
+  <text x="788" y="481">• All 12V DC cables run in subfloor void or ceiling space</text>
+  <text x="788" y="491">• Cables penetrating wall plates must be in conduit (min 20mm)</text>
+  <text x="788" y="501">• Underground pump cable: 6mm² in 20mm conduit, 300mm min depth</text>
+  <text x="788" y="511">• Solar cable from roof: 6mm² DC, sleeve through fascia in conduit</text>
+  <text x="788" y="524" font-weight="bold">PROTECTION:</text>
+  <text x="788" y="534">• Each 12V circuit: individual fuse/breaker at Blue Sea DB, sized as schedule</text>
+  <text x="788" y="544">• Smoke alarm: dual-sensor type (smoke + heat), 12V with battery backup</text>
+  <text x="788" y="557" font-weight="bold">EARTHING:</text>
+  <text x="788" y="567">• 240V system: earth via RCD board to inverter chassis to battery neg</text>
+  <text x="788" y="577">• Consult licensed EC for earthing design (AS/NZS 3000 cl.5.3)</text>
+</g>
+<line x1="510" y1="584" x2="1075" y2="584" stroke="#ccc" stroke-width="0.5"/>
+
+<!-- REVISION TABLE -->
+<rect x="510" y="588" width="565" height="11" fill="#333"/>
+<text x="793" y="597" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">REVISIONS</text>
+<rect x="510" y="599" width="565" height="11" fill="#f5f5f5"/>
+<text x="515" y="608" font-size="7" fill="#444">Rev 0 — Initial issue. April 2026.</text>
+<text x="793" y="608" font-size="7" fill="#444" text-anchor="middle">Not for construction without engineering review.</text>
+<text x="1073" y="608" font-size="7" fill="#444" text-anchor="end">Owner-builder reference drawing only.</text>
+
+</svg>
+
+<!-- Title Block Sheet 4 -->
+<div class="title-block">
+<table>
+<tr><td colspan="2" class="proj">BUSH CABIN — GROOMSVILLE BLOCK, SE QLD</td></tr>
+<tr><td colspan="2" class="drwtitle">ELECTRICAL SERVICES PLAN</td></tr>
+<tr><td style="width:50%">Project No: GRV-2026</td><td>Date: April 2026</td></tr>
+<tr><td>Drawn: S. Cheeseman</td><td>Scale: 1:50</td></tr>
+<tr><td>Status: WORKING DRAWING</td><td class="shnum">Sheet 4 of 5</td></tr>
+<tr><td colspan="2" style="font-size:7px;color:#cc0000">★ 240V circuits — LICENSED ELECTRICIAN REQUIRED</td></tr>
+</table>
+</div>
+
+</div><!-- .sheet -->
+</div><!-- .sheet-wrap -->
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- SHEET 5 — PLUMBING & GAS SERVICES PLAN                            -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="sheet-wrap">
+<div class="sheet">
+<div class="border-line"></div>
+
+<svg width="1095" height="766" viewBox="0 0 1095 766" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;">
+
+<!-- ─── SHEET TITLE ─── -->
+<text x="18" y="30" font-size="13" font-weight="bold" fill="#000">SHEET 5 — PLUMBING &amp; GAS SERVICES PLAN</text>
+<text x="18" y="43" font-size="8.5" fill="#555">Off-Grid Cold Water / LPG / Greywater / Hot Water — Bush Cabin, Groomsville Block — Not for Regulatory Approval</text>
+<line x1="18" y1="48" x2="515" y2="48" stroke="#000" stroke-width="0.8"/>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- SITE PLAN 1:200 (x=25–225, y=65–265, 200×200px)       -->
+<!-- ══════════════════════════════════════════════════════ -->
+
+<text x="18" y="62" font-size="8" font-weight="bold" fill="#333">SITE PLAN   1:200</text>
+<rect x="25" y="65" width="200" height="200" fill="#f0f4e8" stroke="#666" stroke-width="1"/>
+
+<!-- Cabin (20×30px at 1:200) x=90–110, y=110–140 -->
+<rect x="90" y="110" width="20" height="30" fill="#ddd" stroke="#000" stroke-width="1.5"/>
+<text x="100" y="127" font-size="5" fill="#333" text-anchor="middle">CABIN</text>
+
+<!-- Verandah north of cabin -->
+<rect x="90" y="99" width="20" height="11" fill="#e8e8d8" stroke="#888" stroke-width="0.8" stroke-dasharray="2,1"/>
+<text x="100" y="106" font-size="4" fill="#777" text-anchor="middle">VDA</text>
+
+<!-- Water tank 10kL (15×10px) x=30–45, y=90–100 (~12m NW) -->
+<rect x="30" y="90" width="15" height="10" fill="#cce4f0" stroke="#1155cc" stroke-width="1.5"/>
+<text x="37" y="98" font-size="4.5" fill="#1155cc" text-anchor="middle">TANK</text>
+<text x="37" y="108" font-size="4" fill="#1155cc" text-anchor="middle">10kL</text>
+
+<!-- Pump circle next to tank -->
+<circle cx="50" cy="95" r="4" fill="#ddeeff" stroke="#1155cc" stroke-width="1"/>
+<text x="50" y="97" font-size="3.5" fill="#1155cc" text-anchor="middle">PMP</text>
+
+<!-- LPG cylinder (external E wall N end) x=112–117, y=108–120 -->
+<rect x="112" y="108" width="5" height="12" fill="#ffe8b0" stroke="#cc8800" stroke-width="1.2"/>
+<text x="114" y="115" font-size="3.5" fill="#885500" text-anchor="middle">LPG</text>
+
+<!-- Joolca HWU (N wall external, 12×6px) x=98–110, y=104–110 -->
+<rect x="92" y="104" width="18" height="6" fill="#ffd4aa" stroke="#cc4400" stroke-width="1"/>
+<text x="101" y="109" font-size="4" fill="#882200" text-anchor="middle">JOOLCA HWU</text>
+
+<!-- Outdoor shower (6×6px) x=148–154, y=122–128 (~10m E) -->
+<rect x="148" y="122" width="6" height="6" fill="#e8f0ff" stroke="#3366aa" stroke-width="1"/>
+<text x="151" y="127" font-size="3.5" fill="#3366aa" text-anchor="middle">SHR</text>
+
+<!-- Outhouse (8×8px) x=183–191, y=133–141 (~15m E, 3m S) -->
+<rect x="183" y="133" width="8" height="8" fill="#f0e8d8" stroke="#665533" stroke-width="1"/>
+<text x="187" y="139" font-size="3.5" fill="#553311" text-anchor="middle">WC</text>
+
+<!-- French drain (10×6px) x=125–135, y=155–161 (~8m SE) -->
+<rect x="125" y="155" width="10" height="6" fill="#d8e8d8" stroke="#336633" stroke-width="1" stroke-dasharray="2,1"/>
+<text x="130" y="161" font-size="3.5" fill="#336633" text-anchor="middle">FD</text>
+
+<!-- PIPE ROUTES — SITE PLAN -->
+<!-- CW main (blue solid): pump→cabin W wall -->
+<line x1="50" y1="95" x2="50" y2="145" stroke="#1155cc" stroke-width="1.5"/>
+<line x1="50" y1="145" x2="90" y2="145" stroke="#1155cc" stroke-width="1.5"/>
+<!-- CW to outdoor shower branch from cabin N wall -->
+<line x1="100" y1="110" x2="100" y2="104"/>
+<!-- CW branch to shower -->
+<line x1="100" y1="107" x2="148" y2="125" stroke="#1155cc" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+<!-- HW to shower (red): Joolca → shower -->
+<line x1="110" y1="107" x2="148" y2="125" stroke="#cc3300" stroke-width="1.2"/>
+
+<!-- GAS to Joolca (orange dashed) -->
+<line x1="112" y1="112" x2="110" y2="112" stroke="#cc7700" stroke-width="1.2" stroke-dasharray="3,1"/>
+<!-- GAS internal (orange dashed) -->
+<line x1="112" y1="114" x2="112" y2="125" stroke="#cc7700" stroke-width="1.2" stroke-dasharray="3,1"/>
+<line x1="112" y1="125" x2="110" y2="125" stroke="#cc7700" stroke-width="1.2" stroke-dasharray="3,1"/>
+
+<!-- GW greywater (green dashed): cabin → french drain -->
+<line x1="100" y1="140" x2="100" y2="158" stroke="#336633" stroke-width="1.2" stroke-dasharray="4,2"/>
+<line x1="100" y1="158" x2="128" y2="158" stroke="#336633" stroke-width="1.2" stroke-dasharray="4,2"/>
+
+<!-- Site plan labels -->
+<text x="44" y="142" font-size="4" fill="#1155cc" transform="rotate(-90,44,142)">CW-M 25mm</text>
+<text x="62" y="149" font-size="4" fill="#1155cc">CW 25mm UG</text>
+<text x="115" y="121" font-size="4" fill="#cc7700">GAS</text>
+<text x="104" y="152" font-size="4" fill="#336633">GW 40mm</text>
+
+<!-- Site plan north arrow -->
+<g transform="translate(213,78)">
+  <polygon points="0,-8 2,-3 0,-5 -2,-3" fill="#000"/>
+  <polygon points="0,8 2,3 0,5 -2,3" fill="#aaa" stroke="#444" stroke-width="0.3"/>
+  <text x="0" y="-10" font-size="5" text-anchor="middle" font-weight="bold">N</text>
+</g>
+
+<!-- Site scale bar 1:200 — 10m = 50px -->
+<g transform="translate(25,272)">
+  <rect x="0" y="0" width="25" height="3" fill="#000"/>
+  <rect x="25" y="0" width="25" height="3" fill="#fff" stroke="#000" stroke-width="0.3"/>
+  <rect x="50" y="0" width="25" height="3" fill="#000"/>
+  <line x1="0" y1="0" x2="0" y2="5" stroke="#000" stroke-width="0.5"/>
+  <line x1="25" y1="0" x2="25" y2="5" stroke="#000" stroke-width="0.5"/>
+  <line x1="50" y1="0" x2="50" y2="5" stroke="#000" stroke-width="0.5"/>
+  <line x1="75" y1="0" x2="75" y2="5" stroke="#000" stroke-width="0.5"/>
+  <text x="0" y="11" font-size="5" text-anchor="middle">0</text>
+  <text x="25" y="11" font-size="5" text-anchor="middle">5m</text>
+  <text x="50" y="11" font-size="5" text-anchor="middle">10m</text>
+  <text x="75" y="11" font-size="5" text-anchor="middle">15m</text>
+</g>
+<text x="25" y="292" font-size="6" fill="#444" font-weight="bold">SCALE 1:200</text>
+
+<!-- Site plan legend -->
+<g font-size="5" fill="#444">
+  <text x="25" y="302">Site legend:</text>
+  <line x1="25" y1="308" x2="45" y2="308" stroke="#1155cc" stroke-width="1.5"/>
+  <text x="48" y="311">Cold water (main)</text>
+  <line x1="25" y1="317" x2="45" y2="317" stroke="#cc3300" stroke-width="1.2"/>
+  <text x="48" y="320">Hot water</text>
+  <line x1="25" y1="326" x2="45" y2="326" stroke="#cc7700" stroke-width="1.2" stroke-dasharray="3,1"/>
+  <text x="48" y="329">LPG gas</text>
+  <line x1="110" y1="308" x2="130" y2="308" stroke="#336633" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <text x="133" y="311">Greywater</text>
+  <line x1="110" y1="317" x2="130" y2="317" stroke="#1155cc" stroke-width="1.2" stroke-dasharray="3,2"/>
+  <text x="133" y="320">CW to shower</text>
+</g>
+
+<!-- Dimension callouts on site plan -->
+<text x="27" y="80" font-size="4.5" fill="#1155cc">~12m NW</text>
+<text x="150" y="120" font-size="4.5" fill="#3366aa">~10m E</text>
+<text x="185" y="127" font-size="4.5" fill="#553311">~15m E</text>
+<text x="127" y="170" font-size="4.5" fill="#336633">~8m SE</text>
+
+<!-- LPG cage note -->
+<text x="119" y="108" font-size="4" fill="#885500">CAGE</text>
+<text x="119" y="114" font-size="4" fill="#885500">VENT</text>
+
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- FLOOR PLAN DETAIL 1:50 — shifted +110 from original              -->
+<!-- Cabin x=270–490, y=185–515                                       -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+
+<text x="240" y="62" font-size="8" font-weight="bold" fill="#333">FLOOR PLAN DETAIL   1:50</text>
+
+<!-- Verandah -->
+<rect x="270" y="75" width="220" height="110" fill="#f5f5f5" stroke="#aaa" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="380" y="130" font-size="7.5" fill="#888" text-anchor="middle">VERANDAH</text>
+
+<!-- Cabin outer walls -->
+<rect x="270" y="185" width="220" height="330" fill="#eeeeee" stroke="#000" stroke-width="8"/>
+<!-- Cabin inner fill -->
+<rect x="279" y="194" width="202" height="312" fill="#fafafa" stroke="none"/>
+
+<!-- Loft zone hatch (y=350–515) -->
+<rect x="279" y="350" width="202" height="156" fill="none" stroke="#bbb" stroke-width="0.5"/>
+<g stroke="#ccc" stroke-width="0.5">
+  <line x1="279" y1="362" x2="481" y2="362"/>
+  <line x1="279" y1="374" x2="481" y2="374"/>
+  <line x1="279" y1="386" x2="481" y2="386"/>
+  <line x1="279" y1="398" x2="481" y2="398"/>
+  <line x1="279" y1="410" x2="481" y2="410"/>
+  <line x1="279" y1="422" x2="481" y2="422"/>
+  <line x1="279" y1="434" x2="481" y2="434"/>
+  <line x1="279" y1="446" x2="481" y2="446"/>
+  <line x1="279" y1="458" x2="481" y2="458"/>
+  <line x1="279" y1="470" x2="481" y2="470"/>
+  <line x1="279" y1="482" x2="481" y2="482"/>
+  <line x1="279" y1="494" x2="481" y2="494"/>
+</g>
+<line x1="270" y1="350" x2="490" y2="350" stroke="#666" stroke-width="1" stroke-dasharray="8,3"/>
+<text x="380" y="358" font-size="7" fill="#888" text-anchor="middle" font-style="italic">LOFT ABOVE — FFL +2000mm</text>
+
+<!-- Kitchen bench (W wall, 550mm deep × ~2800mm) x=270–300, y=194–344 -->
+<rect x="279" y="194" width="21" height="150" fill="#d4c9b0" stroke="#888" stroke-width="0.8"/>
+<text x="289" y="268" font-size="6" fill="#666" text-anchor="middle" transform="rotate(-90,289,268)">KITCHEN BENCH</text>
+
+<!-- Sink symbol -->
+<rect x="281" y="216" width="16" height="18" fill="#aaccdd" stroke="#555" stroke-width="0.8" rx="1"/>
+<line x1="289" y1="217" x2="289" y2="233" stroke="#555" stroke-width="0.5"/>
+<line x1="281" y1="225" x2="297" y2="225" stroke="#555" stroke-width="0.5"/>
+<text x="289" y="242" font-size="5" fill="#555" text-anchor="middle">SINK</text>
+
+<!-- Stove -->
+<rect x="281" y="248" width="16" height="16" fill="#e8e0d0" stroke="#555" stroke-width="0.8"/>
+<circle cx="285" cy="252" r="3" fill="none" stroke="#555" stroke-width="0.8"/>
+<circle cx="293" cy="252" r="3" fill="none" stroke="#555" stroke-width="0.8"/>
+<circle cx="285" cy="260" r="3" fill="none" stroke="#555" stroke-width="0.8"/>
+<circle cx="293" cy="260" r="3" fill="none" stroke="#555" stroke-width="0.8"/>
+<text x="289" y="273" font-size="5" fill="#555" text-anchor="middle">GAS STOVE</text>
+
+<!-- Fridge -->
+<rect x="281" y="279" width="16" height="30" fill="#dde8ee" stroke="#555" stroke-width="0.8"/>
+<text x="289" y="298" font-size="5" fill="#555" text-anchor="middle">FRG</text>
+
+<!-- Wood stove circle -->
+<circle cx="289" cy="330" r="11" fill="#c8a070" stroke="#555" stroke-width="1"/>
+<text x="289" y="333" font-size="5.5" fill="#333" text-anchor="middle">WS</text>
+
+<!-- N door gap -->
+<rect x="357" y="185" width="46" height="9" fill="#fff" stroke="none"/>
+<line x1="357" y1="185" x2="357" y2="194" stroke="#000" stroke-width="2"/>
+<line x1="403" y1="185" x2="403" y2="194" stroke="#000" stroke-width="2"/>
+<path d="M357,194 A46,46 0 0,1 403,194" fill="none" stroke="#000" stroke-width="0.8" stroke-dasharray="2,2"/>
+
+<!-- West window -->
+<rect x="270" y="305" width="9" height="50" fill="#cce4f0" stroke="#000" stroke-width="1.5"/>
+<!-- East window -->
+<rect x="481" y="305" width="9" height="50" fill="#cce4f0" stroke="#000" stroke-width="1.5"/>
+<!-- South window -->
+<rect x="363" y="506" width="33" height="9" fill="#cce4f0" stroke="#000" stroke-width="1.5"/>
+
+<!-- Stairs (x=443–481, y=218–346) -->
+<rect x="443" y="218" width="38" height="128" fill="#e8e8e8" stroke="#666" stroke-width="0.8"/>
+<g stroke="#888" stroke-width="0.5">
+  <line x1="443" y1="232" x2="481" y2="232"/>
+  <line x1="443" y1="246" x2="481" y2="246"/>
+  <line x1="443" y1="260" x2="481" y2="260"/>
+  <line x1="443" y1="274" x2="481" y2="274"/>
+  <line x1="443" y1="288" x2="481" y2="288"/>
+  <line x1="443" y1="302" x2="481" y2="302"/>
+  <line x1="443" y1="316" x2="481" y2="316"/>
+  <line x1="443" y1="330" x2="481" y2="330"/>
+</g>
+<text x="462" y="285" font-size="6" fill="#666" text-anchor="middle">UP</text>
+
+<!-- LPG cylinder EXTERNAL E wall (shown outside, x=494–508, y=185–210) -->
+<rect x="494" y="190" width="14" height="22" fill="#ffe8b0" stroke="#cc8800" stroke-width="1.5"/>
+<text x="501" y="200" font-size="5" fill="#885500" text-anchor="middle">LPG</text>
+<text x="501" y="207" font-size="5" fill="#885500" text-anchor="middle">45kg</text>
+<!-- cage dashed border -->
+<rect x="491" y="187" width="20" height="28" fill="none" stroke="#cc8800" stroke-width="0.8" stroke-dasharray="2,1"/>
+<text x="501" y="221" font-size="5" fill="#885500" text-anchor="middle">VENTD</text>
+<text x="501" y="227" font-size="5" fill="#885500" text-anchor="middle">CAGE</text>
+
+<!-- Joolca HWU EXTERNAL N wall -->
+<rect x="359" y="167" width="22" height="12" fill="#ffd4aa" stroke="#cc4400" stroke-width="1.2"/>
+<text x="370" y="176" font-size="5" fill="#882200" text-anchor="middle">JOOLCA</text>
+<text x="370" y="183" font-size="5" fill="#882200" text-anchor="middle">HWU</text>
+
+<!-- ════════════════════════════════════ -->
+<!-- PLUMBING ROUTES — FLOOR PLAN DETAIL -->
+<!-- ════════════════════════════════════ -->
+
+<!-- CW 15mm PEX (blue solid) enters W wall at (270,290) -->
+<!-- Main: (279,290) → N to (279,232) → to sink/fridge -->
+<line x1="270" y1="290" x2="279" y2="290" stroke="#1155cc" stroke-width="2"/>
+<line x1="279" y1="290" x2="279" y2="232" stroke="#1155cc" stroke-width="2"/>
+<!-- Branch to sink -->
+<line x1="279" y1="225" x2="297" y2="225" stroke="#1155cc" stroke-width="1.5"/>
+<!-- Main continues to N wall / Joolca/shower -->
+<line x1="279" y1="290" x2="279" y2="195" stroke="#1155cc" stroke-width="2"/>
+<line x1="279" y1="195" x2="279" y2="185" stroke="#1155cc" stroke-width="2"/>
+
+<!-- CW label at entry -->
+<text x="250" y="289" font-size="6" fill="#1155cc" text-anchor="end">← CW IN</text>
+<text x="250" y="297" font-size="5.5" fill="#1155cc" text-anchor="end">15mm PEX</text>
+
+<!-- CW to Joolca / shower (exits N wall) -->
+<text x="280" y="183" font-size="5.5" fill="#1155cc">CW → JOOLCA + SHOWER</text>
+
+<!-- Isolation valve symbol on CW main at (279,260) -->
+<!-- butterfly valve: two triangles -->
+<polygon points="279,255 275,262 279,259 283,262" fill="#1155cc" stroke="#1155cc" stroke-width="0.5"/>
+<text x="283" y="261" font-size="5" fill="#1155cc">ISO</text>
+
+<!-- GAS 8mm Cu (orange dashed) — enters E wall at (481,205) → W along ceiling → stove -->
+<line x1="494" y1="199" x2="481" y2="199" stroke="#cc7700" stroke-width="1.8" stroke-dasharray="4,2"/>
+<line x1="481" y1="199" x2="299" y2="199" stroke="#cc7700" stroke-width="1.8" stroke-dasharray="4,2"/>
+<line x1="299" y1="199" x2="299" y2="257" stroke="#cc7700" stroke-width="1.8" stroke-dasharray="4,2"/>
+
+<!-- Gas isolation valve at ceiling level before stove drop -->
+<polygon points="299,235 295,242 299,239 303,242" fill="#cc7700" stroke="#cc7700" stroke-width="0.5"/>
+<text x="304" y="239" font-size="5" fill="#cc7700">ISO</text>
+
+<!-- Gas to stove label -->
+<text x="301" y="260" font-size="5.5" fill="#cc7700">GAS STOVE</text>
+<text x="301" y="267" font-size="5" fill="#cc7700">8mm Cu</text>
+
+<!-- Gas to Joolca external note (arrow pointing up to N wall) -->
+<line x1="481" y1="199" x2="481" y2="175" stroke="#cc7700" stroke-width="1.5" stroke-dasharray="3,2"/>
+<line x1="370" y1="175" x2="481" y2="175" stroke="#cc7700" stroke-width="1.5" stroke-dasharray="3,2"/>
+<line x1="370" y1="175" x2="370" y2="167" stroke="#cc7700" stroke-width="1.5" stroke-dasharray="3,2"/>
+<text x="420" y="172" font-size="5.5" fill="#cc7700" text-anchor="middle">GAS → JOOLCA (EXT, LICENSED)</text>
+
+<!-- GW 40mm PVC (green dashed) from sink drain down through floor -->
+<line x1="289" y1="234" x2="289" y2="258" stroke="#336633" stroke-width="2" stroke-dasharray="5,2"/>
+<!-- floor penetration symbol (X in circle) -->
+<circle cx="289" cy="262" r="5" fill="none" stroke="#336633" stroke-width="1"/>
+<line x1="285" y1="258" x2="293" y2="266" stroke="#336633" stroke-width="0.8"/>
+<line x1="285" y1="266" x2="293" y2="258" stroke="#336633" stroke-width="0.8"/>
+<text x="297" y="258" font-size="5.5" fill="#336633">GW PENETRATION</text>
+<text x="297" y="265" font-size="5" fill="#336633">1:40 MIN FALL</text>
+<text x="297" y="272" font-size="5" fill="#336633">8m SE TO FRENCH DRAIN</text>
+<text x="297" y="279" font-size="5" fill="#336633">40mm PVC SOLVENT-WELD</text>
+
+<!-- CW entry annotation arrow from outside -->
+<text x="240" y="285" font-size="6" fill="#1155cc">25mm HDPE PN10</text>
+<text x="240" y="293" font-size="5.5" fill="#1155cc">BURIED 300mm MIN</text>
+<line x1="268" y1="290" x2="245" y2="293" stroke="#1155cc" stroke-width="0.8" marker-end="url(#arrowN)"/>
+
+<!-- "No HW at sink" note -->
+<rect x="300" y="215" width="130" height="18" fill="#fff8e8" stroke="#cc8800" stroke-width="0.8"/>
+<text x="365" y="225" font-size="5.5" fill="#885500" text-anchor="middle">COLD WATER ONLY AT BENCH</text>
+<text x="365" y="231" font-size="5" fill="#885500" text-anchor="middle">Extend CW to Joolca if HW at sink required</text>
+
+<!-- GAS main run label -->
+<text x="385" y="196" font-size="5.5" fill="#cc7700" text-anchor="middle">GAS MAIN 8mm Cu — IN CEILING</text>
+
+<!-- Compass rose -->
+<g transform="translate(355,545)">
+  <circle cx="0" cy="0" r="14" fill="none" stroke="#444" stroke-width="0.8"/>
+  <polygon points="0,-13 3,-5 0,-7 -3,-5" fill="#000"/>
+  <polygon points="0,13 3,5 0,7 -3,5" fill="#ccc" stroke="#444" stroke-width="0.5"/>
+  <polygon points="-13,0 -5,3 -7,0 -5,-3" fill="#ccc" stroke="#444" stroke-width="0.5"/>
+  <polygon points="13,0 5,3 7,0 5,-3" fill="#ccc" stroke="#444" stroke-width="0.5"/>
+  <text x="0" y="-17" font-size="8" text-anchor="middle" font-weight="bold">N</text>
+</g>
+
+<!-- Scale bar 1:50 -->
+<text x="240" y="558" font-size="7" fill="#333" font-weight="bold">SCALE 1:50</text>
+<g transform="translate(240,566)">
+  <rect x="0" y="0" width="55" height="5" fill="#000"/>
+  <rect x="55" y="0" width="55" height="5" fill="#fff" stroke="#000" stroke-width="0.5"/>
+  <rect x="110" y="0" width="55" height="5" fill="#000"/>
+  <rect x="165" y="0" width="55" height="5" fill="#fff" stroke="#000" stroke-width="0.5"/>
+  <line x1="0" y1="0" x2="0" y2="8" stroke="#000" stroke-width="0.8"/>
+  <line x1="55" y1="0" x2="55" y2="8" stroke="#000" stroke-width="0.8"/>
+  <line x1="110" y1="0" x2="110" y2="8" stroke="#000" stroke-width="0.8"/>
+  <line x1="165" y1="0" x2="165" y2="8" stroke="#000" stroke-width="0.8"/>
+  <line x1="220" y1="0" x2="220" y2="8" stroke="#000" stroke-width="0.8"/>
+  <text x="0" y="16" font-size="6" text-anchor="middle">0</text>
+  <text x="55" y="16" font-size="6" text-anchor="middle">1m</text>
+  <text x="110" y="16" font-size="6" text-anchor="middle">2m</text>
+  <text x="165" y="16" font-size="6" text-anchor="middle">3m</text>
+  <text x="220" y="16" font-size="6" text-anchor="middle">4m</text>
+</g>
+
+<!-- Dimension annotations -->
+<g fill="#444" stroke="#444" font-size="6">
+  <line x1="270" y1="590" x2="490" y2="590" stroke="#444" stroke-width="0.7"/>
+  <line x1="270" y1="585" x2="270" y2="595" stroke="#444" stroke-width="0.7"/>
+  <line x1="490" y1="585" x2="490" y2="595" stroke="#444" stroke-width="0.7"/>
+  <text x="380" y="586" text-anchor="middle">4000</text>
+</g>
+
+<!-- ═════════════════════════════════════════════════════════════════= -->
+<!-- RIGHT PANEL — PIPE SCHEDULE, FIXTURE SCHEDULE, COMPLIANCE NOTES  -->
+<!-- ═════════════════════════════════════════════════════════════════= -->
+<line x1="525" y1="15" x2="525" y2="740" stroke="#aaa" stroke-width="0.8"/>
+
+<!-- PIPE SCHEDULE -->
+<rect x="530" y="18" width="550" height="14" fill="#1a3a2a"/>
+<text x="805" y="29" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">PIPE &amp; MATERIAL SCHEDULE</text>
+
+<!-- Column headers -->
+<rect x="530" y="32" width="550" height="11" fill="#e8f2ec"/>
+<text x="534" y="41" font-size="7" font-weight="bold" fill="#222">Ref</text>
+<text x="556" y="41" font-size="7" font-weight="bold" fill="#222">Description</text>
+<text x="700" y="41" font-size="7" font-weight="bold" fill="#222">Size</text>
+<text x="745" y="41" font-size="7" font-weight="bold" fill="#222">Material</text>
+<text x="860" y="41" font-size="7" font-weight="bold" fill="#222">Standard / Notes</text>
+<line x1="530" y1="43" x2="1080" y2="43" stroke="#999" stroke-width="0.5"/>
+
+<!-- CW-M -->
+<rect x="530" y="44" width="550" height="11" fill="#f0f8ff"/>
+<rect x="530" y="44" width="4" height="11" fill="#1155cc"/>
+<text x="536" y="53" font-size="6.5" fill="#1155cc" font-weight="bold">CW-M</text>
+<text x="556" y="53" font-size="6.5" fill="#222">Cold water main — underground from tank</text>
+<text x="700" y="53" font-size="6.5" fill="#222">25mm</text>
+<text x="745" y="53" font-size="6.5" fill="#222">Blue line poly HDPE PN10</text>
+<text x="860" y="53" font-size="6.5" fill="#555">Buried 300mm min. Compression fittings.</text>
+
+<!-- CW-I -->
+<rect x="530" y="55" width="550" height="11" fill="#fff"/>
+<rect x="530" y="55" width="4" height="11" fill="#3388cc"/>
+<text x="536" y="64" font-size="6.5" fill="#3388cc" font-weight="bold">CW-I</text>
+<text x="556" y="64" font-size="6.5" fill="#222">Internal cold water — bench, subfloor</text>
+<text x="700" y="64" font-size="6.5" fill="#222">15mm PEX</text>
+<text x="745" y="64" font-size="6.5" fill="#222">Blue PEX-A (Rehau or equiv)</text>
+<text x="860" y="64" font-size="6.5" fill="#555">Lagged in subfloor. Expansion fittings.</text>
+
+<!-- HW-1 -->
+<rect x="530" y="66" width="550" height="11" fill="#fff8f0"/>
+<rect x="530" y="66" width="4" height="11" fill="#cc3300"/>
+<text x="536" y="75" font-size="6.5" fill="#cc3300" font-weight="bold">HW-1</text>
+<text x="556" y="75" font-size="6.5" fill="#222">Hot water — Joolca to outdoor shower</text>
+<text x="700" y="75" font-size="6.5" fill="#222">15mm PEX</text>
+<text x="745" y="75" font-size="6.5" fill="#222">Red PEX-A, external run</text>
+<text x="860" y="75" font-size="6.5" fill="#555">Max 7L/min Joolca flow. Insulate run.</text>
+
+<!-- GW-1 -->
+<rect x="530" y="77" width="550" height="11" fill="#f0fff0"/>
+<rect x="530" y="77" width="4" height="11" fill="#336633"/>
+<text x="536" y="86" font-size="6.5" fill="#336633" font-weight="bold">GW-1</text>
+<text x="556" y="86" font-size="6.5" fill="#222">Greywater drain — sink to french drain</text>
+<text x="700" y="86" font-size="6.5" fill="#222">40mm PVC</text>
+<text x="745" y="86" font-size="6.5" fill="#222">Solvent-weld PVC DWV Class B</text>
+<text x="860" y="86" font-size="6.5" fill="#555">1:40 min fall (25mm/m). Min 3m from cabin.</text>
+
+<!-- GAS-1 -->
+<rect x="530" y="88" width="550" height="11" fill="#fffaf0"/>
+<rect x="530" y="88" width="4" height="11" fill="#cc7700"/>
+<text x="536" y="97" font-size="6.5" fill="#cc7700" font-weight="bold">GAS-1</text>
+<text x="556" y="97" font-size="6.5" fill="#222">LPG to gas stove — internal run, ceiling void</text>
+<text x="700" y="97" font-size="6.5" fill="#222">8mm Cu</text>
+<text x="745" y="97" font-size="6.5" fill="#222">Hard-drawn copper R250</text>
+<text x="860" y="97" font-size="6.5" fill="#cc2200" font-weight="bold">★ LICENSED GAS FITTER REQUIRED</text>
+
+<!-- GAS-2 -->
+<rect x="530" y="99" width="550" height="11" fill="#fffaf0"/>
+<rect x="530" y="99" width="4" height="11" fill="#cc7700"/>
+<text x="536" y="108" font-size="6.5" fill="#cc7700" font-weight="bold">GAS-2</text>
+<text x="556" y="108" font-size="6.5" fill="#222">LPG to Joolca HWU — external pipe run</text>
+<text x="700" y="108" font-size="6.5" fill="#222">8mm Cu</text>
+<text x="745" y="108" font-size="6.5" fill="#222">Hard-drawn copper, R250, outdoor</text>
+<text x="860" y="108" font-size="6.5" fill="#cc2200" font-weight="bold">★ LICENSED GAS FITTER REQUIRED</text>
+
+<line x1="530" y1="110" x2="1080" y2="110" stroke="#999" stroke-width="0.5"/>
+
+<!-- FIXTURE SCHEDULE -->
+<rect x="530" y="114" width="550" height="14" fill="#1a3a2a"/>
+<text x="805" y="125" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">FIXTURE SCHEDULE</text>
+
+<rect x="530" y="128" width="550" height="11" fill="#e8f2ec"/>
+<text x="534" y="137" font-size="7" font-weight="bold" fill="#222">Ref</text>
+<text x="556" y="137" font-size="7" font-weight="bold" fill="#222">Item</text>
+<text x="680" y="137" font-size="7" font-weight="bold" fill="#222">Specification</text>
+<text x="870" y="137" font-size="7" font-weight="bold" fill="#222">Notes</text>
+<line x1="530" y1="139" x2="1080" y2="139" stroke="#999" stroke-width="0.5"/>
+
+<!-- Fixture rows -->
+<!-- WH1 -->
+<rect x="530" y="140" width="550" height="11" fill="#fff8f0"/>
+<text x="534" y="149" font-size="6.5" fill="#cc4400" font-weight="bold">WH1</text>
+<text x="556" y="149" font-size="6.5" fill="#222">Hot water unit — external N wall</text>
+<text x="680" y="149" font-size="6.5" fill="#222">Joolca HOTTAP 2.0, LPG, 7 L/min</text>
+<text x="870" y="149" font-size="6.5" fill="#555">Gas connection by licensed fitter. Min 500mm from openings.</text>
+
+<!-- SHR -->
+<rect x="530" y="151" width="550" height="11" fill="#f8f8ff"/>
+<text x="534" y="160" font-size="6.5" fill="#3366aa" font-weight="bold">SHR</text>
+<text x="556" y="160" font-size="6.5" fill="#222">Outdoor shower — ~10m E of cabin</text>
+<text x="680" y="160" font-size="6.5" fill="#222">1200×1200 hardwood deck, thermostatic mixer</text>
+<text x="870" y="160" font-size="6.5" fill="#555">HW + CW supply. Greywater to garden or FD.</text>
+
+<!-- SK1 -->
+<rect x="530" y="162" width="550" height="11" fill="#f0f8ff"/>
+<text x="534" y="171" font-size="6.5" fill="#1155cc" font-weight="bold">SK1</text>
+<text x="556" y="171" font-size="6.5" fill="#222">Kitchen sink — W bench</text>
+<text x="680" y="171" font-size="6.5" fill="#222">600×400 single bowl S/S, 900mm bench ht</text>
+<text x="870" y="171" font-size="6.5" fill="#555">CW only. Extend CW to Joolca if HW required.</text>
+
+<!-- TK1 -->
+<rect x="530" y="173" width="550" height="11" fill="#f0f8ff"/>
+<text x="534" y="182" font-size="6.5" fill="#1155cc" font-weight="bold">TK1</text>
+<text x="556" y="182" font-size="6.5" fill="#222">Cold water tank — ~12m NW of cabin</text>
+<text x="680" y="182" font-size="6.5" fill="#222">10,000L poly (Tankworld or equiv)</text>
+<text x="870" y="182" font-size="6.5" fill="#555">First flush diverter. Overflow to soil. Screen inlets.</text>
+
+<!-- PMP -->
+<rect x="530" y="184" width="550" height="11" fill="#f8f8ff"/>
+<text x="534" y="193" font-size="6.5" fill="#1155cc" font-weight="bold">PMP</text>
+<text x="556" y="193" font-size="6.5" fill="#222">Pressure pump — at tank</text>
+<text x="680" y="193" font-size="6.5" fill="#222">Shurflo 2088 or equiv. 12V DC, 11.3 LPM @ 45psi</text>
+<text x="870" y="193" font-size="6.5" fill="#555">Demand pump. No pressure vessel needed. 6mm² cable.</text>
+
+<!-- WC1 -->
+<rect x="530" y="195" width="550" height="11" fill="#f8f4ee"/>
+<text x="534" y="204" font-size="6.5" fill="#665533" font-weight="bold">WC1</text>
+<text x="556" y="204" font-size="6.5" fill="#222">Composting WC — outhouse ~15m E</text>
+<text x="680" y="204" font-size="6.5" fill="#222">Nature Loo Premier or Ozzi Kleen, vent pipe</text>
+<text x="870" y="204" font-size="6.5" fill="#555">No water supply. Vent through outhouse roof. Fly screen vent cap.</text>
+
+<line x1="530" y1="206" x2="1080" y2="206" stroke="#999" stroke-width="0.5"/>
+
+<!-- COMPLIANCE / LICENSING NOTES -->
+<rect x="530" y="210" width="550" height="14" fill="#660000"/>
+<text x="805" y="221" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle">★ LICENSING NOTE — PLUMBING &amp; GAS</text>
+
+<g font-size="7" fill="#222">
+  <text x="534" y="237" font-weight="bold" fill="#cc2200">GAS WORK (ALL):</text>
+  <text x="534" y="247">All LPG gas pipework, connections, and appliance installation must be carried out by a licensed gas fitter (Type B gas work) in Queensland under the</text>
+  <text x="534" y="257">Petroleum and Gas (Production and Safety) Act 2004. This includes: cylinder connection, copper pipe runs (GAS-1, GAS-2), Joolca connection, stove connection,</text>
+  <text x="534" y="267">regulator installation, and final leakage test. A Certificate of Compliance for Gas Work must be issued. Owner is not permitted to perform any gas work.</text>
+
+  <text x="534" y="281" font-weight="bold" fill="#cc6600">PLUMBING WORK (QLD):</text>
+  <text x="534" y="291">In Queensland, plumbing work (water supply, drainage) generally requires a licensed plumber. However, for a non-sewered rural property using an on-site water</text>
+  <text x="534" y="301">supply tank (not connected to reticulated water), owner-installer exemptions may apply for some work. Confirm with QBCC (Queensland Building and Construction</text>
+  <text x="534" y="311">Commission) before commencing. All plumbing must meet AS/NZS 3500 (Plumbing and Drainage). Greywater disposal must comply with On-site Sewage Facility</text>
+  <text x="534" y="321">requirements — confirm with Toowoomba Regional Council for rural zone setbacks and French drain acceptability.</text>
+
+  <text x="534" y="335" font-weight="bold">LPG STORAGE:</text>
+  <text x="534" y="345">LPG cylinder must be in a ventilated cage min 500mm from any window, door, or air inlet. Max 2×45kg cylinders without additional approvals. Cage must be</text>
+  <text x="534" y="355">secured and labelled. Refer to AS/NZS 1596 (LPG storage and handling) and AS 3000 for separation distances.</text>
+
+  <text x="534" y="369" font-weight="bold">GREYWATER:</text>
+  <text x="534" y="379">Greywater from sink only (no toilet waste). French drain minimum 3m from cabin, 3m from property boundary, 1.5m from any tree, soil conditions permitting.</text>
+  <text x="534" y="389">Dedicated laundry greywater system may be required if washing machine added — refer TRC planning conditions.</text>
+</g>
+
+<line x1="530" y1="394" x2="1080" y2="394" stroke="#ccc" stroke-width="0.5"/>
+
+<!-- WATER SYSTEM SIZING NOTE -->
+<rect x="530" y="398" width="265" height="12" fill="#1a3a5a"/>
+<text x="662" y="408" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">WATER SYSTEM SIZING</text>
+
+<g font-size="7" fill="#222">
+  <text x="534" y="424" font-weight="bold">Tank capacity: 10,000L</text>
+  <text x="534" y="434">Estimated consumption: 50–80L/day (2 persons, bush use)</text>
+  <text x="534" y="444">Days storage: 125–200 days without rainfall</text>
+  <text x="534" y="454">Roof catchment (cabin only): 4m × 6m = 24m² × 0.85 efficiency</text>
+  <text x="534" y="464">1mm rain → ~20L collected. 500mm/yr ≈ 10,200L/yr harvest</text>
+  <text x="534" y="474">Recommend first flush diverter min 25L capacity (1mm/m² roof)</text>
+  <text x="534" y="484">Consider bore or creek supply for prolonged dry periods</text>
+</g>
+
+<!-- GAS CONSUMPTION NOTE -->
+<rect x="803" y="398" width="277" height="12" fill="#5a3a1a"/>
+<text x="942" y="408" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">LPG CONSUMPTION ESTIMATE</text>
+
+<g font-size="7" fill="#222">
+  <text x="808" y="424" font-weight="bold">Appliances: gas stove + Joolca HWU</text>
+  <text x="808" y="434">Gas stove (2-burner): ~0.2–0.4kg/day (cooking, 2 persons)</text>
+  <text x="808" y="444">Joolca HOTTAP: 7L/min @ 145g/hr — shower 5min = ~12g</text>
+  <text x="808" y="454">Estimated total: ~0.3–0.5kg/day combined</text>
+  <text x="808" y="464">45kg cylinder: ~90–150 days per cylinder</text>
+  <text x="808" y="474">Recommend: 2× 45kg cylinders on auto-changeover reg</text>
+  <text x="808" y="484">Changeover valve: Cavagna or Elgas brand, auto-switch</text>
+</g>
+
+<line x1="530" y1="492" x2="1080" y2="492" stroke="#ccc" stroke-width="0.5"/>
+
+<!-- LEGEND PLUMBING -->
+<rect x="530" y="496" width="550" height="12" fill="#2a3a2a"/>
+<text x="805" y="506" font-size="8.5" font-weight="bold" fill="#fff" text-anchor="middle">LEGEND — PLUMBING &amp; GAS</text>
+
+<g font-size="7" fill="#222">
+  <!-- Row 1 -->
+  <line x1="534" y1="518" x2="562" y2="518" stroke="#1155cc" stroke-width="2"/>
+  <text x="566" y="521">Cold water (CW) — internal 15mm PEX</text>
+
+  <line x1="700" y1="518" x2="728" y2="518" stroke="#cc3300" stroke-width="1.5"/>
+  <text x="732" y="521">Hot water (HW) — 15mm PEX from Joolca</text>
+
+  <line x1="880" y1="518" x2="908" y2="518" stroke="#336633" stroke-width="1.5" stroke-dasharray="5,2"/>
+  <text x="912" y="521">Greywater drain 40mm PVC</text>
+
+  <!-- Row 2 -->
+  <line x1="534" y1="530" x2="562" y2="530" stroke="#cc7700" stroke-width="1.8" stroke-dasharray="4,2"/>
+  <text x="566" y="533">LPG gas 8mm Cu — ★ LICENSED GAS FITTER</text>
+
+  <line x1="700" y1="530" x2="728" y2="530" stroke="#1155cc" stroke-width="2"/>
+  <rect x="714" y="524" width="1" height="12" fill="#fff"/>
+  <text x="732" y="533">Cold water main 25mm HDPE (underground)</text>
+
+  <!-- ISO valve symbol -->
+  <polygon points="880,526 876,533 880,530 884,533" fill="#1155cc" stroke="#1155cc" stroke-width="0.5"/>
+  <text x="889" y="533">Isolation valve</text>
+
+  <!-- Row 3 -->
+  <circle cx="540" cy="543" r="4" fill="none" stroke="#336633" stroke-width="1"/>
+  <line x1="536" y1="539" x2="544" y2="547" stroke="#336633" stroke-width="0.7"/>
+  <line x1="536" y1="547" x2="544" y2="539" stroke="#336633" stroke-width="0.7"/>
+  <text x="549" y="546">Floor penetration (GW drain)</text>
+
+  <rect x="699" y="539" width="30" height="8" fill="#ffd4aa" stroke="#cc4400" stroke-width="0.8"/>
+  <text x="714" y="545" font-size="5.5" fill="#882200" text-anchor="middle">JOOLCA</text>
+  <text x="733" y="546">Joolca HWU (external wall)</text>
+
+  <rect x="878" y="539" width="12" height="8" fill="#ffe8b0" stroke="#cc8800" stroke-width="0.8"/>
+  <text x="884" y="545" font-size="5" fill="#885500">LPG</text>
+  <text x="895" y="546">LPG cylinder (external cage)</text>
+</g>
+
+<line x1="530" y1="554" x2="1080" y2="554" stroke="#ccc" stroke-width="0.5"/>
+
+<!-- INSTALLATION SEQUENCE NOTE -->
+<rect x="530" y="558" width="550" height="12" fill="#333"/>
+<text x="805" y="568" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">RECOMMENDED TRADE SEQUENCE</text>
+
+<g font-size="7" fill="#222">
+  <text x="534" y="583">1. Earthworks: trench for CW-M from tank site to cabin W wall. Lay 25mm HDPE PN10 in conduit, 300mm deep. Cap ends. Compact backfill.</text>
+  <text x="534" y="593">2. Plumber (or owner where exempt): connect pump at tank, run internal CW-I 15mm PEX in subfloor to bench sink. Install isolation valve. Commission pump.</text>
+  <text x="534" y="603">3. Licensed gas fitter: install LPG cage, regulator, run copper GAS-1 to stove and GAS-2 to Joolca position. Pressure test. Issue compliance cert.</text>
+  <text x="534" y="613">4. Install Joolca HOTTAP to N wall bracket (gas fitter confirms connection). Run CW-I branch to Joolca inlet. Commission hot water + outdoor shower.</text>
+  <text x="534" y="623">5. GW drainage: install sink trap, 40mm PVC from floor penetration out to French drain (min 1:40 fall, min 3m from cabin).</text>
+  <text x="534" y="633">6. Install composting WC in outhouse. Run vent pipe through roof. No plumbing connection required.</text>
+</g>
+
+<!-- Revision -->
+<line x1="530" y1="640" x2="1080" y2="640" stroke="#ccc" stroke-width="0.5"/>
+<rect x="530" y="644" width="550" height="11" fill="#333"/>
+<text x="805" y="653" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">REVISIONS</text>
+<rect x="530" y="655" width="550" height="11" fill="#f5f5f5"/>
+<text x="534" y="664" font-size="7" fill="#444">Rev 0 — Initial issue. April 2026.</text>
+<text x="805" y="664" font-size="7" fill="#444" text-anchor="middle">Owner-builder reference drawing — verify with licensed trades prior to construction.</text>
+<text x="1078" y="664" font-size="7" fill="#444" text-anchor="end">Not for regulatory submission.</text>
+
+</svg>
+
+<!-- Title Block Sheet 5 -->
+<div class="title-block">
+<table>
+<tr><td colspan="2" class="proj">BUSH CABIN — GROOMSVILLE BLOCK, SE QLD</td></tr>
+<tr><td colspan="2" class="drwtitle">PLUMBING &amp; GAS SERVICES PLAN</td></tr>
+<tr><td style="width:50%">Project No: GRV-2026</td><td>Date: April 2026</td></tr>
+<tr><td>Drawn: S. Cheeseman</td><td>Scale: NOTED</td></tr>
+<tr><td>Status: WORKING DRAWING</td><td class="shnum">Sheet 5 of 5</td></tr>
+<tr><td colspan="2" style="font-size:7px;color:#cc0000">★ ALL GAS WORK — LICENSED GAS FITTER REQUIRED</td></tr>
+</table>
+</div>
+
+</div><!-- .sheet -->
+</div><!-- .sheet-wrap -->
+
+</body>
+</html>
