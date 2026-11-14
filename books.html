@@ -99,6 +99,8 @@
 
   .hint { font-style:italic; font-size:0.95rem; color:var(--muted); padding:1.5rem; border:1px dashed var(--border); text-align:center; line-height:1.7; }
   .hint a { color:var(--accent); }
+  .signin { display:inline-block; margin-top:1rem; background:var(--accent); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.8rem 1.6rem; border-radius:4px; transition:background 0.2s; }
+  .signin:hover { background:var(--accent-light); }
   .hint code { font-family:'IBM Plex Mono',monospace; font-style:normal; font-size:0.78rem; color:var(--accent); }
 
   .crumb { position:relative; z-index:2; background:var(--surface); border-top:1px solid var(--border); padding:0.75rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--faint); text-align:center; }
@@ -140,7 +142,7 @@ function fmtDate(d) { if (!d) return ''; const x = new Date(d); return `${x.getD
 
 function signedOut() {
   $('#status').innerHTML = `<a href="${API}/login?next=${encodeURIComponent('https://shaunzen.com/books.html')}">Sign in to see reading</a>`;
-  $('#main').innerHTML = `<div class="hint">Reading data is private. <a href="${API}/login?next=${encodeURIComponent('https://shaunzen.com/books.html')}">Sign in</a> to load it.</div>`;
+  $('#main').innerHTML = `<div class="hint">Reading data is private.<br><a class="signin" href="${API}/login?next=${encodeURIComponent('https://shaunzen.com/books.html')}">Sign in</a></div>`;
 }
 
 function bars(data, label, valueKey, tipFn) {
@@ -239,7 +241,8 @@ async function load() {
     render(d);
   } catch (e) {
     if (location.search.includes('demo')) return;
-    $('#status').textContent = 'Couldn’t load reading data: ' + e.message;
+    $('#status').textContent = 'Couldn’t load reading data';
+    $('#main').innerHTML = `<div class="hint">Couldn’t load reading data (${esc(e.message)}).<br><a class="signin" href="${API}/login?next=${encodeURIComponent('https://shaunzen.com/books.html')}">Sign in again</a></div>`;
   }
 }
 window.renderBooks = render;  // used by ?demo previews
