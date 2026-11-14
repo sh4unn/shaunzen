@@ -1,20 +1,9 @@
-const CACHE = 'shaunzen-v1';
+const CACHE = 'shaunzen-v2';
 const ASSETS = [
   './',
   './index.html',
-  './shaunswatch.html',
-  './shauns-commonplace.html',
-  './shauns-ledger.html',
-  './book-recommender.html',
-  './rs3-hiscores.html',
-  './drug-reference.html',
-  './qigong.html',
-  './daily-tracker.html',
-  './lean-season.html',
-  './sql-dojo.html',
-  './cardiac-surgery-reference.html',
-  './shauns-scrolls.html',
-  './study-flashcards.html',
+  './favicon.svg',
+  './manifest.json',
 ];
 
 self.addEventListener('install', e => {

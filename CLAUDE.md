@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Shaunzen (sh4unn.github.io/shaunzen) is a collection of standalone HTML tools — no build system, no framework, no npm. Each file is self-contained: CSS in `<style>`, JS in `<script>`, deployed directly to GitHub Pages.
+Shaunzen (shaunzen.com, GitHub Pages) is a launcher: one `index.html` with Work / Life / Systems tiles linking to Shaun's services. No build system, no framework, no npm. The old standalone tools (trackers, notes, references, books) were removed in Nov 2026 — don't recreate them.
+
+The repo is PUBLIC. Never commit personal data, tokens, or private notes. Services that need privacy live on their own subdomain behind Cloudflare Access (`home.`, `energy.`, `terminal.`).
 
 ## Development
 
@@ -15,11 +17,9 @@ python3 -m http.server 8080
 
 There are no tests, no linting tools, no CI. Correctness is verified by opening the page in a browser.
 
-## Adding a new tool
+## Adding a link
 
-1. Create a new `.html` file following the page template below.
-2. Add a card to `index.html` above the `<!-- ADD NEW CARDS ABOVE THIS LINE -->` comment — use the "Add a Tool" generator on the page itself to produce the snippet.
-3. Add to the service worker cache list in `sw.js` (once created).
+Copy a `tool-card` line in `index.html` into the right section (Work / Life / Systems). Add `<span class="lock">locked</span>` inside `.card-meta` if the target sits behind Cloudflare Access. New local pages also go in the `ASSETS` list in `sw.js` (bump `CACHE`).
 
 ## Theme & design system
 
@@ -50,13 +50,6 @@ Every page uses the same CSS variables and fonts. Do not deviate.
 
 `--cream`, `--parchment`, `--teal`, `--burnt` are legacy aliases for old pages — keep them so existing CSS doesn't break.
 
-**Accent colours per tool** (for headers/highlights, deviate from `--accent` when the tool has its own identity):
-- Cardiac Surgery: `--warm` (`#c45e2a`, orange)
-- Drug Reference: `--rust` (`#7a3a1a`)
-- Shaun's Ledger: `--purple` (`#5a3a7a`)
-- Shaun's Commonplace: `--gold` (`#8a6a20`)
-- RS3 Hiscores: `--gold`
-
 ## Page template
 
 Every sub-page must include these three structural elements:
@@ -84,45 +77,21 @@ Standard home-btn CSS:
 .home-btn:hover { background:var(--accent-light); }
 ```
 
-## GitHub save pattern
+## Subdomains
 
-Tools that persist data to the repo use this pattern (see `shaunswatch.html` as the reference implementation):
-
-- **Token/repo keys** are namespaced per tool (e.g. `scrolls_token`/`scrolls_repo`, `fc_token`/`fc_repo`) — a GitHub PAT with `contents: write`
-- **Save flow:** GET the file SHA first (if it exists), then PUT with `{message, content: btoa(JSON), sha}` to `https://api.github.com/repos/{repo}/contents/{path}`
-- **Data files** live in named subfolders: `watch/`, `ledger/`, `scrolls/` etc.
-- Settings panels always explain to the user where the token comes from and that it's stored locally only.
-
-## Public APIs used
-
-| Tool | API | Notes |
-|------|-----|-------|
-| Drug Reference | OpenFDA `https://api.fda.gov/drug/label.json` | No key. AU names differ — map noradrenaline→norepinephrine, paracetamol→acetaminophen, etc. |
-| Book Recommender | OpenLibrary `https://openlibrary.org/search.json` | No key. Covers: `https://covers.openlibrary.org/b/id/{cover_i}-M.jpg` |
-| Shaun's Ledger | OpenLibrary (same) | Live search with debounce |
-| RS3 Hiscores | Jagex hiscores API via CORS proxy | Proxy needed — see `rs3-hiscores.html` |
+| Host | What | How |
+|------|------|-----|
+| `shaunzen.com` | This launcher | GitHub Pages, Cloudflare DNS |
+| `home.shaunzen.com` | Home Assistant | Nabu Casa |
+| `energy.shaunzen.com` | Energy dashboard | Cloudflare Access |
+| `terminal.shaunzen.com` | Web terminal on EC2 `claude-code-server` (Sydney) | ttyd on 127.0.0.1:7681 → Cloudflare Tunnel → Cloudflare Access. ttyd rejects requests without `Cf-Access-Authenticated-User-Email` |
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Home page — tool grid, koan display, card generator |
-| `shaunswatch.html` | Watch journal — tabs (Write/Entries/Settings), GitHub save |
-| `shauns-commonplace.html` | Commonplace book — quotes, tags, GitHub save |
-| `shauns-ledger.html` | Book tracker — OpenLibrary search, star rating, GitHub save |
-| `drug-reference.html` | Drug lookup — OpenFDA, rust/navy theme, no API key |
-| `book-recommender.html` | Book recommendations — OpenLibrary search, Goodreads CSV upload |
-| `rs3-hiscores.html` | RuneScape 3 hiscore lookup |
-| `cardiac-surgery-reference.html` | Clinical reference — offline-friendly |
-| `sql-dojo.html` | SQL practice — in-browser SQLite via sql.js |
-| `daily-tracker.html` | Habit/daily tracking |
-| `lean-season.html` | Calorie/nutrition tracking |
-| `qigong.html` | Qigong practice guide |
-| `shauns-scrolls.html` | Quick notes — Write/Scrolls/Settings tabs, GitHub save to `scrolls/{id}.json` |
-| `study-flashcards.html` | Flashcards — Study/Decks/Create/Settings tabs, flip animation, GitHub save to `flashcards/{slug}.json` |
-| `manifest.json` | PWA manifest — theme colour, icons, standalone display |
-| `sw.js` | Service worker — cache-first for all HTML, updates in background |
-| `ledger/books.json` | Persisted book data |
-| `watch/` | Persisted watch entries |
-| `scrolls/` | Persisted scroll entries (one JSON per scroll) |
-| `flashcards/` | Persisted flashcard decks (one JSON per deck, slugified name) |
+| `index.html` | Launcher — koan + Work/Life/Systems tiles |
+| `manifest.json` | PWA manifest |
+| `sw.js` | Service worker — caches the launcher shell |
+| `.well-known/appspecific/com.tesla.3p.public-key.pem` | Tesla Fleet API public key — must stay |
+| `CNAME` | `shaunzen.com` |
