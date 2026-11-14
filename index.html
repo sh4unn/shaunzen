@@ -72,6 +72,54 @@
   .card-meta { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--faint); position:relative; z-index:1; display:flex; align-items:center; gap:0.4rem; }
   .lock { font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); border:1px solid var(--border); border-radius:2px; padding:0.05rem 0.35rem; }
 
+  .live { color:var(--muted); }
+  .live:empty { display:none; }
+
+  /* STATUS STRIP */
+  .status { position:relative; z-index:2; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:0.4rem 1.1rem; padding:0.7rem 1rem; border-bottom:1px solid var(--border); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+  .status .s { display:inline-flex; align-items:center; gap:0.4rem; }
+  .dot { width:7px; height:7px; border-radius:50%; background:var(--faint); flex:none; }
+  .dot.up { background:#3a8a4a; box-shadow:0 0 0 3px rgba(58,138,74,0.15); }
+  .dot.down { background:var(--warm); box-shadow:0 0 0 3px rgba(196,94,42,0.18); }
+  .status a { color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-faint); }
+  .status a:hover { border-color:var(--accent); }
+  .status .when { color:var(--faint); text-transform:none; letter-spacing:0.04em; }
+
+  /* MINI HA DASH */
+  .dash { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:0; border:1px solid var(--border); }
+  .dash-card { border:1px solid var(--border); margin:-1px 0 0 -1px; padding:1.1rem 1.25rem 1.2rem; background:var(--bg); }
+  .dash-title { font-family:'New Rocker',cursive; font-size:1.35rem; color:var(--ink); margin-bottom:0.6rem; }
+  .dash-row { display:flex; justify-content:space-between; gap:1rem; padding:0.28rem 0; border-top:1px dashed var(--border); font-family:'IBM Plex Mono',monospace; font-size:11px; }
+  .dash-row:first-of-type { border-top:none; }
+  .dash-row .k { color:var(--muted); }
+  .dash-row .v { color:var(--ink); text-align:right; }
+  .v.good { color:#3a7a4a; } .v.bad { color:var(--warm); } .v.na { color:var(--faint); }
+  .hint { font-family:'Spectral',serif; font-style:italic; font-size:0.85rem; color:var(--faint); padding:1rem 1.25rem; border:1px dashed var(--border); }
+  .hint code { font-family:'IBM Plex Mono',monospace; font-style:normal; font-size:0.75rem; color:var(--accent); }
+
+  /* CAPTURE */
+  .capture { border:1px solid var(--border); border-top:none; padding:1rem 1.25rem 1.1rem; background:var(--bg); }
+  .capture-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--faint); margin-bottom:0.5rem; display:flex; justify-content:space-between; gap:1rem; }
+  .capture textarea { width:100%; min-height:3.2rem; resize:vertical; background:white; border:1px solid var(--border); border-radius:4px; padding:0.6rem 0.8rem; color:var(--ink); font-family:'Spectral',serif; font-size:1rem; outline:none; transition:border-color 0.2s; }
+  .capture textarea:focus { border-color:var(--accent); }
+  .capture textarea:disabled { background:var(--surface); }
+  .capture-row { display:flex; justify-content:space-between; align-items:center; gap:0.75rem; margin-top:0.55rem; }
+  .capture-msg { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); }
+  .btn { background:var(--accent); color:white; border:none; border-radius:4px; padding:0.55rem 1.2rem; font-family:'IBM Plex Mono',monospace; font-size:0.75rem; letter-spacing:0.04em; cursor:pointer; transition:background 0.2s; }
+  .btn:hover { background:var(--accent-light); } .btn:disabled { background:var(--faint); cursor:default; }
+
+  /* COMMAND PALETTE */
+  .kbd { font-family:'IBM Plex Mono',monospace; font-size:9px; border:1px solid var(--border); border-radius:3px; padding:0.05rem 0.35rem; color:var(--muted); }
+  .palette { position:fixed; inset:0; z-index:200; background:rgba(26,38,40,0.35); display:none; align-items:flex-start; justify-content:center; padding:12vh 1rem 1rem; }
+  .palette.open { display:flex; }
+  .palette-box { width:100%; max-width:480px; background:var(--bg); border:1px solid var(--border); border-radius:6px; box-shadow:0 20px 60px rgba(26,38,40,0.25); overflow:hidden; }
+  .palette input { width:100%; border:none; border-bottom:1px solid var(--border); padding:0.9rem 1rem; font-family:'IBM Plex Mono',monospace; font-size:0.95rem; background:transparent; color:var(--ink); outline:none; }
+  .palette ul { list-style:none; max-height:50vh; overflow:auto; }
+  .palette li { padding:0.6rem 1rem; display:flex; justify-content:space-between; gap:1rem; cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; }
+  .palette li .n { font-family:'New Rocker',cursive; font-size:1.1rem; }
+  .palette li .m { color:var(--faint); font-size:10px; align-self:center; }
+  .palette li.sel { background:var(--surface); }
+
   footer { position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:1.25rem 1.5rem 2rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; }
   footer span { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:var(--faint); }
 
@@ -95,21 +143,42 @@
   <div class="koan-source" id="koansSource"></div>
 </div>
 
+<div class="status" id="status" aria-live="polite">
+  <span class="s"><span class="dot" data-dot="terminal"></span>Terminal</span>
+  <span class="s"><span class="dot" data-dot="server"></span>Server</span>
+  <span class="s"><span class="dot" data-dot="home"></span>Home</span>
+  <span class="s"><span class="dot" data-dot="energy"></span>Energy</span>
+  <span class="when" id="statusWhen"><a id="signIn" href="https://api.shaunzen.com/login?next=https%3A%2F%2Fshaunzen.com%2F">Sign in for live status</a></span>
+  <span class="s" title="Search tools"><span class="kbd">⌘K</span></span>
+</div>
+
 <main>
   <div class="section-block">
     <div class="section-label">— Work</div>
     <div class="tool-grid">
       <a class="tool-card" href="https://claude.ai/code" style="--card-color:#c45e2a;--card-tint:rgba(196,94,42,0.05);"><div class="card-name">Claude Code</div><div class="card-meta">claude.ai/code</div></a>
-      <a class="tool-card" href="https://terminal.shaunzen.com" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Terminal</div><div class="card-meta">terminal.shaunzen.com<span class="lock">locked</span></div></a>
+      <a class="tool-card" href="https://terminal.shaunzen.com" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Terminal</div><div class="card-meta"><span class="live" data-live="terminal"></span><span data-static>terminal.shaunzen.com</span><span class="lock">locked</span></div></a>
+      <a class="tool-card" href="https://m365.cloud.microsoft" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Microsoft 365</div><div class="card-meta">mail · teams · files</div></a>
+    </div>
+    <div class="capture">
+      <div class="capture-label"><span>Send to Claude</span><span id="inboxCount"></span></div>
+      <textarea id="captureText" placeholder="Sign in to send notes and tasks to Claude on the terminal" disabled></textarea>
+      <div class="capture-row"><span class="capture-msg" id="captureMsg">Lands in ~/inbox.md on the server within a minute.</span><button class="btn" id="captureBtn" disabled>Send</button></div>
     </div>
   </div>
 
   <div class="section-block">
     <div class="section-label">— Life</div>
     <div class="tool-grid">
-      <a class="tool-card" href="https://home.shaunzen.com" style="--card-color:#3a6a2a;--card-tint:rgba(58,106,42,0.05);"><div class="card-name">Home</div><div class="card-meta">home.shaunzen.com<span class="lock">locked</span></div></a>
-      <a class="tool-card" href="https://energy.shaunzen.com" style="--card-color:#8a6a20;--card-tint:rgba(138,106,32,0.05);"><div class="card-name">Energy</div><div class="card-meta">energy.shaunzen.com<span class="lock">locked</span></div></a>
+      <a class="tool-card" href="https://home.shaunzen.com" style="--card-color:#3a6a2a;--card-tint:rgba(58,106,42,0.05);"><div class="card-name">Home</div><div class="card-meta"><span class="live" data-live="home"></span><span data-static>home.shaunzen.com</span><span class="lock">locked</span></div></a>
+      <a class="tool-card" href="https://energy.shaunzen.com" style="--card-color:#8a6a20;--card-tint:rgba(138,106,32,0.05);"><div class="card-name">Energy</div><div class="card-meta"><span class="live" data-live="energy"></span><span data-static>energy.shaunzen.com</span><span class="lock">locked</span></div></a>
+      <a class="tool-card" href="https://hardcover.app" id="readingCard" style="--card-color:#5a3a7a;--card-tint:rgba(90,58,122,0.05);"><div class="card-name">Reading</div><div class="card-meta"><span class="live" data-live="reading"></span><span data-static>hardcover.app</span></div></a>
     </div>
+  </div>
+
+  <div class="section-block" id="dashBlock" hidden>
+    <div class="section-label">— Live</div>
+    <div class="dash" id="dash"></div>
   </div>
 
   <div class="section-block">
@@ -126,8 +195,15 @@
 
 <footer>
   <span>shaunzen.com</span>
-  <span>locked = Cloudflare sign-in</span>
+  <span>locked = Cloudflare sign-in · live data only shows when signed in</span>
 </footer>
+
+<div class="palette" id="palette" role="dialog" aria-label="Search tools">
+  <div class="palette-box">
+    <input id="paletteInput" type="text" placeholder="Jump to…" autocomplete="off" aria-label="Search tools">
+    <ul id="paletteList"></ul>
+  </div>
+</div>
 
 <script>
   const koans=[{text:"Before enlightenment, chop wood, carry water. After enlightenment, chop wood, carry water.",source:"Zen proverb"},{text:"To the mind that is still, the whole universe surrenders.",source:"Lao Tzu"},{text:"Flow with whatever may happen and let your mind be free.",source:"Zhuangzi"},{text:"Nature does not hurry, yet everything is accomplished.",source:"Lao Tzu"},{text:"When you realise there is nothing lacking, the whole world belongs to you.",source:"Tao Te Ching"},{text:"A tree that is unbending is easily broken. The soft and supple will prevail.",source:"Tao Te Ching"},{text:"Knowing others is wisdom. Knowing yourself is enlightenment.",source:"Tao Te Ching"},{text:"The usefulness of a cup is its emptiness.",source:"Lao Tzu"},{text:"Do you have the patience to wait until your mud settles and the water is clear?",source:"Lao Tzu"},{text:"What the caterpillar calls the end of the world, the master calls a butterfly.",source:"Zhuangzi"},{text:"He who knows does not speak. He who speaks does not know.",source:"Tao Te Ching"},{text:"Act without expectation, accomplish without claiming credit.",source:"Lao Tzu"},{text:"To return to the root is to find peace.",source:"Tao Te Ching"},{text:"Life is a series of natural and spontaneous changes. Don't resist them.",source:"Lao Tzu"},{text:"The ten thousand things rise and fall while the Self watches their return.",source:"Tao Te Ching"}];
@@ -135,6 +211,108 @@
   document.getElementById('koansText').textContent='\u201c'+k.text+'\u201d';
   document.getElementById('koansSource').textContent='\u2014 '+k.source;
   if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+  // ---------- Live data (api.shaunzen.com, behind Cloudflare Access) ----------
+  const API='https://api.shaunzen.com';
+  const $=s=>document.querySelector(s);
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let signedIn=false;
+
+  function fmt(it){
+    const s=it.state; if(s==null) return ['—','na'];
+    const n=parseFloat(s);
+    switch(it.kind){
+      case 'power': { const w=it.unit==='kW'?n*1000:n; return [Math.abs(w)>=1000?(w/1000).toFixed(1)+' kW':Math.round(w)+' W','']; }
+      case 'pct': return [(n<10?n.toFixed(1):Math.round(n))+'%',''];
+      case 'temp': return [n.toFixed(1)+'°',''];
+      case 'ms': return [Math.round(n)+' ms',n>80?'bad':''];
+      case 'mbps': return [(n<10?n.toFixed(1):Math.round(n))+' Mb/s',''];
+      case 'lock': return [s==='locked'?'Locked':s==='unlocked'?'Unlocked':s, s==='locked'?'good':'bad'];
+      case 'onoff': return [s==='on'?'Yes':'No', s==='on'?'good':'bad'];
+      case 'problem': return [s==='on'?'Yes':'No', s==='on'?'bad':'good'];
+      case 'presence': return [s==='home'?'Home':s==='not_home'?'Away':s, s==='home'?'good':''];
+      case 'climate': return [(s==='off'?'Off':s)+(it.current!=null?' · '+Number(it.current).toFixed(1)+'°':''),''];
+      default: return [s.replace(/_/g,' '),''];
+    }
+  }
+  const val=(groups,g,label)=>{const grp=(groups||[]).find(x=>x.group===g);const it=grp&&grp.items.find(i=>i.label===label);return it?fmt(it)[0]:null;};
+  function setLive(key,text){const el=document.querySelector(`[data-live="${key}"]`);if(!el)return;el.textContent=text||'';const st=el.parentElement.querySelector('[data-static]');if(st)st.style.display=text?'none':'';}
+  function ago(iso){const s=Math.round((Date.now()-Date.parse(iso))/1000);return s<60?s+'s ago':s<3600?Math.round(s/60)+'m ago':Math.round(s/3600)+'h ago';}
+
+  function render(d){
+    signedIn=true;
+    for(const [k,v] of Object.entries(d.status||{})){const dot=document.querySelector(`[data-dot="${k}"]`);if(dot){dot.className='dot '+(v==='up'?'up':v==='down'?'down':'');dot.title=k+': '+v;}}
+    $('#statusWhen').textContent='updated '+new Date(d.at).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+    const t=d.terminal; setLive('terminal', t ? (t.claude?'claude running':t.tmux?'session open · idle':'no session')+' · seen '+ago(t.last_seen) : 'server not reporting');
+    const g=d.ha&&d.ha.groups;
+    if(g){
+      const who=val(g,'Home','Shaun'), front=val(g,'Home','Front door');
+      setLive('home',[who,front&&('front '+front.toLowerCase())].filter(Boolean).join(' · '));
+      const solar=val(g,'Energy','Solar'), batt=val(g,'Energy','Battery');
+      setLive('energy',(solar&&solar!=='—')||(batt&&batt!=='—')?['☀ '+solar,'🔋 '+batt].join(' · '):'sensors unavailable');
+      $('#dash').innerHTML=g.map(grp=>`<div class="dash-card"><div class="dash-title">${esc(grp.group)}</div>${grp.items.map(it=>{const [v,c]=fmt(it);return `<div class="dash-row"><span class="k">${esc(it.label)}</span><span class="v ${c}">${esc(v)}</span></div>`;}).join('')}</div>`).join('');
+    } else {
+      const need=d.ha&&d.ha.needs, err=d.ha&&d.ha.error;
+      $('#dash').innerHTML=`<div class="hint">${need?'Connect Home Assistant: add a long-lived token as the <code>HA_TOKEN</code> secret on the <code>shaunzen-api</code> worker in Cloudflare.':'Home Assistant unreachable'+(err?' ('+esc(err)+')':'')+'.'}</div>`;
+    }
+    $('#dashBlock').hidden=false;
+    const r=d.reading;
+    if(r&&r.books&&r.books.length){const b=r.books[0];setLive('reading',b.title+(b.author?' — '+b.author:''));if(b.url)$('#readingCard').href=b.url;}
+    else if(r&&r.needs) setLive('reading','connect hardcover');
+    $('#inboxCount').textContent=d.inbox_pending?d.inbox_pending+' waiting for pickup':'';
+    $('#captureText').disabled=false; $('#captureBtn').disabled=false;
+    $('#captureText').placeholder='A note or task for Claude…';
+  }
+
+  async function refresh(){
+    try{
+      const res=await fetch(API+'/summary',{credentials:'include',redirect:'manual',cache:'no-store'});
+      if(res.type==='opaqueredirect'||res.status===401) throw new Error('signed out');
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      render(await res.json());
+    }catch(e){
+      if(!signedIn) return; // keep the sign-in link
+      $('#statusWhen').textContent='offline · retrying';
+    }
+  }
+  refresh(); setInterval(()=>{if(!document.hidden)refresh();},60000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+
+  async function send(){
+    const ta=$('#captureText'), msg=$('#captureMsg'), btn=$('#captureBtn');
+    const text=ta.value.trim(); if(!text) return;
+    btn.disabled=true; msg.textContent='Sending…';
+    try{
+      const res=await fetch(API+'/inbox',{method:'POST',credentials:'include',redirect:'manual',headers:{'Content-Type':'text/plain'},body:text});
+      if(!res.ok) throw new Error(res.type==='opaqueredirect'?'sign in again':'HTTP '+res.status);
+      ta.value=''; msg.textContent='Queued. Claude picks it up within a minute.'; refresh();
+    }catch(e){ msg.textContent='Not sent: '+e.message; }
+    btn.disabled=false;
+  }
+  $('#captureBtn').addEventListener('click',send);
+  $('#captureText').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();send();}});
+
+  // ---------- ⌘K palette ----------
+  const tools=[...document.querySelectorAll('.tool-card')].map(a=>({name:a.querySelector('.card-name').textContent,meta:(a.querySelector('[data-static]')||a.querySelector('.card-meta')).textContent,href:a.href}));
+  let sel=0, shown=tools;
+  const pal=$('#palette'), pin=$('#paletteInput'), plist=$('#paletteList');
+  function draw(){plist.innerHTML=shown.map((t,i)=>`<li class="${i===sel?'sel':''}" data-i="${i}"><span class="n">${esc(t.name)}</span><span class="m">${esc(t.meta)}</span></li>`).join('');}
+  function openPal(){pal.classList.add('open');pin.value='';sel=0;shown=tools;draw();pin.focus();}
+  function closePal(){pal.classList.remove('open');}
+  pin.addEventListener('input',()=>{const q=pin.value.toLowerCase();shown=tools.filter(t=>(t.name+' '+t.meta).toLowerCase().includes(q));sel=0;draw();});
+  pin.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){sel=Math.min(sel+1,shown.length-1);draw();e.preventDefault();}
+    else if(e.key==='ArrowUp'){sel=Math.max(sel-1,0);draw();e.preventDefault();}
+    else if(e.key==='Enter'&&shown[sel]){location.href=shown[sel].href;}
+    else if(e.key==='Escape'){closePal();}
+  });
+  plist.addEventListener('click',e=>{const li=e.target.closest('li');if(li)location.href=shown[+li.dataset.i].href;});
+  pal.addEventListener('click',e=>{if(e.target===pal)closePal();});
+  document.querySelector('.status .kbd').parentElement.addEventListener('click',openPal);
+  document.addEventListener('keydown',e=>{
+    const typing=/INPUT|TEXTAREA/.test(document.activeElement.tagName);
+    if((e.key==='k'&&(e.metaKey||e.ctrlKey))||(e.key==='/'&&!typing)){e.preventDefault();pal.classList.contains('open')?closePal():openPal();}
+  });
   document.fonts.ready.then(()=>{const c=document.createElement('canvas');c.width=64;c.height=64;const x=c.getContext('2d');x.fillStyle='#1a2628';x.beginPath();x.roundRect(0,0,64,64,10);x.fill();x.fillStyle='#f0f4f5';x.font="52px 'New Rocker'";x.textAlign='center';x.textBaseline='middle';x.fillText('S',32,35);const l=document.createElement('link');l.rel='icon';l.href=c.toDataURL();document.head.appendChild(l);});
 </script>
 </body>

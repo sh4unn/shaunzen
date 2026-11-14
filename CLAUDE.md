@@ -85,12 +85,26 @@ Standard home-btn CSS:
 | `home.shaunzen.com` | Home Assistant | Nabu Casa |
 | `energy.shaunzen.com` | Energy dashboard | Cloudflare Access |
 | `terminal.shaunzen.com` | Web terminal on EC2 `claude-code-server` (Sydney) | ttyd on 127.0.0.1:7681 → Cloudflare Tunnel → Cloudflare Access. ttyd rejects requests without `Cf-Access-Authenticated-User-Email` |
+| `api.shaunzen.com` | Live data for the launcher | Worker `shaunzen-api` (`workers/api/worker.js`), KV `shaunzen-api-state`, behind Access (plus JWT check in the worker). `/agent/*` is an Access bypass authenticated by the `AGENT_SECRET` bearer |
+
+## Live data (signed-in only)
+
+The launcher is static and public. Everything live comes from `api.shaunzen.com` via `fetch(..., {credentials:'include'})`; signed-out visitors just see the sign-in link.
+
+- `GET /summary` — status dots, tile details, mini HA dash, current Hardcover book, inbox count. Cached 60s in KV.
+- `POST /inbox` — capture box. Origin must be `https://shaunzen.com`. Body is plain text.
+- `/agent/heartbeat`, `/agent/inbox`, `/agent/ack` — called every minute by `shaunzen-agent` on the EC2 server (`server/install-agent.sh`). It writes captured notes to `~ec2-user/inbox.md`.
+- Mini HA dash entities live in the `DASH` array in `workers/api/worker.js`. Look up IDs in `~/GitHub/HomeAssistant/entities/register.md`.
+- Optional worker secrets, set in the Cloudflare dashboard (never commit them): `HA_TOKEN` (HA long-lived token), `HARDCOVER_TOKEN`.
+- Deploying the worker: upload `workers/api/worker.js` as module `worker.js` with bindings STATE (KV), TEAM, AUD, HA_URL, SITE_ORIGIN, AGENT_SECRET. Keep existing secrets.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Launcher — koan + Work/Life/Systems tiles |
+| `index.html` | Launcher — status strip, koan, Work/Life/Systems tiles, capture box, mini HA dash, ⌘K search |
+| `workers/api/worker.js` | Source of the `api.shaunzen.com` worker |
+| `server/install-agent.sh` | Installs heartbeat/inbox agent + terminal home-screen tags on the EC2 server |
 | `manifest.json` | PWA manifest |
 | `sw.js` | Service worker — caches the launcher shell |
 | `.well-known/appspecific/com.tesla.3p.public-key.pem` | Tesla Fleet API public key — must stay |
