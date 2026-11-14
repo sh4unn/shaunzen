@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shaunzen</title>
+<meta name="theme-color" content="#2a5a6a">
+<link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
@@ -60,38 +62,22 @@
 
   .tool-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:0; border:1px solid var(--border); }
 
-  .tool-card { display:flex; align-items:center; justify-content:center; text-align:center; text-decoration:none; color:var(--ink); padding:2.75rem 1.5rem; border:1px solid var(--border); margin:-1px 0 0 -1px; position:relative; background:var(--bg); transition:background 0.25s; min-height:130px; overflow:hidden; }
+  .tool-card { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.55rem; text-align:center; text-decoration:none; color:var(--ink); padding:2.25rem 1.5rem; border:1px solid var(--border); margin:-1px 0 0 -1px; position:relative; background:var(--bg); transition:background 0.25s; min-height:140px; overflow:hidden; -webkit-tap-highlight-color:transparent; }
   .tool-card::after { content:''; position:absolute; inset:0; background:var(--card-tint,rgba(42,90,106,0.05)); opacity:0; transition:opacity 0.3s; }
-  .tool-card:hover { background:var(--surface); }
-  .tool-card:hover::after { opacity:1; }
-  .tool-card:hover .card-name { color:var(--card-color,var(--accent)); }
-  .card-name { font-family:'New Rocker',cursive; font-size:clamp(1.4rem,3vw,2rem); line-height:1.15; color:var(--ink); transition:color 0.25s; position:relative; z-index:1; }
-
-  /* ADD TOOL */
-  .add-wrap { margin-top:2.5rem; border:1px dashed var(--border); padding:1.75rem; opacity:0; animation:up 0.7s ease forwards 1.3s; }
-  .add-title { font-family:'New Rocker',cursive; font-size:1.6rem; color:var(--muted); margin-bottom:0.2rem; }
-  .add-sub { font-family:'Spectral',serif; font-style:italic; font-size:0.82rem; color:var(--faint); margin-bottom:1.25rem; }
-  .add-form { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; }
-  .add-form input { background:white; border:1px solid var(--border); border-radius:4px; padding:0.55rem 0.8rem; color:var(--ink); font-family:'IBM Plex Mono',monospace; font-size:0.78rem; outline:none; transition:border-color 0.2s; }
-  .add-form input:focus { border-color:var(--accent); }
-  .add-form input::placeholder { color:var(--faint); }
-  .add-form .full { grid-column:1/-1; }
-  .btn-row { grid-column:1/-1; display:flex; gap:0.6rem; flex-wrap:wrap; margin-top:0.1rem; }
-  .btn { background:var(--accent); color:white; border:none; border-radius:4px; padding:0.6rem 1.4rem; font-family:'IBM Plex Mono',monospace; font-size:0.78rem; cursor:pointer; transition:background 0.2s; letter-spacing:0.04em; }
-  .btn:hover { background:var(--accent-light); }
-  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:4px; padding:0.6rem 1.1rem; font-family:'IBM Plex Mono',monospace; font-size:0.78rem; cursor:pointer; transition:all 0.2s; }
-  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
-  .code-wrap { display:none; margin-top:1rem; }
-  .code-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem; display:flex; justify-content:space-between; align-items:center; }
-  .copy-btn { background:transparent; border:1px solid var(--border); color:var(--muted); padding:0.15rem 0.5rem; font-family:'IBM Plex Mono',monospace; font-size:9px; cursor:pointer; transition:all 0.2s; }
-  .copy-btn:hover { border-color:var(--accent); color:var(--accent); }
-  .code-out { background:var(--card); border:1px solid var(--border); padding:1rem 1.2rem; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--accent); white-space:pre; overflow-x:auto; line-height:1.7; }
+  .tool-card:hover, .tool-card:focus-visible { background:var(--surface); outline:none; }
+  .tool-card:hover::after, .tool-card:focus-visible::after { opacity:1; }
+  .tool-card:hover .card-name, .tool-card:focus-visible .card-name { color:var(--card-color,var(--accent)); }
+  .tool-card:active { background:var(--card); }
+  .card-name { font-family:'New Rocker',cursive; font-size:clamp(1.5rem,3vw,2rem); line-height:1.15; color:var(--ink); transition:color 0.25s; position:relative; z-index:1; }
+  .card-meta { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--faint); position:relative; z-index:1; display:flex; align-items:center; gap:0.4rem; }
+  .lock { font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); border:1px solid var(--border); border-radius:2px; padding:0.05rem 0.35rem; }
 
   footer { position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:1.25rem 1.5rem 2rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; }
   footer span { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.1em; color:var(--faint); }
 
   @keyframes up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-  @media(max-width:600px) { .tool-grid{grid-template-columns:1fr 1fr;} .add-form{grid-template-columns:1fr;} .add-form .full,.btn-row{grid-column:1;} footer{flex-direction:column;gap:0.3rem;} }
+  @media(max-width:600px) { header{padding:3.5rem 1.25rem 2.25rem;} main{padding:2rem 1rem;} .tool-grid{grid-template-columns:1fr 1fr;} .tool-card{padding:1.75rem 0.75rem;min-height:120px;} .card-meta{font-size:9px;} footer{flex-direction:column;gap:0.3rem;padding:1.25rem 1rem 2rem;} }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; opacity:1!important; transition:none!important; } }
 </style>
 </head>
 <body>
@@ -101,7 +87,7 @@
   <div class="site-mark">S</div>
   <div class="eyebrow">Personal Toolkit — Toowoomba</div>
   <h1>Shaunzen</h1>
-  <div class="subtitle">Clinical reference, practice & everyday tools</div>
+  <div class="subtitle">Work, life &amp; systems — one place</div>
 </header>
 
 <div class="koan">
@@ -110,73 +96,37 @@
 </div>
 
 <main>
-  <div class="grid-label" id="gridLabel"></div>
-
   <div class="section-block">
-    <div class="section-label">— Personal</div>
+    <div class="section-label">— Work</div>
     <div class="tool-grid">
-      <a class="tool-card" href="daily-tracker.html" style="--card-color:#5a7a3a;--card-tint:rgba(90,122,58,0.05);"><div class="card-name">Daily Tracker</div></a>
-      <a class="tool-card" href="pomodoro.html" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Pomodoro</div></a>
-      <a class="tool-card" href="lean-season.html" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Lean Season</div></a>
-      <a class="tool-card" href="qigong.html" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Qigong</div></a>
+      <a class="tool-card" href="https://claude.ai/code" style="--card-color:#c45e2a;--card-tint:rgba(196,94,42,0.05);"><div class="card-name">Claude Code</div><div class="card-meta">claude.ai/code</div></a>
+      <a class="tool-card" href="https://terminal.shaunzen.com" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Terminal</div><div class="card-meta">terminal.shaunzen.com<span class="lock">locked</span></div></a>
     </div>
   </div>
 
   <div class="section-block">
-    <div class="section-label">— Clinical</div>
+    <div class="section-label">— Life</div>
     <div class="tool-grid">
-      <a class="tool-card" href="surgical-reference.html" style="--card-color:#c45e2a;--card-tint:rgba(196,94,42,0.05);"><div class="card-name">Surgical Reference</div></a>
-      <a class="tool-card" href="drug-reference.html" style="--card-color:#8a2020;--card-tint:rgba(138,32,32,0.05);"><div class="card-name">Drug Reference</div></a>
+      <a class="tool-card" href="https://home.shaunzen.com" style="--card-color:#3a6a2a;--card-tint:rgba(58,106,42,0.05);"><div class="card-name">Home</div><div class="card-meta">home.shaunzen.com<span class="lock">locked</span></div></a>
+      <a class="tool-card" href="https://energy.shaunzen.com" style="--card-color:#8a6a20;--card-tint:rgba(138,106,32,0.05);"><div class="card-name">Energy</div><div class="card-meta">energy.shaunzen.com<span class="lock">locked</span></div></a>
     </div>
   </div>
 
   <div class="section-block">
-    <div class="section-label">— Books &amp; Notes</div>
+    <div class="section-label">— Systems</div>
     <div class="tool-grid">
-      <a class="tool-card" href="shauns-ledger.html" style="--card-color:#6a3a7a;--card-tint:rgba(106,58,122,0.05);"><div class="card-name">Reading Log</div></a>
-      <a class="tool-card" href="shauns-commonplace.html" style="--card-color:#7a6a20;--card-tint:rgba(122,106,32,0.05);"><div class="card-name">Commonplace</div></a>
-      <a class="tool-card" href="shauns-scrolls.html" style="--card-color:#2a5a6a;--card-tint:rgba(42,90,106,0.05);"><div class="card-name">Notes</div></a>
-      <a class="tool-card" href="book-recommender.html" style="--card-color:#6a3a7a;--card-tint:rgba(106,58,122,0.05);"><div class="card-name">Book Recommender</div></a>
-      <a class="tool-card" href="study-flashcards.html" style="--card-color:#5a3a7a;--card-tint:rgba(90,58,122,0.05);"><div class="card-name">Flashcards</div></a>
+      <a class="tool-card" href="https://ap-southeast-2.console.aws.amazon.com/console/home?region=ap-southeast-2" style="--card-color:#c45e2a;--card-tint:rgba(196,94,42,0.05);"><div class="card-name">AWS</div><div class="card-meta">console · sydney</div></a>
+      <a class="tool-card" href="https://dash.cloudflare.com" style="--card-color:#c45e2a;--card-tint:rgba(196,94,42,0.05);"><div class="card-name">Cloudflare</div><div class="card-meta">dash.cloudflare.com</div></a>
+      <a class="tool-card" href="https://github.com/sh4unn" style="--card-color:#1a2628;--card-tint:rgba(26,38,40,0.05);"><div class="card-name">GitHub</div><div class="card-meta">github.com/sh4unn</div></a>
     </div>
   </div>
 
-  <div class="section-block">
-    <div class="section-label">— Other</div>
-    <div class="tool-grid">
-      <a class="tool-card" href="sql-dojo.html" style="--card-color:#2a6a3a;--card-tint:rgba(42,106,58,0.05);"><div class="card-name">SQL Dojo</div></a>
-      <a class="tool-card" href="rs3-hiscores.html" style="--card-color:#8a6a20;--card-tint:rgba(138,106,32,0.05);"><div class="card-name">RS3 Hiscores</div></a>
-    </div>
-  </div>
-
-  <div style="grid-column:1/-1;border-top:1px solid var(--border);padding-top:0;margin-top:0;"></div>
-  <div style="grid-column:1/-1;padding:1.25rem 1.5rem 0.25rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--faint);">Off-grid</div>
-  <a class="tool-card" href="cabin-12v-shopping-list.html" style="--card-color:#3a6a2a;--card-tint:rgba(58,106,42,0.05);"><div class="card-name">Cabin Build</div></a>
-
-  <!-- ADD NEW CARDS ABOVE THIS LINE -->
-
-  <div class="add-wrap">
-    <div class="add-title">Add a Tool</div>
-    <div class="add-sub">Two fields. Generate the code. Paste above the comment. Upload to GitHub.</div>
-    <div class="add-form">
-      <input type="text" id="toolName" placeholder="Tool name" class="full">
-      <input type="text" id="toolFile" placeholder="filename.html">
-      <input type="text" id="toolColor" placeholder="Hover colour hex" value="#2a5a6a">
-      <div class="btn-row">
-        <button class="btn" onclick="generateCard()">Generate code</button>
-        <button class="btn-ghost" onclick="clearForm()">Clear</button>
-      </div>
-    </div>
-    <div class="code-wrap" id="codeWrap">
-      <div class="code-label"><span>Paste above the comment in index.html</span><button class="copy-btn" onclick="copyCode()">Copy</button></div>
-      <div class="code-out" id="codeOut"></div>
-    </div>
-  </div>
+  <!-- ADD NEW CARDS: copy a tool-card line into the right section -->
 </main>
 
 <footer>
-  <span>shaunzen — sh4unn.github.io/shaunzen</span>
-  <span id="footerCount"></span>
+  <span>shaunzen.com</span>
+  <span>locked = Cloudflare sign-in</span>
 </footer>
 
 <script>
@@ -184,15 +134,8 @@
   const k=koans[Math.floor(Date.now()/86400000)%koans.length];
   document.getElementById('koansText').textContent='\u201c'+k.text+'\u201d';
   document.getElementById('koansSource').textContent='\u2014 '+k.source;
-  const count=document.querySelectorAll('.tool-card').length;
-  document.getElementById('footerCount').textContent=count+' tools';
-  document.getElementById('gridLabel').textContent='';
-  function hexToRgb(h){h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
-  function generateCard(){const name=document.getElementById('toolName').value.trim(),file=document.getElementById('toolFile').value.trim(),color=document.getElementById('toolColor').value.trim()||'#2a5a6a';if(!name||!file){alert('Need a name and filename.');return;}const[r,g,b]=hexToRgb(color);document.getElementById('codeOut').textContent=`<a class="tool-card" href="${file}" style="--card-color:${color};--card-tint:rgba(${r},${g},${b},0.05);">\n  <div class="card-name">${name}</div>\n</a>`;document.getElementById('codeWrap').style.display='block';}
-  function copyCode(){navigator.clipboard.writeText(document.getElementById('codeOut').textContent).then(()=>{const b=document.querySelector('.copy-btn');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2000);});}
   if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
   document.fonts.ready.then(()=>{const c=document.createElement('canvas');c.width=64;c.height=64;const x=c.getContext('2d');x.fillStyle='#1a2628';x.beginPath();x.roundRect(0,0,64,64,10);x.fill();x.fillStyle='#f0f4f5';x.font="52px 'New Rocker'";x.textAlign='center';x.textBaseline='middle';x.fillText('S',32,35);const l=document.createElement('link');l.rel='icon';l.href=c.toDataURL();document.head.appendChild(l);});
-  function clearForm(){document.getElementById('toolName').value='';document.getElementById('toolFile').value='';document.getElementById('toolColor').value='#2a5a6a';document.getElementById('codeWrap').style.display='none';}
 </script>
 </body>
 </html>
