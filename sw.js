@@ -1,7 +1,8 @@
-const CACHE = 'shaunzen-v3';
+const CACHE = 'shaunzen-v4';
 const ASSETS = [
   './',
   './index.html',
+  './books.html',
   './favicon.svg',
   './manifest.json',
 ];

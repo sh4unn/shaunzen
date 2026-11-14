@@ -172,7 +172,7 @@
     <div class="tool-grid">
       <a class="tool-card" href="https://home.shaunzen.com" style="--card-color:#3a6a2a;--card-tint:rgba(58,106,42,0.05);"><div class="card-name">Home</div><div class="card-meta"><span class="live" data-live="home"></span><span data-static>home.shaunzen.com</span><span class="lock">locked</span></div></a>
       <a class="tool-card" href="https://energy.shaunzen.com" style="--card-color:#8a6a20;--card-tint:rgba(138,106,32,0.05);"><div class="card-name">Energy</div><div class="card-meta"><span class="live" data-live="energy"></span><span data-static>energy.shaunzen.com</span><span class="lock">locked</span></div></a>
-      <a class="tool-card" href="https://hardcover.app" id="readingCard" style="--card-color:#5a3a7a;--card-tint:rgba(90,58,122,0.05);"><div class="card-name">Reading</div><div class="card-meta"><span class="live" data-live="reading"></span><span data-static>hardcover.app</span></div></a>
+      <a class="tool-card" href="books.html" id="readingCard" style="--card-color:#5a3a7a;--card-tint:rgba(90,58,122,0.05);"><div class="card-name">Reading</div><div class="card-meta"><span class="live" data-live="reading"></span><span data-static>Kindle &amp; next up</span></div></a>
     </div>
   </div>
 
@@ -257,8 +257,8 @@
     }
     $('#dashBlock').hidden=false;
     const r=d.reading;
-    if(r&&r.books&&r.books.length){const b=r.books[0];setLive('reading',b.title+(b.author?' — '+b.author:''));if(b.url)$('#readingCard').href=b.url;}
-    else if(r&&r.needs) setLive('reading','connect hardcover');
+    if(r&&r.books&&r.books.length){const b=r.books[0];setLive('reading',b.title+(b.percent!=null?' · '+Math.round(b.percent)+'%':(b.author?' — '+b.author:'')));if(b.url)$('#readingCard').href=b.url;}
+    else if(r&&r.needs) setLive('reading','connect register');
     $('#inboxCount').textContent=d.inbox_pending?d.inbox_pending+' waiting for pickup':'';
     $('#captureText').disabled=false; $('#captureBtn').disabled=false;
     $('#captureText').placeholder='A note or task for Claude…';
