@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Shaunzen (shaunzen.com, GitHub Pages) is a launcher: one `index.html` with Work / Life / Systems tiles linking to Shaun's services. No build system, no framework, no npm. The old standalone tools (trackers, notes, references, books) were removed in Nov 2026 — don't recreate them.
+Shaunzen (shaunzen.com, GitHub Pages) is a launcher: one `index.html` with Work / Life / Systems tiles linking to Shaun's services. No build system, no framework, no npm. The old standalone tools (trackers, notes, references, books) were removed in Nov 2026 — don't recreate them. `books.html` is the exception: a read-only view of the private book register, not an editing tool.
 
 The repo is PUBLIC. Never commit personal data, tokens, or private notes. Services that need privacy live on their own subdomain behind Cloudflare Access (`home.`, `energy.`, `terminal.`).
 
@@ -91,11 +91,12 @@ Standard home-btn CSS:
 
 The launcher is static and public. Everything live comes from `api.shaunzen.com` via `fetch(..., {credentials:'include'})`; signed-out visitors just see the sign-in link.
 
-- `GET /summary` — status dots, tile details, mini HA dash, current Hardcover book, inbox count. Cached 60s in KV.
+- `GET /summary` — status dots, tile details, mini HA dash, current book (from the book register; Hardcover only as a fallback), inbox count. Cached 60s in KV.
+- `GET /books` — data for `books.html`: now reading (Kindle %), Claude's weekly picks, stats, recently finished, up next. Built from `books.json`, `reading-log.json` and `recommendations.md` in the private `sh4unn/book-register` repo (read with `GITHUB_TOKEN`), cached 5 min in KV. The register updates when Shaun plugs in the Kindle (weekly) and pushes to GitHub; the picks update every Monday.
 - `POST /inbox` — capture box. Origin must be `https://shaunzen.com`. Body is plain text.
 - `/agent/heartbeat`, `/agent/inbox`, `/agent/ack` — called every minute by `shaunzen-agent` on the EC2 server (`server/install-agent.sh`). It writes captured notes to `~ec2-user/inbox.md`.
 - Mini HA dash entities live in the `DASH` array in `workers/api/worker.js`. Look up IDs in `~/GitHub/HomeAssistant/entities/register.md`.
-- Optional worker secrets, set in the Cloudflare dashboard (never commit them): `HA_TOKEN` (HA long-lived token), `HARDCOVER_TOKEN`.
+- Optional worker secrets, set in the Cloudflare dashboard (never commit them): `HA_TOKEN` (HA long-lived token), `GITHUB_TOKEN` (fine-grained PAT, read-only Contents on `sh4unn/book-register`), `HARDCOVER_TOKEN` (legacy fallback). Optional var `BOOKS_REPO` overrides the repo.
 - Deploying the worker: upload `workers/api/worker.js` as module `worker.js` with bindings STATE (KV), TEAM, AUD, HA_URL, SITE_ORIGIN, AGENT_SECRET. Keep existing secrets.
 
 ## Files
@@ -103,6 +104,7 @@ The launcher is static and public. Everything live comes from `api.shaunzen.com`
 | File | Purpose |
 |------|---------|
 | `index.html` | Launcher — status strip, koan, Work/Life/Systems tiles, capture box, mini HA dash, ⌘K search |
+| `books.html` | Reading page — static shell; all data comes from `api.shaunzen.com/books` after sign-in (no reading data in this public repo) |
 | `workers/api/worker.js` | Source of the `api.shaunzen.com` worker |
 | `server/install-agent.sh` | Installs heartbeat/inbox agent + terminal home-screen tags on the EC2 server |
 | `manifest.json` | PWA manifest |

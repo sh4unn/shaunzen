@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading — Shaunzen</title>
+<meta name="theme-color" content="#2a5a6a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f0f4f5; --surface:#e4ecee; --surface2:#dde7ea;
+    --border:#c0ced2; --slate:#bfcbce;
+    --ink:#1a2628; --muted:#4a6068; --faint:#8fa0a5;
+    --accent:#2a5a6a; --accent-light:#3a7a8c; --accent-faint:#e0ecf0;
+    --warm:#c45e2a; --gold:#8a6a20; --green:#3a6a2a; --red:#7a2020; --purple:#5a3a7a;
+    --cream:#f0f4f5; --parchment:#e4ecee; --teal:#2a5a6a; --teal-light:#3a7a8c; --teal-faint:#e0ecf0;
+    --burnt:#c45e2a; --burnt-faint:#f5ede8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:'Spectral',serif; min-height:100vh; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"); }
+  .bg-layer { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .orb { position:absolute; border-radius:50%; filter:blur(120px); opacity:0.15; animation:drift 28s ease-in-out infinite alternate; }
+  .orb1 { width:60vw; height:60vw; background:radial-gradient(circle,#bfcbce,transparent 70%); top:-20%; left:-20%; animation-duration:22s; }
+  .orb2 { width:45vw; height:45vw; background:radial-gradient(circle,#5a3a7a,transparent 70%); bottom:-15%; right:-15%; animation-duration:32s; animation-delay:-12s; }
+  @keyframes drift { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(3vw,-3vh) scale(1.03)} 100%{transform:translate(-2vw,2vh) scale(0.98)} }
+  @keyframes up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--accent); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; }
+  .home-btn:hover { background:var(--accent-light); }
+
+  .header { position:relative; z-index:2; text-align:center; padding:5rem 2rem 2.75rem; border-bottom:1px solid var(--border); }
+  .header-label { font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:300; letter-spacing:0.4em; text-transform:uppercase; color:var(--faint); margin-bottom:0.9rem; animation:up 0.7s ease both; }
+  h1 { font-family:'New Rocker',cursive; font-size:clamp(3rem,10vw,6.5rem); font-weight:400; line-height:1; color:var(--ink); text-shadow:0 2px 16px rgba(26,38,40,0.12); margin-bottom:0.5rem; animation:up 0.9s ease both 0.15s; }
+  .header-sub { font-style:italic; font-size:0.9rem; color:var(--faint); animation:up 0.9s ease both 0.3s; }
+
+  .status { position:relative; z-index:2; text-align:center; padding:0.7rem 1rem; border-bottom:1px solid var(--border); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; color:var(--faint); }
+  .status a { color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-faint); }
+
+  main { position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+  section { margin-bottom:2.75rem; animation:up 0.7s ease both 0.45s; }
+  .section-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--faint); margin-bottom:0.85rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; gap:1rem; }
+  .section-label span:last-child { letter-spacing:0.08em; text-transform:none; }
+
+  .grid { display:grid; gap:0; border:1px solid var(--border); }
+  .cell { border:1px solid var(--border); margin:-1px 0 0 -1px; background:var(--bg); padding:1.4rem 1.5rem; }
+
+  /* now reading */
+  .now { display:grid; grid-template-columns:1fr auto; gap:0.4rem 2rem; align-items:end; padding:2rem 1.75rem; }
+  .now-title { font-family:'New Rocker',cursive; font-size:clamp(1.8rem,4.5vw,2.8rem); line-height:1.1; grid-column:1 / -1; }
+  .now-author { font-style:italic; color:var(--muted); font-size:1.05rem; grid-column:1; grid-row:2; }
+  .now-pct { font-family:'IBM Plex Mono',monospace; font-size:2.6rem; font-weight:300; color:var(--accent); line-height:1; text-align:right; grid-row:2; grid-column:2; }
+  .bar { grid-column:1 / -1; height:6px; background:var(--surface2); border-radius:3px; margin-top:1rem; overflow:hidden; }
+  .bar > div { height:100%; background:var(--accent); border-radius:3px; }
+  .now-meta { grid-column:1 / -1; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; color:var(--faint); margin-top:0.5rem; }
+
+  /* picks */
+  .picks { grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+  .pick { position:relative; }
+  .pick .n { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.25em; text-transform:uppercase; color:var(--faint); margin-bottom:0.6rem; }
+  .pick.top .n { color:var(--warm); }
+  .pick.top { background:linear-gradient(var(--burnt-faint),var(--bg)); }
+  .pick .t { font-family:'New Rocker',cursive; font-size:1.45rem; line-height:1.15; }
+  .pick .a { font-style:italic; color:var(--muted); font-size:0.9rem; margin:0.15rem 0 0.6rem; }
+  .pick .r { font-size:0.92rem; color:var(--ink); line-height:1.5; }
+  .note { font-style:italic; font-size:0.88rem; color:var(--muted); padding:0.8rem 1.5rem; border:1px solid var(--border); border-top:none; background:var(--surface); }
+
+  /* stats */
+  .tiles { grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); }
+  .tile .k { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.22em; text-transform:uppercase; color:var(--faint); }
+  .tile .v { font-family:'IBM Plex Mono',monospace; font-weight:300; font-size:2.1rem; color:var(--ink); margin:0.35rem 0 0.15rem; }
+  .tile .s { font-size:0.82rem; font-style:italic; color:var(--muted); }
+  .charts { grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); border-top:none; }
+  .chart-title { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:var(--muted); margin-bottom:1rem; }
+  .bars { display:flex; align-items:flex-end; gap:2px; height:130px; border-bottom:1px solid var(--border); }
+  .bars .col { flex:1; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; position:relative; cursor:default; }
+  .bars .col::before { content:''; position:absolute; inset:0 -1px; }
+  .bars .fill { width:min(70%,28px); background:var(--accent); border-radius:4px 4px 0 0; min-height:0; transition:background 0.15s; }
+  .bars .col:hover .fill, .bars .col:focus .fill { background:var(--accent-light); }
+  .bars .val { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--muted); margin-bottom:3px; }
+  .axis { display:flex; gap:2px; margin-top:0.35rem; }
+  .axis span { flex:1; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--faint); }
+  .tip { position:fixed; z-index:50; pointer-events:none; background:var(--ink); color:var(--bg); font-family:'IBM Plex Mono',monospace; font-size:10px; line-height:1.5; padding:0.45rem 0.6rem; border-radius:3px; max-width:260px; opacity:0; transition:opacity 0.1s; }
+  .tip.on { opacity:1; }
+
+  /* lists */
+  .rows { border:1px solid var(--border); }
+  .row { display:grid; grid-template-columns:1fr auto; gap:0.2rem 1rem; padding:0.75rem 1.25rem; border-top:1px dashed var(--border); background:var(--bg); }
+  .row:first-child { border-top:none; }
+  .row .t { font-size:1.02rem; }
+  .row .a { font-style:italic; color:var(--muted); font-size:0.88rem; }
+  .row .m { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); text-align:right; white-space:nowrap; align-self:center; grid-row:1 / span 2; grid-column:2; }
+  .stars { color:var(--gold); letter-spacing:0.08em; }
+  .chip { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); border:1px solid var(--border); border-radius:2px; padding:0.05rem 0.35rem; margin-left:0.35rem; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
+
+  .hint { font-style:italic; font-size:0.95rem; color:var(--muted); padding:1.5rem; border:1px dashed var(--border); text-align:center; line-height:1.7; }
+  .hint a { color:var(--accent); }
+  .hint code { font-family:'IBM Plex Mono',monospace; font-style:normal; font-size:0.78rem; color:var(--accent); }
+
+  .crumb { position:relative; z-index:2; background:var(--surface); border-top:1px solid var(--border); padding:0.75rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--faint); text-align:center; }
+  .crumb a { color:var(--accent); text-decoration:none; }
+
+  @media(max-width:700px) { .header{padding:4rem 1.25rem 2.25rem;} main{padding:2rem 1rem 3rem;} .two{grid-template-columns:1fr;} .now{padding:1.5rem 1.25rem;} .now-pct{font-size:2rem;} }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
+</style>
+</head>
+<body>
+<div class="bg-layer"><div class="orb orb1"></div><div class="orb orb2"></div></div>
+<a class="home-btn" href="index.html">← Home</a>
+
+<div class="header">
+  <div class="header-label">Life — Reading</div>
+  <h1>Reading</h1>
+  <div class="header-sub">What's open on the Kindle, what's next, and how the year is going</div>
+</div>
+<div class="status" id="status">Loading…</div>
+
+<main id="main"></main>
+
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="crumb"><a href="index.html">Home</a> &rsaquo; Reading</div>
+
+<script>
+const API = 'https://api.shaunzen.com';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const short = t => esc(String(t).split(/[:(]/)[0].trim());
+const stars = r => r ? '★'.repeat(Math.floor(r)) + (r % 1 ? '½' : '') : '';
+function ago(d) {
+  if (!d) return '';
+  const days = Math.round((Date.now() - Date.parse(d)) / 864e5);
+  return days <= 0 ? 'today' : days === 1 ? 'yesterday' : days < 14 ? `${days} days ago` : `${Math.round(days / 7)} weeks ago`;
+}
+function fmtDate(d) { if (!d) return ''; const x = new Date(d); return `${x.getDate()} ${MONTHS[x.getMonth()]}`; }
+
+function signedOut() {
+  $('#status').innerHTML = `<a href="${API}/login?next=${encodeURIComponent('https://shaunzen.com/books.html')}">Sign in to see reading</a>`;
+  $('#main').innerHTML = `<div class="hint">Reading data is private. <a href="${API}/login?next=${encodeURIComponent('https://shaunzen.com/books.html')}">Sign in</a> to load it.</div>`;
+}
+
+function bars(data, label, valueKey, tipFn) {
+  const max = Math.max(1, ...data.map(d => d[valueKey]));
+  return `<div class="bars">${data.map((d, i) => {
+      const h = d[valueKey] / max * 100;
+      return `<div class="col" tabindex="0" data-tip="${esc(tipFn(d))}">
+        ${d[valueKey] ? `<div class="val">${d[valueKey]}</div>` : ''}
+        <div class="fill" style="height:${h ? `max(${h}%,4px)` : '0'}"></div></div>`;
+    }).join('')}</div>
+    <div class="axis">${data.map(d => `<span>${esc(label(d))}</span>`).join('')}</div>`;
+}
+
+function render(d) {
+  const s = d.stats;
+  $('#status').textContent = s.lastExport
+    ? `Kindle last synced ${fmtDate(s.lastExport)} (${ago(s.lastExport)}) · ${s.counts.read} read · ${s.counts.want} to read`
+    : `${s.counts.read} read · ${s.counts.want} to read`;
+  let h = '';
+
+  // now reading
+  h += `<section><div class="section-label"><span>— Now reading</span><span></span></div>`;
+  if (d.reading.length) {
+    h += `<div class="grid">` + d.reading.map(b => {
+      const p = b.percent != null ? Math.round(b.percent) : null;
+      const meta = [b.started && `started ${fmtDate(b.started)}`, b.lastOpened && `last opened ${ago(b.lastOpened)}`].filter(Boolean).join(' · ');
+      return `<div class="cell now">
+        <div class="now-title">${short(b.title)}</div>
+        ${p != null ? `<div class="now-pct">${p}%</div>` : ''}
+        <div class="now-author">${esc(b.author)}</div>
+        ${p != null ? `<div class="bar" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><div style="width:${p}%"></div></div>` : ''}
+        <div class="now-meta">${esc(meta)}</div></div>`;
+    }).join('') + `</div>`;
+  } else {
+    h += `<div class="hint">Nothing open right now. Pick one below.</div>`;
+  }
+  h += `</section>`;
+
+  // this week's picks
+  if (d.picks && d.picks.items.length) {
+    h += `<section><div class="section-label"><span>— Claude's picks</span><span>week of ${fmtDate(d.picks.week)}</span></div>
+      <div class="grid picks">` + d.picks.items.map((p, i) => `
+        <div class="cell pick${p.top ? ' top' : ''}"><div class="n">${p.top ? 'Top pick' : 'Or try'}</div>
+        <div class="t">${short(p.title)}</div><div class="a">${esc(p.author)}</div><div class="r">${esc(p.reason)}</div></div>`).join('') +
+      `</div>${d.picks.progress ? `<div class="note">${esc(d.picks.progress)}</div>` : ''}</section>`;
+  }
+
+  // stats
+  h += `<section><div class="section-label"><span>— ${esc(s.year)} so far</span><span></span></div>
+    <div class="grid tiles">
+      <div class="cell tile"><div class="k">Books finished</div><div class="v">${s.finished}</div><div class="s">${s.lastYear} last year</div></div>
+      <div class="cell tile"><div class="k">Pages</div><div class="v">${s.pages ? s.pages.toLocaleString() : '—'}</div><div class="s">in finished books</div></div>
+      <div class="cell tile"><div class="k">Average rating</div><div class="v">${s.avgRating != null ? s.avgRating.toFixed(1) : '—'}</div><div class="s"><span class="stars">${stars(s.avgRating)}</span></div></div>
+      <div class="cell tile"><div class="k">Pace</div><div class="v">${s.pace ?? '—'}</div><div class="s">${s.pace != null ? 'pages a week, last 4 weeks' : 'after two weekly syncs'}</div></div>
+    </div>
+    <div class="grid charts">
+      <div class="cell"><div class="chart-title">Books finished by month, ${esc(s.year)}</div>
+        ${bars(s.byMonth, x => MONTHS[x.m][0], 'n', x => `${MONTHS[x.m]}: ${x.n} book${x.n === 1 ? '' : 's'}${x.titles.length ? '\n' + x.titles.map(t => String(t).split(':')[0]).join('\n') : ''}`)}</div>
+      <div class="cell"><div class="chart-title">Books finished by year</div>
+        ${bars(s.byYear, x => "'" + x.y.slice(2), 'n', x => `${x.y}: ${x.n} book${x.n === 1 ? '' : 's'}`)}</div>
+    </div>
+    ${s.koreader ? `<div class="note">KOReader era, ${fmtDate(s.koreader.from)} to ${fmtDate(s.koreader.to)}: ${s.koreader.hours} hours on ${s.koreader.days} days.</div>` : ''}
+  </section>`;
+
+  // recent + queue
+  h += `<div class="two">
+    <section><div class="section-label"><span>— Recently finished</span><span></span></div><div class="rows">` +
+      d.recent.map(b => `<div class="row"><div class="t">${short(b.title)}</div><div class="m"><span class="stars">${stars(b.rating)}</span><br>${fmtDate(b.finished)} ${b.finished ? b.finished.slice(0, 4) : ''}</div><div class="a">${esc(b.author)}</div></div>`).join('') +
+    `</div></section>
+    <section><div class="section-label"><span>— Up next</span><span>${s.counts.want} on the list</span></div><div class="rows">` +
+      d.queue.map(b => `<div class="row"><div class="t">${short(b.title)}${b.onKindle ? '<span class="chip">on Kindle</span>' : ''}</div><div class="m">${esc((b.tags || [])[0] || '')}</div><div class="a">${esc(b.author)}${b.why ? ' — ' + esc(b.why) : ''}</div></div>`).join('') +
+    `</div></section></div>`;
+
+  $('#main').innerHTML = h;
+}
+
+// tooltip for chart bars
+const tip = $('#tip');
+function showTip(el, x, y) { tip.textContent = el.dataset.tip; tip.style.whiteSpace = 'pre-line'; tip.classList.add('on');
+  const r = tip.getBoundingClientRect(); tip.style.left = Math.min(x + 12, innerWidth - r.width - 8) + 'px'; tip.style.top = Math.max(y - r.height - 10, 8) + 'px'; }
+document.addEventListener('mousemove', e => { const c = e.target.closest('.col'); c ? showTip(c, e.clientX, e.clientY) : tip.classList.remove('on'); });
+document.addEventListener('focusin', e => { const c = e.target.closest('.col'); if (c) { const r = c.getBoundingClientRect(); showTip(c, r.left, r.top); } });
+document.addEventListener('focusout', () => tip.classList.remove('on'));
+
+async function load() {
+  try {
+    const res = await fetch(API + '/books', { credentials: 'include', redirect: 'manual', cache: 'no-store' });
+    if (res.type === 'opaqueredirect' || res.status === 401) return signedOut();
+    const d = await res.json();
+    if (d.needs) {
+      $('#status').textContent = 'Not connected yet';
+      $('#main').innerHTML = `<div class="hint">The reading API needs a <code>${esc(d.needs)}</code> secret on the <code>shaunzen-api</code> worker.</div>`;
+      return;
+    }
+    if (d.error) throw new Error(d.error);
+    render(d);
+  } catch (e) {
+    if (location.search.includes('demo')) return;
+    $('#status').textContent = 'Couldn’t load reading data: ' + e.message;
+  }
+}
+window.renderBooks = render;  // used by ?demo previews
+if (!location.search.includes('demo')) load();
+</script>
+</body>
+</html>

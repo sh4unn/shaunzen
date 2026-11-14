@@ -5,8 +5,10 @@
 // used by the EC2 server, authenticated with the AGENT_SECRET bearer token.
 //
 // Bindings: STATE (KV). Vars: TEAM, AUD, HA_URL, SITE_ORIGIN.
-// Secrets: AGENT_SECRET (set at deploy), HA_TOKEN and HARDCOVER_TOKEN (optional,
-// add them in the Cloudflare dashboard; tiles show "connect" hints until then).
+// Secrets: AGENT_SECRET (set at deploy), HA_TOKEN, GITHUB_TOKEN and HARDCOVER_TOKEN
+// (optional, add them in the Cloudflare dashboard; tiles show "connect" hints until then).
+// GITHUB_TOKEN: fine-grained, read-only Contents on the private book-register repo
+// (var BOOKS_REPO, default sh4unn/book-register). It feeds /books and the Reading tile.
 
 // Mini HA dash: read-only. Each item: [label, entity_id, kind]. kind picks the formatter
 // on the site (power, pct, temp, lock, onoff, problem, mbps, ms, presence, text).
@@ -60,6 +62,7 @@ export default {
         return Response.redirect(next.startsWith(env.SITE_ORIGIN + '/') ? next : env.SITE_ORIGIN + '/', 302);
       }
       if (req.method === 'GET' && url.pathname === '/summary') return cors(env, json(await summary(env)));
+      if (req.method === 'GET' && url.pathname === '/books') return cors(env, json(await books(env)));
       if (url.pathname === '/inbox') {
         if (req.method === 'GET') return cors(env, json(await listInbox(env)));
         if (req.method === 'POST') {
@@ -205,7 +208,13 @@ async function haStates(env) {
 }
 
 async function currentlyReading(env) {
-  if (!env.HARDCOVER_TOKEN) return { needs: 'HARDCOVER_TOKEN' };
+  if (env.GITHUB_TOKEN) {
+    const b = await books(env).catch(() => null);
+    if (b && b.reading) {
+      return { books: b.reading.map(r => ({ title: r.title, author: r.author, percent: r.percent, url: `${env.SITE_ORIGIN}/books.html` })) };
+    }
+  }
+  if (!env.HARDCOVER_TOKEN) return { needs: 'GITHUB_TOKEN' };
   try {
     const query = `{ me { user_books(where: {status_id: {_eq: 2}}, limit: 3, order_by: {updated_at: desc}) { book { title slug contributions(limit: 1) { author { name } } } } } }`;
     const r = await fetch('https://api.hardcover.app/v1/graphql', {
@@ -223,6 +232,113 @@ async function currentlyReading(env) {
       })),
     };
   } catch { return { books: [] }; }
+}
+
+// ---------- Books (from the private book-register repo) ----------
+const BOOKS_CACHE_S = 300;
+
+async function repoFile(env, path) {
+  const repo = env.BOOKS_REPO || 'sh4unn/book-register';
+  const r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    headers: { Authorization: `Bearer ${env.GITHUB_TOKEN}`, Accept: 'application/vnd.github.raw+json', 'User-Agent': 'shaunzen-api' },
+  });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`GitHub ${r.status} for ${path}`);
+  return r.text();
+}
+
+async function books(env) {
+  if (!env.GITHUB_TOKEN) return { needs: 'GITHUB_TOKEN' };
+  const cached = await env.STATE.get('books', 'json');
+  if (cached && Date.now() - cached.t < BOOKS_CACHE_S * 1000) return cached.v;
+  const [reg, log, recs] = await Promise.all([
+    repoFile(env, 'books.json'), repoFile(env, 'reading-log.json'), repoFile(env, 'recommendations.md'),
+  ]);
+  const v = summariseBooks(JSON.parse(reg || '{"books":[]}').books, JSON.parse(log || '{}'), recs);
+  await env.STATE.put('books', JSON.stringify({ t: Date.now(), v }));
+  return v;
+}
+
+function summariseBooks(all, log, recs) {
+  const now = new Date();
+  const year = String(now.getFullYear());
+  const read = all.filter(b => b.status === 'read');
+  const dated = read.filter(b => b.date_finished).sort((a, b) => b.date_finished.localeCompare(a.date_finished));
+  const thisYear = dated.filter(b => b.date_finished.startsWith(year));
+  const rated = thisYear.filter(b => b.rating);
+  const slim = b => ({ title: b.title, author: b.author || '', rating: b.rating || null, finished: b.date_finished || null,
+                       tags: b.tags || [], pages: b.pages || null });
+
+  const byMonth = Array.from({ length: 12 }, (_, i) => ({ m: i, n: 0, titles: [] }));
+  for (const b of thisYear) { const m = +b.date_finished.slice(5, 7) - 1; byMonth[m].n++; byMonth[m].titles.push(b.title); }
+  const years = {};
+  for (const b of dated) { const y = b.date_finished.slice(0, 4); years[y] = (years[y] || 0) + 1; }
+  const y0 = now.getFullYear() - 5;
+  const byYear = Array.from({ length: 6 }, (_, i) => ({ y: String(y0 + i), n: years[String(y0 + i)] || 0 }));
+
+  // pace: pages a week across Kindle exports from the last 28 days
+  const ex = (log.exports || []).filter(e => Object.keys(e.percent || {}).length);
+  let pace = null;
+  if (ex.length >= 2) {
+    const since = Date.now() - 28 * 864e5;
+    const recent = ex.filter(e => Date.parse(e.at) >= since);
+    const win = recent.length >= 2 ? recent : ex.slice(-2);
+    const first = win[0], last = win[win.length - 1];
+    const days = Math.max((Date.parse(last.at) - Date.parse(first.at)) / 864e5, 1);
+    const byId = Object.fromEntries(all.map(b => [b.id, b]));
+    let pages = 0;
+    for (const [id, pct] of Object.entries(last.percent)) {
+      pages += Math.max(pct - (first.percent[id] || 0), 0) / 100 * ((byId[id] && byId[id].pages) || 300);
+    }
+    pace = Math.round(pages / days * 7);
+  }
+
+  const ko = log.koreader_daily || [];
+  const koMinutes = ko.reduce((s, d) => s + d.minutes, 0);
+
+  const prio = b => (b.priority || '9')[0];
+  const queue = all.filter(b => b.status === 'want')
+    .sort((a, b) => prio(a).localeCompare(prio(b)) || (b.kindle?.on_device ? 1 : 0) - (a.kindle?.on_device ? 1 : 0))
+    .slice(0, 12)
+    .map(b => ({ title: b.title, author: b.author || '', priority: b.priority || null, why: b.why || null,
+                 tags: b.tags || [], onKindle: !!b.kindle?.on_device }));
+
+  return {
+    reading: all.filter(b => b.status === 'reading').map(b => ({
+      title: b.title, author: b.author || '', percent: b.kindle?.percent ?? b.koreader?.percent ?? null,
+      lastOpened: b.kindle?.last_opened || null, started: b.date_started || null, pages: b.pages || null,
+    })),
+    stats: {
+      year, finished: thisYear.length, lastYear: years[String(now.getFullYear() - 1)] || 0,
+      pages: thisYear.reduce((s, b) => s + (b.pages || 0), 0),
+      avgRating: rated.length ? Math.round(rated.reduce((s, b) => s + b.rating, 0) / rated.length * 10) / 10 : null,
+      pace, byMonth, byYear,
+      counts: { read: read.length, want: all.filter(b => b.status === 'want').length, owned: all.filter(b => b.owned).length },
+      koreader: ko.length ? { hours: Math.round(koMinutes / 6) / 10, days: new Set(ko.map(d => d.date)).size,
+                             from: ko[0].date, to: ko[ko.length - 1].date } : null,
+      lastExport: log.last_export || null,
+    },
+    recent: dated.slice(0, 10).map(slim),
+    queue,
+    picks: parsePicks(recs),
+  };
+}
+
+// recommendations.md: "## Week of YYYY-MM-DD" then "1. **Title** by Author — reason"
+function parsePicks(md) {
+  if (!md) return null;
+  const m = md.match(/^## Week of (\S+)\s*\n([\s\S]*?)(?=^## |$(?![\s\S]))/m);
+  if (!m) return null;
+  const items = [];
+  let progress = null;
+  for (const line of m[2].split('\n')) {
+    const it = line.match(/^\s*\d+\.\s+\*\*(.+?)\*\*(?:\s+by\s+(.+?))?\s+[—-]\s+(.*)$/);
+    if (it) items.push({ title: it[1], author: it[2] || '', reason: it[3].replace(/\s*\(top pick\)\s*$/i, ''),
+                         top: /\(top pick\)/i.test(it[3]) || items.length === 0 });
+    const p = line.match(/^Progress:\s*(.*)$/i);
+    if (p) progress = p[1];
+  }
+  return { week: m[1], items, progress };
 }
 
 // ---------- helpers ----------
