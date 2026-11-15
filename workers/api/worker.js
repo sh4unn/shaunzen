@@ -48,7 +48,10 @@ const DASH = [
     ['Outside', 'sensor.garage_rome_outside_temperature', 'temp'],
   ]},
 ];
-const HEARTBEAT_STALE_S = 180;
+// The server posts a heartbeat every minute, but KV's free tier allows only 1,000 writes a day, so a heartbeat
+// is stored only when something changed or the stored one is HEARTBEAT_WRITE_S old (≤ ~150 writes a day).
+const HEARTBEAT_WRITE_S = 600;
+const HEARTBEAT_STALE_S = 900;
 const CACHE_S = 60;
 
 export default {
@@ -148,8 +151,11 @@ async function agent(req, env, url) {
       tmux: !!body.tmux,
       claude: !!body.claude,
     };
-    await env.STATE.put('heartbeat', JSON.stringify(hb));
-    return json({ ok: true });
+    const prev = await env.STATE.get('heartbeat', 'json');
+    const same = prev && ['ttyd', 'tunnel', 'tmux', 'claude'].every(k => prev[k] === hb[k]);
+    if (same && (Date.now() - Date.parse(prev.at)) / 1000 < HEARTBEAT_WRITE_S) return json({ ok: true, stored: false });
+    await cachePut(env, 'heartbeat', hb);
+    return json({ ok: true, stored: true });
   }
   if (req.method === 'GET' && url.pathname === '/agent/inbox') return json(await listInbox(env));
   if (req.method === 'POST' && url.pathname === '/agent/ack') {
@@ -314,7 +320,7 @@ async function summary(env) {
       currentlyReading(env),
     ]);
     base = { homeUp, energyUp, ha, reading };
-    await env.STATE.put('summary', JSON.stringify({ t: Date.now(), v: base }));
+    await cachePut(env, 'summary', { t: Date.now(), v: base });
   }
   const fresh = hb && (Date.now() - Date.parse(hb.at)) / 1000 < HEARTBEAT_STALE_S;
   const inbox = (await env.STATE.list({ prefix: 'inbox:' })).keys.length;
@@ -411,7 +417,7 @@ async function books(env) {
     return { error: `GitHub can't see books.json in ${env.BOOKS_REPO || 'sh4unn/book-register'}. Give the GITHUB_TOKEN access to that repo (Contents: Read-only).` };
   }
   const v = summariseBooks(JSON.parse(reg).books, JSON.parse(log || '{}'), recs);
-  await env.STATE.put('books', JSON.stringify({ t: Date.now(), v }));
+  await cachePut(env, 'books', { t: Date.now(), v });
   return v;
 }
 
@@ -711,6 +717,12 @@ function parsePicks(md) {
 }
 
 // ---------- helpers ----------
+// A cache or heartbeat write must never break a page: if KV refuses (e.g. the free tier's daily write limit),
+// log it and carry on with the fresh value.
+async function cachePut(env, key, value) {
+  try { await env.STATE.put(key, JSON.stringify(value)); }
+  catch (e) { console.warn(`KV put ${key} skipped: ${e.message || e}`); }
+}
 function json(v, status = 200) {
   return new Response(JSON.stringify(v), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 }
