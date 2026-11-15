@@ -55,6 +55,7 @@ export default {
     const url = new URL(req.url);
     try {
       if (url.pathname === '/agent/read-later') return await readLater(req, env);
+      if (url.pathname === '/agent/add-book') return await addBookLine(req, env);
       if (url.pathname.startsWith('/agent/')) return await agent(req, env, url);
 
       const who = await verifyAccess(req, env);
@@ -182,6 +183,42 @@ async function readLater(req, env) {
     return json({ ok: true, queued: link });
   }
   return json({ error: 'read-later.txt kept changing, try again' }, 409);
+}
+
+// ---------- Add a book (iPhone Shortcut → register) ----------
+// POST /agent/add-book with the same READ_LATER_TOKEN and a body of one line in the "Add books.txt"
+// format, e.g. "Dark Matter - Blake Crouch | read 5" (plain text, or JSON {"line": ...}).
+// Appends it to inbox.txt in the book-register repo; that commit triggers the repo's "Book inbox"
+// GitHub Action, which runs register.py inbox on the EC2 runner and commits books.json.
+async function addBookLine(req, env) {
+  const auth = req.headers.get('Authorization') || '';
+  if (!env.READ_LATER_TOKEN || !timingSafeEqual(auth, `Bearer ${env.READ_LATER_TOKEN}`)) return new Response('Unauthorized', { status: 401 });
+  if (req.method !== 'POST') return new Response('POST a line like "Title - Author | read 4"', { status: 405 });
+  let raw = (await req.text()).slice(0, 2000);
+  try { const j = JSON.parse(raw); if (j && typeof j.line === 'string') raw = j.line; } catch { /* plain text */ }
+  const line = raw.split('\n').map(s => s.trim()).find(Boolean)?.replace(/^#+\s*/, '').slice(0, 300);
+  if (!line) return json({ error: 'send one line, e.g. "Dark Matter - Blake Crouch | read 5"' }, 400);
+  const repo = env.BOOKS_REPO || 'sh4unn/book-register';
+  const api = `https://api.github.com/repos/${repo}/contents/inbox.txt`;
+  const headers = { Authorization: `Bearer ${env.GITHUB_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'shaunzen-api' };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const r = await fetch(api, { headers });
+    if (!r.ok && r.status !== 404) return json({ error: `GitHub ${r.status} reading inbox.txt` }, 502);
+    const file = r.ok ? await r.json() : null;
+    const text = file ? new TextDecoder().decode(Uint8Array.from(atob(file.content.replace(/\n/g, '')), c => c.charCodeAt(0))) : '';
+    const at = text.indexOf('\n# Added');
+    const next = at < 0 ? text.replace(/\n*$/, text ? '\n' : '') + line + '\n' : text.slice(0, at).replace(/\n*$/, '\n') + line + '\n' + text.slice(at);
+    const bytes = new TextEncoder().encode(next);
+    let bin = ''; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    const put = await fetch(api, {
+      method: 'PUT', headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Book inbox: add a line', content: btoa(bin), ...(file ? { sha: file.sha } : {}) }),
+    });
+    if (put.status === 409 || put.status === 422) continue;
+    if (!put.ok) return json({ error: `GitHub ${put.status} writing inbox.txt` }, 502);
+    return json({ ok: true, queued: line });
+  }
+  return json({ error: 'inbox.txt kept changing, try again' }, 409);
 }
 
 function timingSafeEqual(a, b) {
