@@ -96,7 +96,9 @@ export default {
           const text = (await req.text()).trim().slice(0, 4000);
           if (!text) return cors(env, json({ error: 'empty' }, 400));
           const id = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
-          await env.STATE.put(`inbox:${id}`, JSON.stringify({ id, text, at: new Date().toISOString(), by: who }));
+          const items = await listInbox(env);
+          items.push({ id, text, at: new Date().toISOString(), by: who });
+          await env.STATE.put(INBOX_KEY, JSON.stringify(items.slice(-200)));
           return cors(env, json({ ok: true, id }));
         }
       }
@@ -160,7 +162,10 @@ async function agent(req, env, url) {
   if (req.method === 'GET' && url.pathname === '/agent/inbox') return json(await listInbox(env));
   if (req.method === 'POST' && url.pathname === '/agent/ack') {
     const { ids } = await req.json();
-    await Promise.all((ids || []).slice(0, 100).map(id => env.STATE.delete(`inbox:${id}`)));
+    const done = new Set((ids || []).slice(0, 100));
+    const items = await listInbox(env);
+    const left = items.filter(x => !done.has(x.id));
+    if (left.length !== items.length) await env.STATE.put(INBOX_KEY, JSON.stringify(left));
     return json({ ok: true });
   }
   return new Response('Not found', { status: 404 });
@@ -301,10 +306,19 @@ function timingSafeEqual(a, b) {
   return d === 0;
 }
 
+// The inbox is one KV key holding a JSON array. The server polls it every minute, and KV's free tier allows
+// only 1,000 list operations a day, so polling must be a plain get. Items saved by the old one-key-per-item
+// layout ("inbox:<id>") are moved into the array once, the first time it's read.
+const INBOX_KEY = 'inbox';
 async function listInbox(env) {
+  const items = await env.STATE.get(INBOX_KEY, 'json');
+  if (Array.isArray(items)) return items;
   const { keys } = await env.STATE.list({ prefix: 'inbox:' });
-  const items = await Promise.all(keys.map(k => env.STATE.get(k.name, 'json')));
-  return items.filter(Boolean).sort((a, b) => a.id.localeCompare(b.id));
+  const old = (await Promise.all(keys.map(k => env.STATE.get(k.name, 'json')))).filter(Boolean)
+    .sort((a, b) => a.id.localeCompare(b.id));
+  await env.STATE.put(INBOX_KEY, JSON.stringify(old));
+  await Promise.all(keys.map(k => env.STATE.delete(k.name)));
+  return old;
 }
 
 // ---------- Summary ----------
@@ -323,7 +337,7 @@ async function summary(env) {
     await cachePut(env, 'summary', { t: Date.now(), v: base });
   }
   const fresh = hb && (Date.now() - Date.parse(hb.at)) / 1000 < HEARTBEAT_STALE_S;
-  const inbox = (await env.STATE.list({ prefix: 'inbox:' })).keys.length;
+  const inbox = (await listInbox(env)).length;
   return {
     at: new Date().toISOString(),
     status: {
