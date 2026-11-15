@@ -254,7 +254,11 @@ async function books(env) {
   const [reg, log, recs] = await Promise.all([
     repoFile(env, 'books.json'), repoFile(env, 'reading-log.json'), repoFile(env, 'recommendations.md'),
   ]);
-  const v = summariseBooks(JSON.parse(reg || '{"books":[]}').books, JSON.parse(log || '{}'), recs);
+  if (reg === null) {
+    // A private repo the token can't see also answers 404, so say so instead of showing an empty library.
+    return { error: `GitHub can't see books.json in ${env.BOOKS_REPO || 'sh4unn/book-register'}. Give the GITHUB_TOKEN access to that repo (Contents: Read-only).` };
+  }
+  const v = summariseBooks(JSON.parse(reg).books, JSON.parse(log || '{}'), recs);
   await env.STATE.put('books', JSON.stringify({ t: Date.now(), v }));
   return v;
 }
