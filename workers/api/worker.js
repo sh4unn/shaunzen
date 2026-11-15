@@ -9,6 +9,8 @@
 // (optional, add them in the Cloudflare dashboard; tiles show "connect" hints until then).
 // GITHUB_TOKEN: fine-grained, read-only Contents on the private book-register repo
 // (var BOOKS_REPO, default sh4unn/book-register). It feeds /books and the Reading tile.
+// With Contents: Read and write it also lets the Reading page add books (POST /books/add).
+// AI binding (Workers AI) turns a loose description into a book for /books/resolve.
 
 // Mini HA dash: read-only. Each item: [label, entity_id, kind]. kind picks the formatter
 // on the site (power, pct, temp, lock, onoff, problem, mbps, ms, presence, text).
@@ -63,6 +65,13 @@ export default {
       }
       if (req.method === 'GET' && url.pathname === '/summary') return cors(env, json(await summary(env)));
       if (req.method === 'GET' && url.pathname === '/books') return cors(env, json(await books(env)));
+      if (req.method === 'POST' && (url.pathname === '/books/resolve' || url.pathname === '/books/add')) {
+        if (req.headers.get('Origin') !== env.SITE_ORIGIN) return new Response('Bad origin', { status: 403 });
+        let body;
+        try { body = JSON.parse(await req.text()); } catch { return cors(env, json({ error: 'bad json' }, 400)); }
+        const out = url.pathname === '/books/resolve' ? await resolveBook(env, body) : await addBook(env, body, who);
+        return cors(env, json(out, out.error ? 400 : 200));
+      }
       if (url.pathname === '/inbox') {
         if (req.method === 'GET') return cors(env, json(await listInbox(env)));
         if (req.method === 'POST') {
@@ -326,6 +335,119 @@ function summariseBooks(all, log, recs) {
     queue,
     picks: parsePicks(recs),
   };
+}
+
+// ---------- Add a book from the Reading page ----------
+const norm = s => String(s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  .replace(/_ /g, ': ').replace(/^(.*?), (the|a|an)\b/, '$2 $1').replace(/\(.*?\)|\[.*?\]/g, ' ')
+  .split(':')[0].trim().replace(/^(the|a|an) /, '').replace(/[^a-z0-9]+/g, ' ').trim();
+const surname = a => { const p = norm(String(a || '').split(',')[0]).split(' '); return p[p.length - 1] || ''; };
+
+async function registerBooks(env) {
+  const raw = await repoFile(env, 'books.json');
+  return raw ? JSON.parse(raw).books : [];
+}
+
+async function openLibrary(params) {
+  const u = new URL('https://openlibrary.org/search.json');
+  for (const [k, v] of Object.entries(params)) if (v) u.searchParams.set(k, v);
+  u.searchParams.set('limit', '5');
+  u.searchParams.set('fields', 'title,author_name,first_publish_year,isbn,number_of_pages_median,cover_i,key');
+  const r = await fetch(u, { headers: { 'User-Agent': 'shaunzen-api (personal reading page)' } });
+  if (!r.ok) return [];
+  return ((await r.json()).docs || []).map(d => ({
+    title: d.title, author: (d.author_name || []).slice(0, 2).join(', '), year: d.first_publish_year || null,
+    isbn13: (d.isbn || []).find(i => i.length === 13 && i.startsWith('97')) || null,
+    pages: d.number_of_pages_median || null,
+    cover: d.cover_i ? `https://covers.openlibrary.org/b/id/${d.cover_i}-M.jpg` : null,
+    olKey: d.key || null,
+  }));
+}
+
+async function aiGuesses(env, q) {
+  if (!env.AI) return [];
+  try {
+    const r = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
+      messages: [
+        { role: 'system', content: 'You identify books from short, possibly vague descriptions. Reply with ONLY a JSON array of up to 3 objects {"title": string, "author": string}, most likely first. Use the real published title and author. No commentary.' },
+        { role: 'user', content: q },
+      ],
+      max_tokens: 200,
+    });
+    const text = typeof r.response === 'string' ? r.response : JSON.stringify(r.response || '');
+    const arr = JSON.parse(text.slice(text.indexOf('['), text.lastIndexOf(']') + 1));
+    return arr.filter(x => x && x.title).slice(0, 3);
+  } catch { return []; }
+}
+
+async function resolveBook(env, { q }) {
+  q = String(q || '').trim().slice(0, 200);
+  if (!q) return { error: 'empty' };
+  const guesses = await aiGuesses(env, q);
+  const lists = await Promise.all([
+    ...guesses.map(g => openLibrary({ title: g.title, author: g.author })),
+    openLibrary({ q }),
+  ]);
+  const seen = new Set(), out = [];
+  for (const list of lists) for (const c of list.slice(0, 2)) {
+    const k = norm(c.title) + '|' + surname(c.author);
+    if (!seen.has(k)) { seen.add(k); out.push(c); }
+  }
+  // fall back to the AI's own guess if Open Library had nothing
+  if (!out.length) for (const g of guesses) out.push({ title: g.title, author: g.author, year: null, isbn13: null, pages: null, cover: null });
+  const reg = await registerBooks(env);
+  for (const c of out.slice(0, 5)) {
+    const hit = reg.find(b => norm(b.title) === norm(c.title) && surname(b.author) === surname(c.author));
+    if (hit) c.inRegister = hit.status;
+  }
+  return { query: q, understood: guesses[0] || null, candidates: out.slice(0, 5) };
+}
+
+async function addBook(env, b, who) {
+  const status = ['shelf', 'want', 'reading', 'read'].includes(b.status) ? b.status : 'want';
+  const title = String(b.title || '').trim().slice(0, 200), author = String(b.author || '').trim().slice(0, 200);
+  if (!title) return { error: 'no title' };
+  const repo = env.BOOKS_REPO || 'sh4unn/book-register';
+  const api = `https://api.github.com/repos/${repo}/contents/books.json`;
+  const headers = { Authorization: `Bearer ${env.GITHUB_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'shaunzen-api' };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const r = await fetch(api, { headers });
+    if (!r.ok) return { error: `GitHub ${r.status} reading books.json` };
+    const file = await r.json();
+    const text = new TextDecoder().decode(Uint8Array.from(atob(file.content.replace(/\n/g, '')), c => c.charCodeAt(0)));
+    const books = JSON.parse(text).books;
+    const hit = books.find(x => norm(x.title) === norm(title) && surname(x.author) === surname(author));
+    if (hit) return { ok: true, existing: true, title: hit.title, status: hit.status };
+    const ids = new Set(books.map(x => x.id));
+    const base = (`${norm(title)} ${surname(author)}`.trim().replace(/ /g, '-').slice(0, 60)) || 'book';
+    let id = base; for (let n = 2; ids.has(id); n++) id = `${base}-${n}`;
+    const today = new Date().toISOString().slice(0, 10);
+    const book = { id, title, author };
+    if (b.isbn13) book.isbn13 = String(b.isbn13);
+    book.status = status;
+    book.date_added = today;
+    if (status === 'reading') book.date_started = today;
+    if (status === 'read') book.date_finished = today;
+    if (b.pages) book.pages = Number(b.pages);
+    if (b.year) book.year = String(b.year);
+    book.source = 'web';
+    // Append as text so the rest of the file stays byte-for-byte the same (the Mac re-sorts it on its next sync).
+    const at = text.lastIndexOf('\n  ]');
+    if (at < 0) return { error: 'unexpected books.json layout' };
+    const entry = JSON.stringify(book, null, 2).split('\n').map(l => '    ' + l).join('\n');
+    const next = text.slice(0, at) + ',\n' + entry + text.slice(at);
+    const bytes = new TextEncoder().encode(next);
+    let bin = ''; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    const put = await fetch(api, {
+      method: 'PUT', headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `Add ${title}${author ? ' by ' + author : ''} (${status}) from shaunzen.com`, content: btoa(bin), sha: file.sha }),
+    });
+    if (put.status === 409 || put.status === 422) continue;  // file changed underneath us: re-read and retry
+    if (!put.ok) return { error: `GitHub ${put.status} writing books.json${put.status === 403 ? ': the token needs Contents: Read and write' : ''}` };
+    await Promise.all([env.STATE.delete('books'), env.STATE.delete('summary')]);
+    return { ok: true, added: true, title, status };
+  }
+  return { error: 'books.json kept changing, try again' };
 }
 
 // recommendations.md: "## Week of YYYY-MM-DD" then "1. **Title** by Author — reason"
