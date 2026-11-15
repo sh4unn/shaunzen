@@ -5,7 +5,7 @@
 // used by the EC2 server, authenticated with the AGENT_SECRET bearer token.
 //
 // Bindings: STATE (KV). Vars: TEAM, AUD, HA_URL, SITE_ORIGIN.
-// Secrets: AGENT_SECRET (set at deploy), HA_TOKEN, GITHUB_TOKEN and HARDCOVER_TOKEN
+// Secrets: AGENT_SECRET (set at deploy), HA_TOKEN, GITHUB_TOKEN, HARDCOVER_TOKEN and READ_LATER_TOKEN
 // (optional, add them in the Cloudflare dashboard; tiles show "connect" hints until then).
 // GITHUB_TOKEN: fine-grained, read-only Contents on the private book-register repo
 // (var BOOKS_REPO, default sh4unn/book-register). It feeds /books and the Reading tile.
@@ -54,6 +54,7 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     try {
+      if (url.pathname === '/agent/read-later') return await readLater(req, env);
       if (url.pathname.startsWith('/agent/')) return await agent(req, env, url);
 
       const who = await verifyAccess(req, env);
@@ -145,6 +146,44 @@ async function agent(req, env, url) {
   }
   return new Response('Not found', { status: 404 });
 }
+// ---------- Read later (iPhone share sheet → Kindle) ----------
+// POST /agent/read-later with "Authorization: Bearer <READ_LATER_TOKEN>" and a body containing a link
+// (plain text, or JSON {"url": ...}). Appends it to articles/read-later.txt in the book-register repo;
+// that commit triggers the repo's "Articles to Kindle" GitHub Action, which emails it to the Kindle.
+// Lives under /agent/ for the existing Cloudflare Access bypass, with its own token (not AGENT_SECRET)
+// so the phone never holds the server's secret. Needs GITHUB_TOKEN with Contents: Read and write.
+async function readLater(req, env) {
+  const auth = req.headers.get('Authorization') || '';
+  if (!env.READ_LATER_TOKEN || !timingSafeEqual(auth, `Bearer ${env.READ_LATER_TOKEN}`)) return new Response('Unauthorized', { status: 401 });
+  if (req.method !== 'POST') return new Response('POST a link', { status: 405 });
+  const body = (await req.text()).slice(0, 4000);
+  let link = (body.match(/https?:\/\/[^\s"'<>]+/) || [])[0];
+  if (!link) return json({ error: 'no link in the request' }, 400);
+  link = link.replace(/[.,)\]]+$/, '');
+  const repo = env.BOOKS_REPO || 'sh4unn/book-register';
+  const api = `https://api.github.com/repos/${repo}/contents/articles/read-later.txt`;
+  const headers = { Authorization: `Bearer ${env.GITHUB_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'shaunzen-api' };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const r = await fetch(api, { headers });
+    if (!r.ok) return json({ error: `GitHub ${r.status} reading read-later.txt` }, 502);
+    const file = await r.json();
+    const text = new TextDecoder().decode(Uint8Array.from(atob(file.content.replace(/\n/g, '')), c => c.charCodeAt(0)));
+    if (text.split('\n').some(l => l.trim() === link)) return json({ ok: true, already: true });
+    const at = text.indexOf('\n# Sent');
+    const next = at < 0 ? text.replace(/\n*$/, '\n') + link + '\n' : text.slice(0, at).replace(/\n*$/, '\n') + link + '\n' + text.slice(at);
+    const bytes = new TextEncoder().encode(next);
+    let bin = ''; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    const put = await fetch(api, {
+      method: 'PUT', headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `Read later: ${new URL(link).hostname}`, content: btoa(bin), sha: file.sha }),
+    });
+    if (put.status === 409 || put.status === 422) continue;  // changed underneath us: re-read and retry
+    if (!put.ok) return json({ error: `GitHub ${put.status} writing read-later.txt` }, 502);
+    return json({ ok: true, queued: link });
+  }
+  return json({ error: 'read-later.txt kept changing, try again' }, 409);
+}
+
 function timingSafeEqual(a, b) {
   if (a.length !== b.length) return false;
   let d = 0;
