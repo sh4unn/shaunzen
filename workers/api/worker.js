@@ -76,6 +76,16 @@ export default {
         const out = url.pathname === '/books/resolve' ? await resolveBook(env, body) : await addBook(env, body, who);
         return cors(env, json(out, out.error ? 400 : 200));
       }
+      if (url.pathname === '/feeds') {
+        if (req.method === 'GET') return cors(env, json(await listFeeds(env)));
+        if (req.method === 'POST') {
+          if (req.headers.get('Origin') !== env.SITE_ORIGIN) return new Response('Bad origin', { status: 403 });
+          let body;
+          try { body = JSON.parse(await req.text()); } catch { return cors(env, json({ error: 'bad json' }, 400)); }
+          const out = await followFeed(env, body);
+          return cors(env, json(out, out.error ? 400 : 200));
+        }
+      }
       if (url.pathname === '/inbox') {
         if (req.method === 'GET') return cors(env, json(await listInbox(env)));
         if (req.method === 'POST') {
@@ -581,6 +591,106 @@ async function addBook(env, b, who) {
     return { ok: true, added: true, title, status };
   }
   return { error: 'books.json kept changing, try again' };
+}
+
+// ---------- Follow a writer (Reading page → articles/feeds.txt) ----------
+// GET /feeds lists who is followed; POST /feeds {url} adds a Substack, Medium writer or any RSS/blog.
+// New posts then arrive in the Sunday "Weekly Reading" issue (book-register's articles.py reads feeds.txt).
+const FEEDS_PATH = 'articles/feeds.txt';
+
+function feedSite(raw) {
+  let u = String(raw || '').trim().split(/\s+/)[0];
+  if (!u) return null;
+  if (u.startsWith('@')) u = 'https://medium.com/' + u;
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  let p;
+  try { p = new URL(u); } catch { return null; }
+  if (!p.hostname.includes('.')) return null;
+  const host = p.hostname.toLowerCase().replace(/^www\./, '');
+  const path = p.pathname.replace(/\/+$/, '');
+  if (host === 'medium.com') {
+    const at = path.split('/').find(s => s.startsWith('@'));
+    return at ? { site: `https://medium.com/${at}`, feed: `https://medium.com/feed/${at}` } : null;
+  }
+  if (host.endsWith('.medium.com')) {  // name.medium.com is the same writer as medium.com/@name
+    return { site: `https://${host}`, feed: `https://medium.com/feed/@${host.split('.')[0]}` };
+  }
+  if (host.endsWith('.substack.com')) {
+    return { site: `https://${host}`, feed: `https://${host}/feed` };  // a post link → the whole publication
+  }
+  if (/(\/feed|\/rss|\.xml|\.rss|\.atom|\/atom)$/i.test(path)) return { site: `https://${host}${path}`, feed: `https://${host}${path}` };
+  if (/^\/p\//.test(path)) return { site: `https://${host}`, feed: `https://${host}/feed` };  // Substack custom domain post
+  return { site: `https://${host}${path}`, feed: `https://${host}${path}/feed` };
+}
+
+async function feedTitle(feedUrl) {
+  try {
+    const r = await fetch(feedUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (shaunzen reading list)' }, cf: { cacheTtl: 0 } });
+    if (!r.ok) return { ok: false, status: r.status };
+    const xml = (await r.text()).slice(0, 20000);
+    if (!/<(rss|feed)[\s>]/i.test(xml)) return { ok: false, status: 'not a feed' };
+    const m = xml.match(/<title>(?:<!\[CDATA\[)?\s*([^<\]]+?)\s*(?:\]\]>)?<\/title>/i);
+    const title = m ? m[1].replace(/&amp;/g, '&').replace(/&#39;|&apos;/g, "'").replace(/[|\n]/g, ' ')
+      .replace(/^Stories by (.+) on Medium$/i, '$1').trim().slice(0, 80) : '';
+    return { ok: true, title };
+  } catch {
+    return { ok: false, status: 'unreachable' };
+  }
+}
+
+async function feedsFile(env) {
+  const repo = env.BOOKS_REPO || 'sh4unn/book-register';
+  const api = `https://api.github.com/repos/${repo}/contents/${FEEDS_PATH}`;
+  const headers = { Authorization: `Bearer ${env.GITHUB_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'shaunzen-api' };
+  const r = await fetch(api, { headers });
+  if (!r.ok) return { error: `GitHub ${r.status} reading feeds.txt`, api, headers };
+  const file = await r.json();
+  const text = new TextDecoder().decode(Uint8Array.from(atob(file.content.replace(/\n/g, '')), c => c.charCodeAt(0)));
+  return { api, headers, file, text };
+}
+
+function parseFeeds(text) {
+  return text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#')).map(l => {
+    const [u, name] = l.split(' | ');
+    const s = feedSite(u);
+    return { url: u.trim(), name: (name || '').trim() || (s ? new URL(s.site).hostname : u), key: s ? s.feed : u };
+  });
+}
+
+async function listFeeds(env) {
+  const f = await feedsFile(env);
+  if (f.error) return { error: f.error };
+  return { feeds: parseFeeds(f.text).map(({ url, name }) => ({ url, name })) };
+}
+
+async function followFeed(env, body) {
+  const s = feedSite(body && body.url);
+  if (!s) return { error: 'that doesn’t look like a web address' };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const f = await feedsFile(env);
+    if (f.error) return { error: f.error };
+    const feeds = parseFeeds(f.text);
+    const have = feeds.find(x => x.key === s.feed);
+    if (have) return { ok: true, existing: true, name: have.name, feeds: feeds.map(({ url, name }) => ({ url, name })) };
+    const t = await feedTitle(s.feed);
+    // Substack sometimes refuses cloud servers; the Sunday job runs from the EC2 server, so add it anyway.
+    if (!t.ok && !/substack\.com$/.test(new URL(s.site).hostname) && t.status !== 403) {
+      return { error: `couldn’t find a feed at ${s.feed} (${t.status}). Try the writer’s home page or their /feed address.` };
+    }
+    const name = t.title || new URL(s.site).hostname;
+    const line = `${s.site} | ${name}`;
+    const next = f.text.replace(/\n*$/, '\n') + line + '\n';
+    const bytes = new TextEncoder().encode(next);
+    let bin = ''; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    const put = await fetch(f.api, {
+      method: 'PUT', headers: { ...f.headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: `Feeds: follow ${name} (from shaunzen.com)`, content: btoa(bin), sha: f.file.sha }),
+    });
+    if (put.status === 409 || put.status === 422) continue;
+    if (!put.ok) return { error: `GitHub ${put.status} writing feeds.txt` };
+    return { ok: true, added: true, name, checked: t.ok, feeds: [...feeds, { url: s.site, name }].map(({ url, name }) => ({ url, name })) };
+  }
+  return { error: 'feeds.txt kept changing, try again' };
 }
 
 // recommendations.md: "## Week of YYYY-MM-DD" then "1. **Title** by Author — reason"
