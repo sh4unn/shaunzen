@@ -5,7 +5,8 @@
 // used by the EC2 server, authenticated with the AGENT_SECRET bearer token.
 //
 // Bindings: STATE (KV). Vars: TEAM, AUD, HA_URL, SITE_ORIGIN.
-// Secrets: AGENT_SECRET (set at deploy), HA_TOKEN, GITHUB_TOKEN, HARDCOVER_TOKEN and READ_LATER_TOKEN
+// Secrets: AGENT_SECRET (set at deploy), HA_TOKEN, GITHUB_TOKEN, HARDCOVER_TOKEN, READ_LATER_TOKEN
+// and KINDLE_UPLOAD_TOKEN
 // (optional, add them in the Cloudflare dashboard; tiles show "connect" hints until then).
 // GITHUB_TOKEN: fine-grained, read-only Contents on the private book-register repo
 // (var BOOKS_REPO, default sh4unn/book-register). It feeds /books and the Reading tile.
@@ -56,6 +57,7 @@ export default {
     try {
       if (url.pathname === '/agent/read-later') return await readLater(req, env);
       if (url.pathname === '/agent/add-book') return await addBookLine(req, env);
+      if (url.pathname === '/agent/kindle-upload') return await kindleUpload(req, env);
       if (url.pathname.startsWith('/agent/')) return await agent(req, env, url);
 
       const who = await verifyAccess(req, env);
@@ -219,6 +221,61 @@ async function addBookLine(req, env) {
     return json({ ok: true, queued: line });
   }
   return json({ error: 'inbox.txt kept changing, try again' }, 409);
+}
+
+// ---------- Kindle reading data over Wi-Fi ----------
+// POST /agent/kindle-upload with "Authorization: Bearer <KINDLE_UPLOAD_TOKEN>", sent by the Kindle's
+// "Export Reading Data" scriptlet (book-register repo, kindle/). The token lives only on the Kindle.
+// Body: JSON {"exported", "rows": [...]} (the cc.db rows register.py reads), or, when the Kindle's sqlite3
+// can't make JSON, the whole cc.db (Content-Type application/vnd.sqlite3, stamp in X-Export-Stamp).
+// Commits kindle/exports/latest.json (for a db: cc.db first, then a latest.json pointing at it) to the
+// book-register repo; that commit triggers its "Kindle sync" GitHub Action, which runs register.py kindle.
+// Needs GITHUB_TOKEN with Contents: Read and write.
+async function kindleUpload(req, env) {
+  const auth = req.headers.get('Authorization') || '';
+  if (!env.KINDLE_UPLOAD_TOKEN || !timingSafeEqual(auth, `Bearer ${env.KINDLE_UPLOAD_TOKEN}`)) return new Response('Unauthorized', { status: 401 });
+  if (req.method !== 'POST') return new Response('POST the Kindle export', { status: 405 });
+  const body = new Uint8Array(await req.arrayBuffer());
+  if (body.length > 25e6) return json({ error: 'export too large' }, 413);
+  let stamp = req.headers.get('X-Export-Stamp') || '';
+  if (!/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d$/.test(stamp)) stamp = new Date().toISOString().slice(0, 19);
+  const sqlite = new TextDecoder().decode(body.subarray(0, 15)) === 'SQLite format 3' && body[15] === 0;
+  let pointer;
+  if (sqlite) {
+    const r = await putRepoFile(env, 'kindle/exports/cc.db', body, `Kindle export ${stamp} (cc.db)`);
+    if (r) return r;
+    pointer = { exported: stamp, db: 'cc.db' };
+  } else {
+    try { pointer = JSON.parse(new TextDecoder().decode(body)); } catch { return json({ error: 'body is neither JSON nor a SQLite database' }, 400); }
+    if (!pointer || !Array.isArray(pointer.rows)) return json({ error: 'JSON needs a "rows" array' }, 400);
+    pointer.exported ||= stamp;
+  }
+  const text = JSON.stringify(pointer, null, 1) + '\n';
+  const r = await putRepoFile(env, 'kindle/exports/latest.json', new TextEncoder().encode(text), `Kindle export ${pointer.exported}`);
+  if (r) return r;
+  return json({ ok: true, exported: pointer.exported, rows: pointer.rows ? pointer.rows.length : undefined, db: sqlite || undefined });
+}
+
+// Create or replace one file in the book-register repo. Returns an error Response, or null when written.
+async function putRepoFile(env, path, bytes, message) {
+  const repo = env.BOOKS_REPO || 'sh4unn/book-register';
+  const api = `https://api.github.com/repos/${repo}/contents/${path}`;
+  const headers = { Authorization: `Bearer ${env.GITHUB_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'shaunzen-api' };
+  let bin = ''; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  const content = btoa(bin);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const r = await fetch(`${api}?ref=main`, { headers });
+    if (!r.ok && r.status !== 404) return json({ error: `GitHub ${r.status} reading ${path}` }, 502);
+    const sha = r.ok ? (await r.json()).sha : undefined;
+    const put = await fetch(api, {
+      method: 'PUT', headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, content, branch: 'main', ...(sha ? { sha } : {}) }),
+    });
+    if (put.status === 409 || put.status === 422) continue;  // changed underneath us: re-read and retry
+    if (!put.ok) return json({ error: `GitHub ${put.status} writing ${path}` }, 502);
+    return null;
+  }
+  return json({ error: `${path} kept changing, try again` }, 409);
 }
 
 function timingSafeEqual(a, b) {
