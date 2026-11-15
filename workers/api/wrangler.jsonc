@@ -1,0 +1,20 @@
+// api.shaunzen.com. Cloudflare Workers Builds deploys this on every push to main
+// that touches workers/api/ (root directory: workers/api, deploy command: npx wrangler deploy).
+// Secrets (AGENT_SECRET, GITHUB_TOKEN, HA_TOKEN) live in the Cloudflare dashboard and are never
+// in this file; wrangler deploy leaves them alone.
+{
+  "name": "shaunzen-api",
+  "main": "worker.js",
+  "compatibility_date": "2025-06-01",
+  "routes": [{ "pattern": "api.shaunzen.com", "custom_domain": true }],
+  "kv_namespaces": [{ "binding": "STATE", "id": "290b9f50491847e882fa5ae7a6b087d1" }],
+  "ai": { "binding": "AI" },
+  "vars": {
+    "TEAM": "little-wind-51ee",
+    "AUD": "463b6c4668b144a64826ca94cf8edf5f819361163b5cd7aefdd892e8e56e3ac8",
+    "HA_URL": "https://home.shaunzen.com",
+    "SITE_ORIGIN": "https://shaunzen.com"
+  },
+  // Keep any variable added in the dashboard instead of deleting it on deploy.
+  "keep_vars": true
+}
