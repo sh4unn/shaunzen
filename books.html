@@ -119,6 +119,10 @@
   .cand .acts { grid-column:2; display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.35rem; }
   .cand .acts .btn { padding:0.4rem 0.75rem; font-size:0.7rem; }
   .cand .have { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--green); }
+  .feeds { margin-top:0.55rem; display:flex; flex-wrap:wrap; align-items:center; gap:0.35rem; }
+  .feeds-k { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--faint); margin-right:0.2rem; }
+  .chip.feed { margin-left:0; text-decoration:none; font-size:10px; letter-spacing:0.06em; text-transform:none; padding:0.15rem 0.45rem; }
+  .chip.feed:hover { color:var(--accent); border-color:var(--accent); }
   .hint code { font-family:'IBM Plex Mono',monospace; font-style:normal; font-size:0.78rem; color:var(--accent); }
 
   .crumb { position:relative; z-index:2; background:var(--surface); border-top:1px solid var(--border); padding:0.75rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--faint); text-align:center; }
@@ -188,6 +192,13 @@ function render(d) {
       <button class="btn" id="addBtn">Find</button></form>
       <div class="add-msg" id="addMsg"></div><div class="cands" id="cands"></div></div></section>`;
 
+  // follow a writer
+  h += `<section><div class="section-label"><span>— Follow a writer</span><span>new posts arrive in Sunday’s issue</span></div>
+    <div class="add"><form id="feedForm" autocomplete="off">
+      <input id="feedQ" placeholder="a Substack, Medium @name or blog address" maxlength="300" inputmode="url" aria-label="Writer’s web address">
+      <button class="btn" id="feedBtn">Follow</button></form>
+      <div class="add-msg" id="feedMsg"></div><div class="feeds" id="feedList"></div></div></section>`;
+
   // now reading
   h += `<section><div class="section-label"><span>— Now reading</span><span></span></div>`;
   if (d.reading.length) {
@@ -242,6 +253,7 @@ function render(d) {
     `</div></section></div>`;
 
   $('#main').innerHTML = h;
+  loadFeeds();
 }
 
 // tooltip for chart bars
@@ -299,6 +311,35 @@ document.addEventListener('click', async e => {
     $('#addMsg').textContent = 'Couldn’t add it: ' + err.message;
     b.closest('.acts').querySelectorAll('.btn').forEach(x => x.disabled = false);
   }
+});
+
+// ---- follow a writer ----
+function renderFeeds(list) {
+  $('#feedList').innerHTML = list && list.length
+    ? `<span class="feeds-k">Following</span>` + list.map(f => `<a class="chip feed" href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>`).join('')
+    : `<span class="feeds-k">Not following anyone yet</span>`;
+}
+async function loadFeeds() {
+  try {
+    const res = await fetch(API + '/feeds', { credentials: 'include', redirect: 'manual', cache: 'no-store' });
+    if (!res.ok) return;
+    const d = await res.json();
+    if (d.feeds) renderFeeds(d.feeds);
+  } catch { /* the list is a nicety; the box still works */ }
+}
+document.addEventListener('submit', async e => {
+  if (e.target.id !== 'feedForm') return;
+  e.preventDefault();
+  const url = $('#feedQ').value.trim(); if (!url) return;
+  $('#feedBtn').disabled = true; $('#feedMsg').textContent = 'Finding their feed…';
+  try {
+    const r = await post('/feeds', { url });
+    $('#feedMsg').textContent = r.existing ? `You already follow ${r.name}.` : `Following ${r.name}. New posts arrive on Sunday.`;
+    $('#feedQ').value = '';
+    if (r.feeds) renderFeeds(r.feeds);
+  } catch (err) {
+    $('#feedMsg').textContent = 'Couldn’t follow that: ' + err.message;
+  } finally { $('#feedBtn').disabled = false; }
 });
 
 async function load() {
