@@ -97,7 +97,7 @@ The launcher is static and public. Everything live comes from `api.shaunzen.com`
 - `/agent/heartbeat`, `/agent/inbox`, `/agent/ack` — called every minute by `shaunzen-agent` on the EC2 server (`server/install-agent.sh`). It writes captured notes to `~ec2-user/inbox.md`.
 - Mini HA dash entities live in the `DASH` array in `workers/api/worker.js`. Look up IDs in `~/GitHub/HomeAssistant/entities/register.md`.
 - Optional worker secrets, set in the Cloudflare dashboard (never commit them): `HA_TOKEN` (HA long-lived token), `GITHUB_TOKEN` (fine-grained PAT, read-only Contents on `sh4unn/book-register`), `HARDCOVER_TOKEN` (legacy fallback). Optional var `BOOKS_REPO` overrides the repo.
-- Deploying the worker: upload `workers/api/worker.js` as module `worker.js` with bindings STATE (KV), TEAM, AUD, HA_URL, SITE_ORIGIN, AGENT_SECRET. Keep existing secrets.
+- Deploying the worker: push to `main`. Cloudflare Workers Builds deploys `workers/api` with `npx wrangler deploy`, using `workers/api/wrangler.jsonc` (bindings STATE KV, AI, vars TEAM, AUD, HA_URL, SITE_ORIGIN). Secrets stay in the dashboard. Don't upload by hand: the next push would overwrite it. Change bindings or vars in `wrangler.jsonc`, not the dashboard.
 
 ## Files
 
