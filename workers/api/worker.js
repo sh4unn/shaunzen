@@ -316,7 +316,13 @@ async function listInbox(env) {
   const { keys } = await env.STATE.list({ prefix: 'inbox:' });
   const old = (await Promise.all(keys.map(k => env.STATE.get(k.name, 'json')))).filter(Boolean)
     .sort((a, b) => a.id.localeCompare(b.id));
-  await env.STATE.put(INBOX_KEY, JSON.stringify(old));
+  try {
+    await env.STATE.put(INBOX_KEY, JSON.stringify(old));
+  } catch (e) {
+    // KV refused the write (e.g. the daily limit): serve the old items as they are and try the move next time.
+    console.warn(`inbox move postponed: ${e.message || e}`);
+    return old;
+  }
   await Promise.all(keys.map(k => env.STATE.delete(k.name)));
   return old;
 }
