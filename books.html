@@ -101,6 +101,24 @@
   .hint a { color:var(--accent); }
   .signin { display:inline-block; margin-top:1rem; background:var(--accent); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.8rem 1.6rem; border-radius:4px; transition:background 0.2s; }
   .signin:hover { background:var(--accent-light); }
+  /* add a book */
+  .add { border:1px solid var(--border); background:var(--bg); padding:1.1rem 1.25rem 1.2rem; }
+  .add form { display:flex; gap:0.6rem; }
+  .add input { flex:1; min-width:0; background:white; border:1px solid var(--border); border-radius:4px; padding:0.65rem 0.85rem; font-family:'Spectral',serif; font-size:1rem; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .add input:focus { border-color:var(--accent); }
+  .btn { background:var(--accent); color:white; border:none; border-radius:4px; padding:0.6rem 1.1rem; font-family:'IBM Plex Mono',monospace; font-size:0.75rem; letter-spacing:0.06em; cursor:pointer; transition:background 0.2s; white-space:nowrap; }
+  .btn:hover { background:var(--accent-light); } .btn:disabled { background:var(--faint); cursor:default; }
+  .btn.ghost { background:transparent; color:var(--accent); border:1px solid var(--border); }
+  .btn.ghost:hover { background:var(--accent-faint); }
+  .add-msg { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); margin-top:0.55rem; min-height:1em; }
+  .cands { margin-top:0.6rem; }
+  .cand { display:grid; grid-template-columns:44px 1fr; gap:0.3rem 0.9rem; padding:0.75rem 0; border-top:1px dashed var(--border); }
+  .cand img, .cand .nocover { width:44px; height:66px; object-fit:cover; border-radius:2px; background:var(--surface2); grid-row:1 / span 2; }
+  .cand .t { font-family:'New Rocker',cursive; font-size:1.15rem; line-height:1.2; }
+  .cand .a { font-style:italic; color:var(--muted); font-size:0.88rem; }
+  .cand .acts { grid-column:2; display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.35rem; }
+  .cand .acts .btn { padding:0.4rem 0.75rem; font-size:0.7rem; }
+  .cand .have { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--green); }
   .hint code { font-family:'IBM Plex Mono',monospace; font-style:normal; font-size:0.78rem; color:var(--accent); }
 
   .crumb { position:relative; z-index:2; background:var(--surface); border-top:1px solid var(--border); padding:0.75rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--faint); text-align:center; }
@@ -162,6 +180,13 @@ function render(d) {
     ? `Kindle last synced ${fmtDate(s.lastExport)} (${ago(s.lastExport)}) · ${s.counts.read} read · ${s.counts.want} to read`
     : `${s.counts.read} read · ${s.counts.want} to read`;
   let h = '';
+
+  // add a book
+  h += `<section><div class="section-label"><span>— Add a book</span><span>describe it however you like</span></div>
+    <div class="add"><form id="addForm" autocomplete="off">
+      <input id="addQ" placeholder="e.g. the new David Grann, or ‘that shipwreck book’" maxlength="200">
+      <button class="btn" id="addBtn">Find</button></form>
+      <div class="add-msg" id="addMsg"></div><div class="cands" id="cands"></div></div></section>`;
 
   // now reading
   h += `<section><div class="section-label"><span>— Now reading</span><span></span></div>`;
@@ -226,6 +251,55 @@ function showTip(el, x, y) { tip.textContent = el.dataset.tip; tip.style.whiteSp
 document.addEventListener('mousemove', e => { const c = e.target.closest('.col'); c ? showTip(c, e.clientX, e.clientY) : tip.classList.remove('on'); });
 document.addEventListener('focusin', e => { const c = e.target.closest('.col'); if (c) { const r = c.getBoundingClientRect(); showTip(c, r.left, r.top); } });
 document.addEventListener('focusout', () => tip.classList.remove('on'));
+
+// ---- add a book ----
+const STATUS_LABEL = { want: 'To read', shelf: 'Shelf', reading: 'Reading now', read: 'Read' };
+let lastCands = [];
+async function post(path, body) {
+  const res = await fetch(API + path, { method: 'POST', credentials: 'include', redirect: 'manual',
+    headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(body) });
+  if (res.type === 'opaqueredirect' || res.status === 401) throw new Error('signed out: sign in again');
+  const d = await res.json().catch(() => ({ error: 'HTTP ' + res.status }));
+  if (d.error) throw new Error(d.error);
+  return d;
+}
+function renderCands(d) {
+  lastCands = d.candidates || [];
+  $('#addMsg').textContent = lastCands.length
+    ? (d.understood ? `Looks like: ${d.understood.title}${d.understood.author ? ' by ' + d.understood.author : ''}` : `${lastCands.length} matches`)
+    : 'No match. Try adding the author.';
+  $('#cands').innerHTML = lastCands.map((c, i) => `<div class="cand">
+      ${c.cover ? `<img src="${esc(c.cover)}" alt="" loading="lazy">` : '<div class="nocover"></div>'}
+      <div><div class="t">${short(c.title)}</div><div class="a">${esc(c.author)}${c.year ? ' · ' + c.year : ''}${c.pages ? ' · ' + c.pages + ' pages' : ''}</div></div>
+      <div class="acts">${c.inRegister
+        ? `<span class="have">Already in your register (${esc(STATUS_LABEL[c.inRegister] || c.inRegister)})</span>`
+        : ['want', 'shelf', 'reading', 'read'].map(st => `<button class="btn${st === 'want' ? '' : ' ghost'}" data-i="${i}" data-st="${st}">${STATUS_LABEL[st]}</button>`).join('')}</div>
+    </div>`).join('');
+}
+document.addEventListener('submit', async e => {
+  if (e.target.id !== 'addForm') return;
+  e.preventDefault();
+  const q = $('#addQ').value.trim(); if (!q) return;
+  $('#addBtn').disabled = true; $('#addMsg').textContent = 'Thinking…'; $('#cands').innerHTML = '';
+  try { renderCands(await post('/books/resolve', { q })); }
+  catch (err) { $('#addMsg').textContent = 'Couldn’t look that up: ' + err.message; }
+  finally { $('#addBtn').disabled = false; }
+});
+document.addEventListener('click', async e => {
+  const b = e.target.closest('.cand .btn'); if (!b) return;
+  const c = lastCands[+b.dataset.i], st = b.dataset.st;
+  b.closest('.acts').querySelectorAll('.btn').forEach(x => x.disabled = true);
+  $('#addMsg').textContent = 'Adding…';
+  try {
+    const r = await post('/books/add', { title: c.title, author: c.author, isbn13: c.isbn13, pages: c.pages, year: c.year, status: st });
+    $('#addMsg').textContent = r.existing ? `${r.title} is already in your register (${STATUS_LABEL[r.status] || r.status}).` : `Added ${r.title}: ${STATUS_LABEL[r.status]}.`;
+    $('#addQ').value = ''; $('#cands').innerHTML = '';
+    setTimeout(load, 600);
+  } catch (err) {
+    $('#addMsg').textContent = 'Couldn’t add it: ' + err.message;
+    b.closest('.acts').querySelectorAll('.btn').forEach(x => x.disabled = false);
+  }
+});
 
 async function load() {
   try {
