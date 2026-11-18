@@ -773,7 +773,12 @@ async function shifts(req, env, url) {
     const auth = req.headers.get('Authorization') || '';
     if (!env.SHIFTS_PUSH_TOKEN || !timingSafeEqual(auth, `Bearer ${env.SHIFTS_PUSH_TOKEN}`)) return new Response('Unauthorized', { status: 401 });
     let payload;
-    try { payload = JSON.parse(await req.text()); } catch { return json({ error: 'body is not JSON' }, 400); }
+    const text = await req.text();
+    try { payload = parseFlowJson(text); }
+    catch (e) {
+      const head = [...text.slice(0, 8)].map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
+      return json({ error: 'body is not JSON', detail: String(e.message || e), length: text.length, first_chars_hex: head }, 400);
+    }
     const list = shiftItems(payload);
     if (!list) return json({ error: 'expected a list of shifts, or an object with a "value" list' }, 400);
     const incoming = {};
@@ -805,6 +810,13 @@ async function shifts(req, env, url) {
     return json({ on_shift: !!current, current, next, updated: store.updated });
   }
   return new Response('Not found', { status: 404 });
+}
+
+// Power Automate's HTTP action can prefix a byte-order mark, or send the JSON double-encoded as a string.
+function parseFlowJson(text) {
+  let v = JSON.parse(text.replace(/^\uFEFF/, '').trim());
+  if (typeof v === 'string') v = JSON.parse(v.replace(/^\uFEFF/, '').trim());
+  return v;
 }
 
 // The Shifts connector may send the bare list or wrap it (value / body / shifts / items).
