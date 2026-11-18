@@ -800,9 +800,9 @@ async function shifts(req, env, url) {
   const m = url.pathname.match(/^\/agent\/shifts\/([^/]+)\.(ics|json)$/);
   if (req.method === 'GET' && m && env.SHIFTS_FEED_TOKEN && timingSafeEqual(m[1], env.SHIFTS_FEED_TOKEN)) {
     const store = (await env.STATE.get(SHIFTS_KEY, 'json')) || { shifts: {}, updated: null };
-    const all = Object.values(store.shifts).sort((a, b) => a.start.localeCompare(b.start));
+    const all = mergeSameShifts(Object.values(store.shifts), env);
     if (m[2] === 'ics') {
-      return new Response(shiftsIcs(all, store.updated, env.SHIFTS_CAL_NAME || 'Shifts'), {
+      return new Response(shiftsIcs(all, store.updated, env), {
         headers: { 'Content-Type': 'text/calendar; charset=utf-8', 'Cache-Control': 'no-store' },
       });
     }
@@ -841,7 +841,7 @@ function normaliseShift(raw, env) {
   const start = shiftTime(shared.startDateTime), end = shiftTime(shared.endDateTime);
   if (!id || !start || !end) return null;  // unpublished (draft only) or malformed
   const activities = (shared.activities || []).map(a => a && a.displayName).filter(Boolean);
-  return { id: String(id), start, end, title: shared.displayName || 'Shift', notes: shared.notes || '', activities };
+  return { id: String(id), start, end, title: shared.displayName || '', notes: shared.notes || '', activities };
 }
 
 // Shifts times are UTC; Graph sometimes sends 7 fractional digits or no zone.
@@ -855,19 +855,48 @@ function shiftTime(v) {
 
 function sortById(o) { return Object.keys(o).sort().map(k => o[k]); }
 
-function shiftsIcs(list, updated, name) {
-  const esc = t => String(t).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
-  const stamp = iso => iso.replace(/[-:]/g, '').replace(/\.\d+/, '');
-  const dtstamp = stamp(updated || new Date().toISOString());
+// Event name: the shift's name in Shifts, else SHIFTS_DEFAULT_TITLE (default "Work").
+function shiftTitle(s, env) { return s.title && s.title !== 'Shift' ? s.title : (env.SHIFTS_DEFAULT_TITLE || 'Work'); }
+
+// Shifts sometimes holds the same shift twice under different IDs. Show one: same start, end and name.
+// Sorted by start then ID, so the copy kept (and its UID) stays the same from one push to the next.
+function mergeSameShifts(list, env) {
+  const seen = new Set();
+  return list.slice().sort((a, b) => a.start.localeCompare(b.start) || a.id.localeCompare(b.id))
+    .filter(s => { const k = `${s.start}|${s.end}|${shiftTitle(s, env)}`; return !seen.has(k) && seen.add(k); })
+    .map(s => ({ ...s, title: shiftTitle(s, env) }));
+}
+
+// Times are written in Brisbane local time (UTC+10 all year, no daylight saving) with a VTIMEZONE,
+// so calendar apps show them as local times rather than GMT/UTC.
+// Optional var SHIFTS_LOCATION: an address or "lat, long" (dashboard only: this repo is public).
+function shiftsIcs(list, updated, env) {
+  const esc = t => String(t).replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  const utc = iso => iso.replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const local = iso => new Date(Date.parse(iso) + 10 * 3600e3).toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, '');
+  const TZ = 'Australia/Brisbane';
+  const dtstamp = utc(updated || new Date().toISOString());
+  const where = (env.SHIFTS_LOCATION || '').trim();
+  const geo = where.match(/^(-?\d+(?:\.\d+)?)\s*[,;]\s*(-?\d+(?:\.\d+)?)$/);
   const lines = [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//shaunzen//shifts//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
-    `X-WR-CALNAME:${esc(name)}`, 'REFRESH-INTERVAL;VALUE=DURATION:PT15M', 'X-PUBLISHED-TTL:PT15M',
+    `X-WR-CALNAME:${esc(env.SHIFTS_CAL_NAME || 'Shifts')}`, `X-WR-TIMEZONE:${TZ}`,
+    'REFRESH-INTERVAL;VALUE=DURATION:PT15M', 'X-PUBLISHED-TTL:PT15M',
+    'BEGIN:VTIMEZONE', `TZID:${TZ}`, 'BEGIN:STANDARD', 'DTSTART:19700101T000000',
+    'TZOFFSETFROM:+1000', 'TZOFFSETTO:+1000', 'TZNAME:AEST', 'END:STANDARD', 'END:VTIMEZONE',
   ];
   for (const s of list) {
     const desc = [s.notes, (s.activities || []).join('\n')].filter(Boolean).join('\n\n');
     lines.push('BEGIN:VEVENT', `UID:${esc(s.id)}@shifts.shaunzen.com`, `DTSTAMP:${dtstamp}`, `LAST-MODIFIED:${dtstamp}`,
-      `DTSTART:${stamp(s.start)}`, `DTEND:${stamp(s.end)}`, `SUMMARY:${esc(s.title)}`);
+      `DTSTART;TZID=${TZ}:${local(s.start)}`, `DTEND;TZID=${TZ}:${local(s.end)}`, `SUMMARY:${esc(s.title)}`);
     if (desc) lines.push(`DESCRIPTION:${esc(desc)}`);
+    if (where) {
+      lines.push(`LOCATION:${esc(where)}`);
+      if (geo) {
+        lines.push(`GEO:${geo[1]};${geo[2]}`,
+          `X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=100;X-TITLE="${where.replace(/"/g, '')}":geo:${geo[1]},${geo[2]}`);
+      }
+    }
     lines.push('TRANSP:OPAQUE', 'END:VEVENT');
   }
   lines.push('END:VCALENDAR');
