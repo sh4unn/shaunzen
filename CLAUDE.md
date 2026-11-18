@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Shaunzen (shaunzen.com, GitHub Pages) is a launcher: one `index.html` with Work / Life / Systems tiles linking to Shaun's services. No build system, no framework, no npm. The old standalone tools (trackers, notes, references, books) were removed in Nov 2026 — don't recreate them. `books.html` is the exception: a read-only view of the private book register, not an editing tool.
+Shaunzen (shaunzen.com, GitHub Pages) is a launcher: one `index.html` with Work / Life / Systems tiles linking to Shaun's services. No build system, no framework, no npm. The old standalone tools (trackers, notes, references, books) were removed in Nov 2026 — don't recreate them. `books.html` and `training.html` are the exceptions: read-only views of private data (book register, Garmin sync), not editing tools.
 
 The repo is PUBLIC. Never commit personal data, tokens, or private notes. Services that need privacy live on their own subdomain behind Cloudflare Access (`home.`, `energy.`, `terminal.`).
 
@@ -93,6 +93,7 @@ The launcher is static and public. Everything live comes from `api.shaunzen.com`
 
 - `GET /summary` — status dots, tile details, mini HA dash, current book (from the book register; Hardcover only as a fallback), inbox count. Cached 60s in KV.
 - `GET /books` — data for `books.html`: now reading (Kindle %), Claude's weekly picks, stats, recently finished, up next. Built from `books.json`, `reading-log.json` and `recommendations.md` in the private `sh4unn/book-register` repo (read with `GITHUB_TOKEN`), cached 5 min in KV. The register updates when Shaun plugs in the Kindle (weekly) and pushes to GitHub; the picks update every Monday.
+- `GET /training` — data for `training.html`: `training.json` from the private `sh4unn/garmin-training` repo (var `TRAINING_REPO`), passed through as-is and cached 10 min in KV. A nightly GitHub Action there pulls Garmin Connect (activities, resting HR, HRV, sleep; no GPS). The page does all the analysis (gaps, missing session types, fitness/fatigue, build-back ramp). `training.html?demo` renders made-up data. `GITHUB_TOKEN` needs read-only Contents on that repo too.
 - `POST /inbox` — capture box. Origin must be `https://shaunzen.com`. Body is plain text.
 - `/agent/heartbeat`, `/agent/inbox`, `/agent/ack` — called every minute by `shaunzen-agent` on the EC2 server (`server/install-agent.sh`). It writes captured notes to `~ec2-user/inbox.md`.
 - `/agent/shifts` — Teams Shifts as a subscribable calendar. A work Power Automate flow (hourly) POSTs the "List all shifts" output with `Authorization: Bearer <SHIFTS_PUSH_TOKEN>`; calendar apps subscribe to `/agent/shifts/<SHIFTS_FEED_TOKEN>.ics` (`.json` gives current/next shift for HA). One KV key `shifts`, written only on change. Secrets `SHIFTS_PUSH_TOKEN`, `SHIFTS_FEED_TOKEN`; vars `SHIFTS_USER_ID` (keeps just Shaun's shifts) and `SHIFTS_LOCATION` (address or "lat, long"), both dashboard only. Times are Brisbane local (AEST, no DST); unnamed shifts are titled "Work"; identical shifts (same start, end, name) show once.
@@ -105,6 +106,7 @@ The launcher is static and public. Everything live comes from `api.shaunzen.com`
 | File | Purpose |
 |------|---------|
 | `index.html` | Launcher — status strip, koan, Work/Life/Systems tiles, capture box, mini HA dash, ⌘K search |
+| `training.html` | Training page — static shell; data from `api.shaunzen.com/training` after sign-in (no training data in this public repo) |
 | `books.html` | Reading page — static shell; all data comes from `api.shaunzen.com/books` after sign-in (no reading data in this public repo) |
 | `workers/api/worker.js` | Source of the `api.shaunzen.com` worker |
 | `server/install-agent.sh` | Installs heartbeat/inbox agent + terminal home-screen tags on the EC2 server |

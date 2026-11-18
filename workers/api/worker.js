@@ -73,6 +73,7 @@ export default {
       }
       if (req.method === 'GET' && url.pathname === '/summary') return cors(env, json(await summary(env)));
       if (req.method === 'GET' && url.pathname === '/books') return cors(env, json(await books(env)));
+      if (req.method === 'GET' && url.pathname === '/training') return cors(env, json(await training(env)));
       if (req.method === 'POST' && (url.pathname === '/books/resolve' || url.pathname === '/books/add')) {
         if (req.headers.get('Origin') !== env.SITE_ORIGIN) return new Response('Bad origin', { status: 403 });
         let body;
@@ -416,8 +417,7 @@ async function currentlyReading(env) {
 // ---------- Books (from the private book-register repo) ----------
 const BOOKS_CACHE_S = 300;
 
-async function repoFile(env, path) {
-  const repo = env.BOOKS_REPO || 'sh4unn/book-register';
+async function repoFile(env, path, repo = env.BOOKS_REPO || 'sh4unn/book-register') {
   const r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
     headers: { Authorization: `Bearer ${env.GITHUB_TOKEN}`, Accept: 'application/vnd.github.raw+json', 'User-Agent': 'shaunzen-api' },
   });
@@ -735,6 +735,26 @@ function parsePicks(md) {
     if (p) progress = p[1];
   }
   return { week: m[1], items, progress };
+}
+
+// ---------- Training (from the private garmin-training repo) ----------
+// A nightly GitHub Action there pulls Garmin Connect into training.json (activities + daily RHR/HRV/sleep).
+// This passes it through; training.html does the analysis. Needs GITHUB_TOKEN with read-only Contents on
+// that repo too (var TRAINING_REPO, default sh4unn/garmin-training). Cached in KV like /books.
+const TRAINING_CACHE_S = 600;
+
+async function training(env) {
+  if (!env.GITHUB_TOKEN) return { needs: 'GITHUB_TOKEN' };
+  const cached = await env.STATE.get('training', 'json');
+  if (cached && Date.now() - cached.t < TRAINING_CACHE_S * 1000) return cached.v;
+  const repo = env.TRAINING_REPO || 'sh4unn/garmin-training';
+  const raw = await repoFile(env, 'training.json', repo);
+  if (raw === null) {
+    return { error: `GitHub can't see training.json in ${repo}. Give the GITHUB_TOKEN access to that repo (Contents: Read-only), and check the Garmin sync has run once.` };
+  }
+  const v = JSON.parse(raw);
+  await cachePut(env, 'training', { t: Date.now(), v });
+  return v;
 }
 
 // ---------- helpers ----------
