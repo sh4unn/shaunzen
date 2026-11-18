@@ -5,8 +5,8 @@
 // used by the EC2 server, authenticated with the AGENT_SECRET bearer token.
 //
 // Bindings: STATE (KV). Vars: TEAM, AUD, HA_URL, SITE_ORIGIN.
-// Secrets: AGENT_SECRET (set at deploy), HA_TOKEN, GITHUB_TOKEN, HARDCOVER_TOKEN, READ_LATER_TOKEN
-// and KINDLE_UPLOAD_TOKEN
+// Secrets: AGENT_SECRET (set at deploy), HA_TOKEN, GITHUB_TOKEN, HARDCOVER_TOKEN, READ_LATER_TOKEN,
+// KINDLE_UPLOAD_TOKEN, SHIFTS_PUSH_TOKEN and SHIFTS_FEED_TOKEN (plus var SHIFTS_USER_ID)
 // (optional, add them in the Cloudflare dashboard; tiles show "connect" hints until then).
 // GITHUB_TOKEN: fine-grained, read-only Contents on the private book-register repo
 // (var BOOKS_REPO, default sh4unn/book-register). It feeds /books and the Reading tile.
@@ -61,6 +61,7 @@ export default {
       if (url.pathname === '/agent/read-later') return await readLater(req, env);
       if (url.pathname === '/agent/add-book') return await addBookLine(req, env);
       if (url.pathname === '/agent/kindle-upload') return await kindleUpload(req, env);
+      if (url.pathname.startsWith('/agent/shifts')) return await shifts(req, env, url);
       if (url.pathname.startsWith('/agent/')) return await agent(req, env, url);
 
       const who = await verifyAccess(req, env);
@@ -752,4 +753,123 @@ function cors(env, res) {
   h.set('Access-Control-Allow-Credentials', 'true');
   h.set('Vary', 'Origin');
   return new Response(res.body, { status: res.status, headers: h });
+}
+
+// ---------- Teams Shifts → subscribable calendar ----------
+// Work blocks every way out of Shifts except Power Automate, so a work flow (hourly) POSTs the output of
+// "List all shifts" here, and calendar apps subscribe to the .ics. Both live under /agent/ for the Access bypass:
+//   POST /agent/shifts                          "Authorization: Bearer <SHIFTS_PUSH_TOKEN>", body = the JSON list
+//   GET  /agent/shifts/<SHIFTS_FEED_TOKEN>.ics   subscribe to this (phone, Google, Outlook.com, HA Remote Calendar)
+//   GET  /agent/shifts/<SHIFTS_FEED_TOKEN>.json  on shift now? next shift? (for HA REST sensors)
+// The feed token is in the path because calendar apps can't send headers. Keep both tokens long and random.
+// Optional var SHIFTS_USER_ID (your Entra object id) keeps only your shifts if the flow sends the whole team's.
+// A push is the truth for everything not yet finished: shifts missing from it are deleted, changed ones updated.
+// Finished shifts are kept as history for SHIFTS_KEEP_DAYS. One KV key; written only when something changed.
+const SHIFTS_KEY = 'shifts';
+const SHIFTS_KEEP_DAYS = 400;
+
+async function shifts(req, env, url) {
+  if (req.method === 'POST' && url.pathname === '/agent/shifts') {
+    const auth = req.headers.get('Authorization') || '';
+    if (!env.SHIFTS_PUSH_TOKEN || !timingSafeEqual(auth, `Bearer ${env.SHIFTS_PUSH_TOKEN}`)) return new Response('Unauthorized', { status: 401 });
+    let payload;
+    try { payload = JSON.parse(await req.text()); } catch { return json({ error: 'body is not JSON' }, 400); }
+    const list = shiftItems(payload);
+    if (!list) return json({ error: 'expected a list of shifts, or an object with a "value" list' }, 400);
+    const incoming = {};
+    for (const raw of list) { const s = normaliseShift(raw, env); if (s) incoming[s.id] = s; }
+    const now = Date.now(), oldest = now - SHIFTS_KEEP_DAYS * 864e5;
+    const store = (await env.STATE.get(SHIFTS_KEY, 'json')) || { shifts: {} };
+    const merged = {};
+    for (const [id, s] of Object.entries(store.shifts)) {
+      const end = Date.parse(s.end);
+      if (!incoming[id] && end < now && end > oldest) merged[id] = s;
+    }
+    Object.assign(merged, incoming);
+    const changed = JSON.stringify(sortById(merged)) !== JSON.stringify(sortById(store.shifts));
+    if (changed) await env.STATE.put(SHIFTS_KEY, JSON.stringify({ shifts: merged, updated: new Date(now).toISOString() }));
+    return json({ ok: true, received: list.length, yours: Object.keys(incoming).length, in_calendar: Object.keys(merged).length, changed });
+  }
+  const m = url.pathname.match(/^\/agent\/shifts\/([^/]+)\.(ics|json)$/);
+  if (req.method === 'GET' && m && env.SHIFTS_FEED_TOKEN && timingSafeEqual(m[1], env.SHIFTS_FEED_TOKEN)) {
+    const store = (await env.STATE.get(SHIFTS_KEY, 'json')) || { shifts: {}, updated: null };
+    const all = Object.values(store.shifts).sort((a, b) => a.start.localeCompare(b.start));
+    if (m[2] === 'ics') {
+      return new Response(shiftsIcs(all, store.updated, env.SHIFTS_CAL_NAME || 'Shifts'), {
+        headers: { 'Content-Type': 'text/calendar; charset=utf-8', 'Cache-Control': 'no-store' },
+      });
+    }
+    const now = Date.now();
+    const current = all.find(s => Date.parse(s.start) <= now && Date.parse(s.end) > now) || null;
+    const next = all.find(s => Date.parse(s.start) > now) || null;
+    return json({ on_shift: !!current, current, next, updated: store.updated });
+  }
+  return new Response('Not found', { status: 404 });
+}
+
+// The Shifts connector may send the bare list or wrap it (value / body / shifts / items).
+function shiftItems(p) {
+  if (Array.isArray(p)) return p;
+  if (p && typeof p === 'object') for (const k of ['value', 'shifts', 'body', 'items']) if (k in p) return shiftItems(p[k]);
+  return null;
+}
+
+function normaliseShift(raw, env) {
+  if (!raw || typeof raw !== 'object') return null;
+  const id = raw.id || raw.shiftId;
+  const me = (env.SHIFTS_USER_ID || '').trim().toLowerCase();
+  if (me && raw.userId && String(raw.userId).toLowerCase() !== me) return null;
+  let shared = raw.sharedShift;
+  if (!shared) {  // flattened connector output, e.g. sharedShift_startDateTime
+    shared = {};
+    for (const [k, v] of Object.entries(raw)) if (k.startsWith('sharedShift_')) shared[k.slice(12)] = v;
+  }
+  const start = shiftTime(shared.startDateTime), end = shiftTime(shared.endDateTime);
+  if (!id || !start || !end) return null;  // unpublished (draft only) or malformed
+  const activities = (shared.activities || []).map(a => a && a.displayName).filter(Boolean);
+  return { id: String(id), start, end, title: shared.displayName || 'Shift', notes: shared.notes || '', activities };
+}
+
+// Shifts times are UTC; Graph sometimes sends 7 fractional digits or no zone.
+function shiftTime(v) {
+  if (!v) return null;
+  let s = String(v).trim().replace(/(\.\d{3})\d+/, '$1');
+  if (!/(Z|[+-]\d\d:?\d\d)$/.test(s)) s += 'Z';
+  const t = Date.parse(s);
+  return Number.isNaN(t) ? null : new Date(t).toISOString();
+}
+
+function sortById(o) { return Object.keys(o).sort().map(k => o[k]); }
+
+function shiftsIcs(list, updated, name) {
+  const esc = t => String(t).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  const stamp = iso => iso.replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const dtstamp = stamp(updated || new Date().toISOString());
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//shaunzen//shifts//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    `X-WR-CALNAME:${esc(name)}`, 'REFRESH-INTERVAL;VALUE=DURATION:PT15M', 'X-PUBLISHED-TTL:PT15M',
+  ];
+  for (const s of list) {
+    const desc = [s.notes, (s.activities || []).join('\n')].filter(Boolean).join('\n\n');
+    lines.push('BEGIN:VEVENT', `UID:${esc(s.id)}@shifts.shaunzen.com`, `DTSTAMP:${dtstamp}`, `LAST-MODIFIED:${dtstamp}`,
+      `DTSTART:${stamp(s.start)}`, `DTEND:${stamp(s.end)}`, `SUMMARY:${esc(s.title)}`);
+    if (desc) lines.push(`DESCRIPTION:${esc(desc)}`);
+    lines.push('TRANSP:OPAQUE', 'END:VEVENT');
+  }
+  lines.push('END:VCALENDAR');
+  return lines.map(foldIcsLine).join('\r\n') + '\r\n';
+}
+
+// iCalendar lines are at most 75 bytes; longer ones continue on the next line after a space.
+function foldIcsLine(line) {
+  const enc = new TextEncoder();
+  const parts = [];
+  let cur = '', len = 0;
+  for (const ch of line) {
+    const n = enc.encode(ch).length;
+    if (len + n > (parts.length ? 74 : 75)) { parts.push(cur); cur = ''; len = 0; }
+    cur += ch; len += n;
+  }
+  parts.push(cur);
+  return parts.join('\r\n ');
 }
