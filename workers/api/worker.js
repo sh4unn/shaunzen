@@ -777,7 +777,9 @@ async function shifts(req, env, url) {
     try { payload = parseFlowJson(text); }
     catch (e) {
       const head = [...text.slice(0, 8)].map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
-      return json({ error: 'body is not JSON', detail: String(e.message || e), length: text.length, first_chars_hex: head }, 400);
+      const h = {};
+      for (const [k, v] of req.headers) if (!/^(authorization|cookie|cf-access)/i.test(k)) h[k] = v.slice(0, 120);
+      return json({ error: 'body is not JSON', detail: String(e.message || e), length: text.length, first_chars_hex: head, method: req.method, headers: h }, 400);
     }
     const list = shiftItems(payload);
     if (!list) return json({ error: 'expected a list of shifts, or an object with a "value" list' }, 400);
