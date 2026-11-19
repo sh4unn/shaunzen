@@ -387,12 +387,33 @@ def vpi_csv(data: bytes) -> Parsed:
 
 
 # ---------- dispatch ----------
+def detect(data: bytes, text: str | None) -> str | None:
+    """Recognise a file by its contents, so a wrong choice in the page's dropdown can't mislabel it."""
+    if text is not None:
+        if "Transaction Listing Report" in text:
+            return "macquarie-pdf"
+        if "Personal Investor" in text and "Account Performance" in text:
+            return "vpi-pdf"
+        if "Vanguard Super" in text or "superannuation" in text.lower():
+            return "super-pdf"
+        return None
+    try:
+        header, _ = read_csv(data)
+    except Unrecognised:
+        return None
+    if header[:4] == ["date", "description", "type", "amount"]:
+        return "super-csv"          # Vanguard Super account activity
+    return None
+
+
 def parse(file_type: str, data: bytes) -> Parsed:
     is_pdf = data[:5] == b"%PDF-"
-    if file_type in ("macquarie-csv", "macquarie-pdf") or (file_type.startswith("macquarie")):
-        return macquarie_pdf(pdf_text(data)) if is_pdf else macquarie_csv(data)
+    text = pdf_text(data) if is_pdf else None
+    file_type = detect(data, text) or file_type
+    if file_type.startswith("macquarie"):
+        return macquarie_pdf(text) if is_pdf else macquarie_csv(data)
     if file_type.startswith("vpi"):
-        return vpi_pdf(pdf_text(data)) if is_pdf else vpi_csv(data)
+        return vpi_pdf(text) if is_pdf else vpi_csv(data)
     if file_type.startswith("super"):
-        return statement_pdf(pdf_text(data), SUPER_KEY, "Vanguard Super", "super") if is_pdf else super_csv(data)
+        return statement_pdf(text, SUPER_KEY, "Vanguard Super", "super") if is_pdf else super_csv(data)
     raise Unrecognised(f"unknown file type {file_type!r}")
