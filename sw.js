@@ -1,4 +1,4 @@
-const CACHE = 'shaunzen-v8';
+const CACHE = 'shaunzen-v9';
 const ASSETS = [
   './',
   './index.html',
@@ -32,6 +32,18 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   if (!e.request.url.startsWith(self.location.origin)) return;
 
+  // Pages: network first, so a deploy shows on the next load; the cached copy is only the offline fallback.
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        if (res.ok) { const clone = res.clone(); caches.open(CACHE).then(cache => cache.put(e.request, clone)); }
+        return res;
+      }).catch(() => caches.match(e.request, { ignoreSearch: true }).then(c => c || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Everything else: cached first, refreshed in the background.
   e.respondWith(
     caches.match(e.request).then(cached => {
       const network = fetch(e.request).then(res => {
