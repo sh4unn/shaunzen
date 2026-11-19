@@ -303,7 +303,8 @@ def summary(con) -> dict:
 
 def apply_adjustments(con, m: str, row: dict) -> None:
     """Moves you made on the page: part of a month's spending re-filed under another category.
-    Moving to Transfer or Income takes it out of spending."""
+    Moving to Transfer or Income takes it out of spending. To Income means "this payment was really my share of
+    some income going back out" (e.g. splitting a car sale), so it lowers income rather than raising it."""
     for a in con.execute("SELECT * FROM adjust WHERE m=?", (m,)):
         amt, src, dst = a["amount"], a["from_cat"], a["to_cat"]
         row["by"][src] = row["by"].get(src, 0) - amt
@@ -314,7 +315,7 @@ def apply_adjustments(con, m: str, row: dict) -> None:
             if dst == config.TRANSFER:
                 row["transfers"] += amt
             else:
-                row["income"] += amt
+                row["income"] -= amt
 
 
 def _r(v):

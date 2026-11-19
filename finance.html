@@ -390,8 +390,8 @@ document.addEventListener('click', async e => {
     if (!DEMO) await post('/finance/adjust', JSON.stringify(body));
     if (DEMO) {   // apply locally so the demo shows the effect
       const row = S.bank.find(x => x.m === (body.month || (S.adjustments.find(a => a.id === undo) || {}).m));
-      if (save) { S.adjustments = [...(S.adjustments || []), { id:`d${Date.now()}`, m:body.month, ...body }]; row.by[body.from] -= body.amount; if (S.categories.includes(body.to)) row.by[body.to] = (row.by[body.to] || 0) + body.amount; else row.spend -= body.amount; }
-      else { const a = S.adjustments.find(x => x.id === undo); S.adjustments = S.adjustments.filter(x => x.id !== undo); row.by[a.from] += a.amount; if (S.categories.includes(a.to)) row.by[a.to] -= a.amount; else row.spend += a.amount; }
+      if (save) { S.adjustments = [...(S.adjustments || []), { id:`d${Date.now()}`, m:body.month, ...body }]; row.by[body.from] -= body.amount; if (S.categories.includes(body.to)) row.by[body.to] = (row.by[body.to] || 0) + body.amount; else { row.spend -= body.amount; if (body.to === 'Income') row.income -= body.amount; else row.transfers += body.amount; } }
+      else { const a = S.adjustments.find(x => x.id === undo); S.adjustments = S.adjustments.filter(x => x.id !== undo); row.by[a.from] += a.amount; if (S.categories.includes(a.to)) row.by[a.to] -= a.amount; else { row.spend += a.amount; if (a.to === 'Income') row.income += a.amount; else row.transfers -= a.amount; } }
       render(); $('#spending').scrollIntoView({ block:'nearest' });
       $('#mvMsg').textContent = 'Done (demo only, nothing sent)';
       return;
