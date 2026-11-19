@@ -113,6 +113,10 @@
   .queue .row { display:grid; grid-template-columns:1fr auto auto; gap:0.75rem; align-items:center; padding:0.6rem 0; border-top:1px dashed var(--border); font-size:0.92rem; }
   .queue .fname { font-family:'IBM Plex Mono',monospace; font-size:0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .how { margin-top:0.5rem; }
+  .balrow { display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem; margin-top:1rem; padding-top:0.9rem; border-top:1px dashed var(--border); }
+  .balrow .lbl { font-size:0.92rem; color:var(--muted); font-style:italic; margin-right:0.25rem; }
+  .balrow input[type=text] { width:9rem; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:0.85rem; border:1px solid var(--border); background:var(--bg); padding:0.35rem 0.5rem; border-radius:2px; }
+  .balrow input[type=date] { font-family:'IBM Plex Mono',monospace; font-size:0.8rem; border:1px solid var(--border); background:var(--bg); padding:0.3rem 0.4rem; border-radius:2px; color:var(--ink); }
   .how summary { cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--accent); padding:0.4rem 0; }
   .how ol { padding-left:1.4rem; font-size:0.92rem; line-height:1.6; color:var(--muted); }
   .how li { margin:0.3rem 0; } .how li b { font-weight:400; color:var(--ink); }
@@ -193,7 +197,8 @@ let spendIdx = null;   // which month the spending view shows
 // Growth is always worked out here: closing − opening − net money in.
 
 // Balances can be null (not known yet, e.g. no super statement uploaded); growth is then null too.
-const known = r => r && r.open != null && r.close != null;
+// nogrowth: a balance carried from one known figure using money in/out only, so market growth there is unknown
+const known = r => r && r.open != null && r.close != null && !r.nogrowth;
 const superIn = r => r.sg + r.salsac + r.personal + (r.rollin || 0);
 const superOut = r => r.tax + r.fees + r.insurance;
 const superGrowth = r => known(r) ? r.close - r.open - superIn(r) + superOut(r) : null;
@@ -384,11 +389,18 @@ function uploadSection() {
         <b>Drop CSV or PDF exports here</b> or click to choose
         <span class="sub">Up to 10 MB each. They're encrypted here with the server's public key, so only your server can read them.</span></label>
       <div class="queue" id="queue"></div>
+      <div class="balrow">
+        <span class="lbl">Or enter a balance from the Vanguard site</span>
+        <select id="balAcct" aria-label="Account"><option value="super">Vanguard Super</option><option value="invest">Personal Investor</option></select>
+        <input type="date" id="balDate" aria-label="Balance date" value="${new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10)}">
+        <input type="text" inputmode="decimal" id="balAmt" placeholder="$0.00" aria-label="Balance in dollars">
+        <button class="btn small" id="saveBalance">Save</button><span class="msg" id="balMsg"></span>
+      </div>
       <details class="how"><summary>What to download from each site</summary>
         <ol>
           <li><b>Macquarie</b>: the <b>Transaction Listing Report</b> PDF for each account (both offset accounts and the home loan), last month or anything since your last upload. Overlaps are fine.</li>
           <li><b>Personal Investor</b>: the <b>Account Performance Report</b> PDF with the date range set to last month. One report per month gives an exact month-end balance.</li>
-          <li><b>Vanguard Super</b>: the <b>account activity</b> CSV, plus a statement PDF showing the balance when you have one. Without a balance, super shows contributions and fees but no growth.</li>
+          <li><b>Vanguard Super</b>: the <b>account activity</b> CSV, plus the balance shown in the portal, typed into the box above (or a statement PDF). Growth shows once there are two balances a month or more apart.</li>
         </ol>
         <div class="note" style="margin-top:0.3rem">The server reads each file within about 15 minutes. If a file isn't recognised it's marked rejected here; nothing from it is shown or emailed.</div>
       </details>
@@ -508,6 +520,22 @@ function wire() {
   ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('on'); }));
   drop.addEventListener('drop', e => handleFiles([...e.dataTransfer.files]));
 }
+
+// "Enter a balance": for super, whose CSV has no balance. Delegated so it also works on the empty-state page.
+document.addEventListener('click', async e => {
+  if (e.target.id !== 'saveBalance') return;
+  const msg = $('#balMsg'), btn = e.target;
+  const amount = Number($('#balAmt').value.replace(/[$,\s]/g, ''));
+  const date = $('#balDate').value, account = $('#balAcct').value;
+  if (!date || !Number.isFinite(amount) || amount < 0 || $('#balAmt').value.trim() === '') { msg.className = 'msg err'; msg.textContent = 'Enter the balance in dollars, e.g. 136684.53'; return; }
+  btn.disabled = true;
+  try {
+    if (!DEMO) await post('/finance/balance', JSON.stringify({ account, date, amount }));
+    $('#balAmt').value = '';
+    msg.className = 'msg'; msg.textContent = DEMO ? 'Saved (demo only, nothing sent)' : 'Saved. The charts update within about 15 minutes.';
+  } catch (err) { msg.className = 'msg err'; msg.textContent = err.message; }
+  btn.disabled = false;
+});
 
 async function post(path, body) {
   const res = await fetch(API + path, { method:'POST', credentials:'include', redirect:'manual',

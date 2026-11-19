@@ -85,6 +85,15 @@ def main(argv: list[str]) -> int:
             changed = True
     acked = categorise.apply_confirmed(con, inbox.get("categories") or [])
     changed |= bool(acked)
+    bal_acked = []
+    for b in inbox.get("balances") or []:
+        if b.get("account") in ("super", "invest") and isinstance(b.get("amount"), (int, float)):
+            con.execute("INSERT OR REPLACE INTO manual VALUES (?,?,?,?)", (b["id"], b["account"], b["date"], float(b["amount"])))
+            # one typed balance per account per day: the newest wins
+            con.execute("DELETE FROM manual WHERE kind=? AND d=? AND id<>?", (b["account"], b["date"], b["id"]))
+        bal_acked.append(b.get("id"))
+    con.commit()
+    changed |= bool(bal_acked)
 
     done, stored = take_uploads(con, inbox.get("uploads") or [])
     changed |= stored > 0
@@ -116,6 +125,9 @@ def main(argv: list[str]) -> int:
         if done:
             remote.call("POST", "/done", done)
             print(f"uploads: {sum(d['status'] == 'processed' for d in done)} processed, {sum(d['status'] == 'rejected' for d in done)} rejected")
+        if bal_acked:
+            remote.call("POST", "/balances-ack", {"ids": bal_acked})
+            print(f"balances entered: {len(bal_acked)}")
         if acked:
             remote.call("POST", "/categories-ack", {"ids": acked})
             print(f"categories confirmed: {len(acked)}")

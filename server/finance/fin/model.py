@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS periods (account TEXT, start TEXT, end TEXT, opening 
 CREATE TABLE IF NOT EXISTS rules (key TEXT PRIMARY KEY, id TEXT UNIQUE, category TEXT, source TEXT, confirmed INTEGER, seen INTEGER DEFAULT 0);
 CREATE TABLE IF NOT EXISTS budgets (cat TEXT PRIMARY KEY, amount INTEGER);
 CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT);
+CREATE TABLE IF NOT EXISTS manual (id TEXT PRIMARY KEY, kind TEXT, d TEXT, amount REAL);   -- balances typed on the page
 """
 
 
@@ -69,6 +70,12 @@ def rebuild(con) -> dict[str, tuple[str, str | None, int]]:
             continue
         store(con, f["id"], parsed)
         results[f["id"]] = ("processed", None, parsed.rows())
+    # balances typed on the page (super has no balance in its CSV); a typed balance wins over a parsed one that day
+    keys = {"super": (parsers.SUPER_KEY, "Vanguard Super"), "invest": (parsers.VPI_KEY, "Personal Investor")}
+    for r in con.execute("SELECT kind, d, amount FROM manual ORDER BY d").fetchall():
+        key, label = keys[r["kind"]]
+        con.execute("INSERT OR IGNORE INTO accounts VALUES (?,?,?)", (key, label, r["kind"]))
+        con.execute("INSERT INTO points VALUES (?,?,?) ON CONFLICT(account, d) DO UPDATE SET balance=excluded.balance", (key, r["d"], r["amount"]))
     for fid, (status, reason, rows) in results.items():
         con.execute("UPDATE files SET status=?, reason=?, rows=? WHERE id=?", (status, reason, rows, fid))
     con.commit()
@@ -137,8 +144,10 @@ class Account:
                 total += net * ((hi - lo).days + 1) / days
         return total
 
-    def balance(self, d: date) -> tuple[float | None, bool]:
-        """(balance at end of d, estimated?)."""
+    def balance(self, d: date) -> tuple[float | None, bool | str]:
+        """(balance at end of d, how it's known): False = a real balance that day; 'between' = estimated between two
+        known balances (growth spread evenly); 'flows' = only money in/out applied to one known balance, so the
+        market growth in that stretch is unknown."""
         before = [p for p in self.points if p[0] <= d]
         after = [p for p in self.points if p[0] > d]
         if before and before[-1][0] == d:
@@ -148,13 +157,13 @@ class Account:
         if before and after:
             (d0, b0), (d1, b1) = before[-1], after[0]
             growth = b1 - b0 - self.flow(d0, d1)
-            return b0 + self.flow(d0, d) + growth * (d - d0).days / (d1 - d0).days, True
+            return b0 + self.flow(d0, d) + growth * (d - d0).days / (d1 - d0).days, "between"
         if before:
             d0, b0 = before[-1]
-            return b0 + self.flow(d0, d), True
+            return b0 + self.flow(d0, d), "flows"
         if after and self.first and d >= self.first - timedelta(days=1):
             d1, b1 = after[0]
-            return b1 - self.flow(d, d1), True
+            return b1 - self.flow(d, d1), "flows"
         return None, False
 
 
@@ -206,7 +215,7 @@ def summary(con) -> dict:
             prev_end = month_start(m) - timedelta(days=1)
             o, oe = model.balance(prev_end)
             c, ce = model.balance(month_end_capped(m))
-            sup.append({"m": m, "open": _r(o), "close": _r(c), "est": oe or ce,
+            sup.append({"m": m, "open": _r(o), "close": _r(c), "est": bool(oe or ce), "nogrowth": "flows" in (oe, ce),
                         "sg": _r(sums["sg"]), "salsac": _r(sums["salsac"]), "personal": _r(sums["personal"]), "rollin": _r(sums["rollin"]),
                         "tax": _r(-sums["tax"]), "fees": _r(-sums["fees"]), "insurance": _r(-sums["insurance"])})
         break   # one super account
@@ -221,7 +230,7 @@ def summary(con) -> dict:
             dist = con.execute("SELECT coalesce(sum(amount),0) FROM txns WHERE account=? AND kind='distribution' AND substr(d,1,7)=?", (a["key"], m)).fetchone()[0]
             o, oe = model.balance(prev_end)
             c, ce = model.balance(month_end_capped(m))
-            inv.append({"m": m, "open": _r(o), "close": _r(c), "est": oe or ce,
+            inv.append({"m": m, "open": _r(o), "close": _r(c), "est": bool(oe or ce), "nogrowth": "flows" in (oe, ce),
                         "deposits": _r(max(net, 0)), "withdrawals": _r(max(-net, 0)), "distributions": _r(dist)})
         break
 

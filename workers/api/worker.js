@@ -838,7 +838,8 @@ async function coachApprove(env, body, who) {
 // only ever holds ciphertext. The server polls /agent/finance/*, decrypts and parses on its own disk, then PUTs back
 // a summary (monthly totals only: no transactions, no account numbers). Budgets and confirmed categories go the
 // other way. Agent routes use their own FINANCE_SECRET (not AGENT_SECRET), so the other agents can't read them.
-// KV: fin:summary, fin:pubkey, fin:budgets, fin:catq (confirmed categories not yet picked up), fin:uploads (log),
+// KV: fin:summary, fin:pubkey, fin:budgets, fin:catq (confirmed categories not yet picked up), fin:balq (balances typed
+// on the page, not yet picked up), fin:uploads (log),
 // fin:up:<id> (encrypted file, expires after 14 days whether or not it was picked up).
 const FIN_MAX_BYTES = 12 * 1024 * 1024;   // page allows 10 MB; the envelope adds a little
 const FIN_MAX_QUEUED = 30;
@@ -892,6 +893,18 @@ async function financePage(req, env, url, who) {
     await env.STATE.put('fin:catq', JSON.stringify(q.slice(-500)));
     return json({ ok: true });
   }
+  if (p === '/balance') {
+    // A balance read off the Vanguard portal, for accounts whose exports don't include one (super).
+    const { account, date, amount } = body;
+    const n = Math.round(Number(amount) * 100) / 100;
+    if (!['super', 'invest'].includes(account) || !/^\d{4}-\d{2}-\d{2}$/.test(String(date || '')) || !Number.isFinite(n) || n < 0 || n > 1e8) return json({ error: 'bad balance' }, 400);
+    if (date > new Date(Date.now() + 864e5).toISOString().slice(0, 10)) return json({ error: 'date is in the future' }, 400);
+    const id = `${Date.now().toString(36)}-${crypto.randomUUID().slice(0, 8)}`;
+    const q = (await env.STATE.get('fin:balq', 'json')) || [];
+    q.push({ id, account, date, amount: n });
+    await env.STATE.put('fin:balq', JSON.stringify(q.slice(-50)));
+    return json({ ok: true, id });
+  }
   return new Response('Not found', { status: 404 });
 }
 
@@ -917,10 +930,10 @@ async function financeAgent(req, env, url) {
   const p = url.pathname.slice('/agent/finance'.length);
   // Everything the server needs each poll, in one read-only call (KV reads are cheap, writes are not).
   if (req.method === 'GET' && p === '/inbox') {
-    const [log, budgets, catq] = await Promise.all([
-      env.STATE.get('fin:uploads', 'json'), env.STATE.get('fin:budgets', 'json'), env.STATE.get('fin:catq', 'json')]);
+    const [log, budgets, catq, balq] = await Promise.all([
+      env.STATE.get('fin:uploads', 'json'), env.STATE.get('fin:budgets', 'json'), env.STATE.get('fin:catq', 'json'), env.STATE.get('fin:balq', 'json')]);
     return json({ uploads: (log || []).filter(u => u.status === 'queued').map(({ id, type, at, size }) => ({ id, type, at, size })),
-      budgets: budgets || {}, categories: catq || [] });
+      budgets: budgets || {}, categories: catq || [], balances: balq || [] });
   }
   const m = p.match(/^\/upload\/([0-9a-z-]+)$/);
   if (req.method === 'GET' && m) {
@@ -937,6 +950,12 @@ async function financeAgent(req, env, url) {
       await env.STATE.delete(`fin:up:${it.id}`);
     }
     await env.STATE.put('fin:uploads', JSON.stringify(log));
+    return json({ ok: true });
+  }
+  if (req.method === 'POST' && p === '/balances-ack') {
+    const ids = new Set((await req.json()).ids || []);
+    const q = ((await env.STATE.get('fin:balq', 'json')) || []).filter(x => !ids.has(x.id));
+    await env.STATE.put('fin:balq', JSON.stringify(q));
     return json({ ok: true });
   }
   if (req.method === 'POST' && p === '/categories-ack') {
