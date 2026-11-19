@@ -905,6 +905,22 @@ async function financePage(req, env, url, who) {
     await env.STATE.put('fin:balq', JSON.stringify(q.slice(-50)));
     return json({ ok: true, id });
   }
+  if (p === '/adjust') {
+    // Move part of a month's spending between categories (e.g. cash that paid for solar → Housing), or undo one.
+    const q = (await env.STATE.get('fin:adjq', 'json')) || [];
+    if (body.remove) {
+      if (!FIN_ID_RE.test(String(body.remove))) return json({ error: 'bad id' }, 400);
+      q.push({ remove: String(body.remove) });
+    } else {
+      const { month, from, to } = body;
+      const n = Math.round(Number(body.amount) * 100) / 100;
+      if (!/^\d{4}-\d{2}$/.test(String(month || '')) || typeof from !== 'string' || typeof to !== 'string' || from === to
+          || from.length > 60 || to.length > 60 || !Number.isFinite(n) || n <= 0 || n > 1e7) return json({ error: 'bad adjustment' }, 400);
+      q.push({ id: `${Date.now().toString(36)}-${crypto.randomUUID().slice(0, 8)}`, month, from, to, amount: n, note: String(body.note || '').slice(0, 60) });
+    }
+    await env.STATE.put('fin:adjq', JSON.stringify(q.slice(-100)));
+    return json({ ok: true });
+  }
   return new Response('Not found', { status: 404 });
 }
 
@@ -930,10 +946,11 @@ async function financeAgent(req, env, url) {
   const p = url.pathname.slice('/agent/finance'.length);
   // Everything the server needs each poll, in one read-only call (KV reads are cheap, writes are not).
   if (req.method === 'GET' && p === '/inbox') {
-    const [log, budgets, catq, balq] = await Promise.all([
-      env.STATE.get('fin:uploads', 'json'), env.STATE.get('fin:budgets', 'json'), env.STATE.get('fin:catq', 'json'), env.STATE.get('fin:balq', 'json')]);
+    const [log, budgets, catq, balq, adjq] = await Promise.all([
+      env.STATE.get('fin:uploads', 'json'), env.STATE.get('fin:budgets', 'json'), env.STATE.get('fin:catq', 'json'),
+      env.STATE.get('fin:balq', 'json'), env.STATE.get('fin:adjq', 'json')]);
     return json({ uploads: (log || []).filter(u => u.status === 'queued').map(({ id, type, at, size }) => ({ id, type, at, size })),
-      budgets: budgets || {}, categories: catq || [], balances: balq || [] });
+      budgets: budgets || {}, categories: catq || [], balances: balq || [], adjustments: adjq || [] });
   }
   const m = p.match(/^\/upload\/([0-9a-z-]+)$/);
   if (req.method === 'GET' && m) {
@@ -950,6 +967,13 @@ async function financeAgent(req, env, url) {
       await env.STATE.delete(`fin:up:${it.id}`);
     }
     await env.STATE.put('fin:uploads', JSON.stringify(log));
+    return json({ ok: true });
+  }
+  if (req.method === 'POST' && p === '/adjustments-ack') {
+    // the server took the first n queued items (adds and removes, in order)
+    const n = Number((await req.json()).count) || 0;
+    const q = (await env.STATE.get('fin:adjq', 'json')) || [];
+    await env.STATE.put('fin:adjq', JSON.stringify(q.slice(n)));
     return json({ ok: true });
   }
   if (req.method === 'POST' && p === '/balances-ack') {

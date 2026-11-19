@@ -94,6 +94,14 @@ def main(argv: list[str]) -> int:
         bal_acked.append(b.get("id"))
     con.commit()
     changed |= bool(bal_acked)
+    adj = inbox.get("adjustments") or []
+    for a in adj:
+        if a.get("remove"):
+            con.execute("DELETE FROM adjust WHERE id=?", (a["remove"],))
+        elif a.get("from") in config.ALL_CATEGORIES and a.get("to") in config.ALL_CATEGORIES:
+            con.execute("INSERT OR REPLACE INTO adjust VALUES (?,?,?,?,?,?)", (a["id"], a["month"], a["from"], a["to"], float(a["amount"]), a.get("note", "")))
+    con.commit()
+    changed |= bool(adj)
 
     done, stored = take_uploads(con, inbox.get("uploads") or [])
     changed |= stored > 0
@@ -125,6 +133,9 @@ def main(argv: list[str]) -> int:
         if done:
             remote.call("POST", "/done", done)
             print(f"uploads: {sum(d['status'] == 'processed' for d in done)} processed, {sum(d['status'] == 'rejected' for d in done)} rejected")
+        if adj:
+            remote.call("POST", "/adjustments-ack", {"count": len(adj)})
+            print(f"adjustments: {len(adj)}")
         if bal_acked:
             remote.call("POST", "/balances-ack", {"ids": bal_acked})
             print(f"balances entered: {len(bal_acked)}")
@@ -175,7 +186,11 @@ def budget_overs(con, month: str) -> set[str]:
         cat = categorise.category(t["desc"], t["amount"], rules)
         if cat in budgets:
             spent[cat] = spent.get(cat, 0) - t["amount"]
-    return {c for c, v in spent.items() if v > budgets[c]}
+    for a in con.execute("SELECT * FROM adjust WHERE m=?", (month,)):
+        spent[a["from_cat"]] = spent.get(a["from_cat"], 0) - a["amount"]
+        if a["to_cat"] in budgets:
+            spent[a["to_cat"]] = spent.get(a["to_cat"], 0) + a["amount"]
+    return {c for c, v in spent.items() if c in budgets and v > budgets[c]}
 
 
 def shape(s: dict) -> dict:

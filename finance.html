@@ -349,6 +349,7 @@ function spendingSection() {
         <span class="pager"><button data-spend="-1" ${i > 0 ? '' : 'disabled'} aria-label="Previous month">←</button><b style="font-weight:400;color:var(--ink)">${esc(mLabel(r.m, true))}</b><button data-spend="1" ${i < b.length - 1 ? '' : 'disabled'} aria-label="Next month">→</button></span></div>
       <div class="cats">${bars}</div>
       <div class="legend"><span><i style="background:var(--accent)"></i>spent</span><span><i style="background:var(--loss)"></i>over budget</span><span><i style="width:2px;background:var(--ink)"></i>budget</span><span><i class="ln" style="border-top:2px dotted var(--muted);background:none;height:0"></i>12-month average</span></div>
+      ${moveControl(r, cats)}
     </div>
     <div class="cell"><div class="chart-title"><span>Money in vs out, each month</span><span>last ${Math.min(12, b.length)} months</span></div>
       ${flowChart(flow.slice(-12))}
@@ -356,6 +357,48 @@ function spendingSection() {
     </div></div>
     <div class="note">Transfers between your own accounts (for example into Personal Investor) aren't counted as spending.</div></section>`;
 }
+
+// "Move $X from A to B" for the month on screen: e.g. cash that paid for solar → Housing. Shown moves can be undone.
+function moveControl(r, cats) {
+  const moves = (S.adjustments || []).filter(a => a.m === r.m);
+  const from = cats.filter(c => (r.by[c] || 0) > 0);
+  const to = [...S.categories, 'Transfer', 'Income'];
+  return `<div class="balrow" id="moveRow">
+    <span class="lbl">Re-file part of ${esc(mLabel(r.m, true))}:</span> move
+    <input type="text" inputmode="decimal" id="mvAmt" placeholder="$0" aria-label="Amount to move" style="width:6.5rem">
+    from <select id="mvFrom" aria-label="From category">${from.map(c => `<option>${esc(c)}</option>`).join('')}</select>
+    to <select id="mvTo" aria-label="To category">${to.map(c => `<option${c === 'Housing' ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select>
+    <input type="text" id="mvNote" placeholder="note (e.g. solar)" maxlength="60" aria-label="Note" style="width:9rem;text-align:left">
+    <button class="btn small" id="mvSave" data-month="${esc(r.m)}">Move</button><span class="msg" id="mvMsg"></span>
+  </div>
+  ${moves.length ? `<div class="note" style="margin-top:0.5rem">${moves.map(a => `Moved ${money(a.amount)} from ${esc(a.from)} to ${esc(a.to)}${a.note ? ` (${esc(a.note)})` : ''} <button class="linkbtn" data-unmove="${esc(a.id)}">undo</button>`).join('<br>')}</div>` : ''}`;
+}
+
+document.addEventListener('click', async e => {
+  const save = e.target.id === 'mvSave', undo = e.target.dataset?.unmove;
+  if (!save && !undo) return;
+  const msg = $('#mvMsg'), btn = e.target;
+  let body;
+  if (save) {
+    const amount = Number($('#mvAmt').value.replace(/[$,\s]/g, ''));
+    if (!Number.isFinite(amount) || amount <= 0) { msg.className = 'msg err'; msg.textContent = 'Enter an amount, e.g. 8000'; return; }
+    body = { month: btn.dataset.month, from: $('#mvFrom').value, to: $('#mvTo').value, amount, note: $('#mvNote').value.trim() };
+    if (body.from === body.to) { msg.className = 'msg err'; msg.textContent = 'Pick two different categories'; return; }
+  } else body = { remove: undo };
+  btn.disabled = true;
+  try {
+    if (!DEMO) await post('/finance/adjust', JSON.stringify(body));
+    if (DEMO) {   // apply locally so the demo shows the effect
+      const row = S.bank.find(x => x.m === (body.month || (S.adjustments.find(a => a.id === undo) || {}).m));
+      if (save) { S.adjustments = [...(S.adjustments || []), { id:`d${Date.now()}`, m:body.month, ...body }]; row.by[body.from] -= body.amount; if (S.categories.includes(body.to)) row.by[body.to] = (row.by[body.to] || 0) + body.amount; else row.spend -= body.amount; }
+      else { const a = S.adjustments.find(x => x.id === undo); S.adjustments = S.adjustments.filter(x => x.id !== undo); row.by[a.from] += a.amount; if (S.categories.includes(a.to)) row.by[a.to] -= a.amount; else row.spend += a.amount; }
+      render(); $('#spending').scrollIntoView({ block:'nearest' });
+      $('#mvMsg').textContent = 'Done (demo only, nothing sent)';
+      return;
+    }
+    msg.className = 'msg'; msg.textContent = save ? 'Saved. The charts update within about 15 minutes.' : 'Undo saved. Updates within about 15 minutes.';
+  } catch (err) { msg.className = 'msg err'; msg.textContent = err.message; btn.disabled = false; }
+});
 
 function reviewSection() {
   if (!S.review.length) return '';

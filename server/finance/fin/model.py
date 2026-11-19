@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS rules (key TEXT PRIMARY KEY, id TEXT UNIQUE, category
 CREATE TABLE IF NOT EXISTS budgets (cat TEXT PRIMARY KEY, amount INTEGER);
 CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT);
 CREATE TABLE IF NOT EXISTS manual (id TEXT PRIMARY KEY, kind TEXT, d TEXT, amount REAL);   -- balances typed on the page
+CREATE TABLE IF NOT EXISTS adjust (id TEXT PRIMARY KEY, m TEXT, from_cat TEXT, to_cat TEXT, amount REAL, note TEXT);   -- moves made on the page
 """
 
 
@@ -270,6 +271,7 @@ def summary(con) -> dict:
                 else:
                     row["spend"] -= t["amount"]          # refunds (positive) reduce spending
                     row["by"][cat] -= t["amount"]
+        apply_adjustments(con, m, row)
         row["by"] = {c: _r(v) for c, v in row["by"].items() if abs(v) >= 0.5}
         bank.append({k: _r(v) if isinstance(v, float) else v for k, v in row.items()})
     if not bank_keys:
@@ -294,7 +296,25 @@ def summary(con) -> dict:
                      for k, lst in (("super", sup), ("invest", inv), ("bank", bank), ("loan", loan)) if lst],
         "networth": nw, "super": sup, "invest": inv, "loan": loan, "bank": bank,
         "categories": config.SPEND_CATEGORIES, "budgets": budgets(con), "review": review(con),
+        "adjustments": [{"id": r["id"], "m": r["m"], "from": r["from_cat"], "to": r["to_cat"], "amount": r["amount"], "note": r["note"]}
+                        for r in con.execute("SELECT * FROM adjust ORDER BY m, id") if r["m"] in months],
     }
+
+
+def apply_adjustments(con, m: str, row: dict) -> None:
+    """Moves you made on the page: part of a month's spending re-filed under another category.
+    Moving to Transfer or Income takes it out of spending."""
+    for a in con.execute("SELECT * FROM adjust WHERE m=?", (m,)):
+        amt, src, dst = a["amount"], a["from_cat"], a["to_cat"]
+        row["by"][src] = row["by"].get(src, 0) - amt
+        if dst in config.SPEND_CATEGORIES:
+            row["by"][dst] = row["by"].get(dst, 0) + amt
+        else:
+            row["spend"] -= amt
+            if dst == config.TRANSFER:
+                row["transfers"] += amt
+            else:
+                row["income"] += amt
 
 
 def _r(v):
