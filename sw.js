@@ -1,10 +1,11 @@
-const CACHE = 'shaunzen-v7';
+const CACHE = 'shaunzen-v8';
 const ASSETS = [
   './',
   './index.html',
   './books.html',
   './training.html',
   './plan.html',
+  './finance.html',
   './sql.html',
   './favicon.svg',
   './manifest.json',

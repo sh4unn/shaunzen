@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance — Shaunzen</title>
+<meta name="theme-color" content="#2a5a6a">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f0f4f5; --surface:#e4ecee; --surface2:#dde7ea;
+    --border:#c0ced2; --slate:#bfcbce;
+    --ink:#1a2628; --muted:#4a6068; --faint:#8fa0a5;
+    --accent:#2a5a6a; --accent-light:#3a7a8c; --accent-faint:#e0ecf0;
+    --warm:#c45e2a; --gold:#8a6a20; --green:#3a6a2a; --red:#7a2020; --purple:#5a3a7a;
+    --cream:#f0f4f5; --parchment:#e4ecee; --teal:#2a5a6a; --teal-light:#3a7a8c; --teal-faint:#e0ecf0;
+    --burnt:#c45e2a; --burnt-faint:#f5ede8;
+    /* account series (same validated categorical order as training.html) */
+    --a-super:#0077a8; --a-invest:#7048a6; --a-bank:#3a8a2e;
+    --gain:#3a8a2e; --loss:#b0413e;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:'Spectral',serif; min-height:100vh; }
+  .bg-layer { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .orb { position:absolute; border-radius:50%; filter:blur(120px); opacity:0.15; animation:drift 28s ease-in-out infinite alternate; }
+  .orb1 { width:60vw; height:60vw; background:radial-gradient(circle,#bfcbce,transparent 70%); top:-20%; left:-20%; animation-duration:22s; }
+  .orb2 { width:45vw; height:45vw; background:radial-gradient(circle,#3a8a2e,transparent 70%); bottom:-15%; right:-15%; animation-duration:32s; animation-delay:-12s; }
+  @keyframes drift { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(3vw,-3vh) scale(1.03)} 100%{transform:translate(-2vw,2vh) scale(0.98)} }
+  @keyframes up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--accent); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:2px; transition:background 0.2s; }
+  .home-btn:hover { background:var(--accent-light); }
+
+  .header { position:relative; z-index:2; text-align:center; padding:5rem 2rem 2.75rem; border-bottom:1px solid var(--border); }
+  .header-label { font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:300; letter-spacing:0.4em; text-transform:uppercase; color:var(--faint); margin-bottom:0.9rem; animation:up 0.7s ease both; }
+  h1 { font-family:'New Rocker',cursive; font-size:clamp(3rem,10vw,6.5rem); font-weight:400; line-height:1; color:var(--ink); text-shadow:0 2px 16px rgba(26,38,40,0.12); margin-bottom:0.5rem; animation:up 0.9s ease both 0.15s; }
+  .header-sub { font-style:italic; font-size:0.9rem; color:var(--faint); animation:up 0.9s ease both 0.3s; }
+
+  .status { position:relative; z-index:2; display:flex; justify-content:center; flex-wrap:wrap; gap:0.4rem 1.4rem; padding:0.7rem 1rem; border-bottom:1px solid var(--border); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; color:var(--faint); }
+  .status a { color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-faint); }
+  .status .stale { color:var(--gold); }
+  .status .demo { color:var(--warm); }
+
+  main { position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+  section { margin-bottom:2.75rem; animation:up 0.7s ease both 0.45s; }
+  .section-label { display:flex; justify-content:space-between; gap:1rem; font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--faint); margin-bottom:0.85rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); }
+  .section-label span:last-child { letter-spacing:0.08em; text-transform:none; text-align:right; }
+
+  .grid { display:grid; gap:0; border:1px solid var(--border); }
+  .cell { border:1px solid var(--border); margin:-1px 0 0 -1px; background:var(--bg); padding:1.4rem 1.5rem; min-width:0; }
+  .tiles { grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); }
+  .tile .k { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.22em; text-transform:uppercase; color:var(--faint); }
+  .tile .v { font-family:'IBM Plex Mono',monospace; font-weight:300; font-size:2rem; color:var(--ink); margin:0.35rem 0 0.15rem; white-space:nowrap; }
+  .tile .v small { font-size:0.9rem; color:var(--muted); }
+  .tile .s { font-size:0.82rem; font-style:italic; color:var(--muted); }
+  .up { color:var(--gain); } .down { color:var(--loss); }
+
+  .chart-title { display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; color:var(--muted); margin-bottom:0.9rem; }
+  svg { display:block; width:100%; height:auto; overflow:visible; }
+  svg text { font-family:'IBM Plex Mono',monospace; font-size:9px; fill:var(--faint); }
+  .legend { display:flex; flex-wrap:wrap; gap:0.35rem 1rem; margin-top:0.8rem; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); align-items:center; }
+  .legend i { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:0.35rem; vertical-align:-1px; }
+  .legend .ln { width:14px; height:2px; border-radius:1px; vertical-align:3px; }
+  .legend .dash { width:14px; height:0; border-top:2px dashed var(--muted); border-radius:0; vertical-align:3px; }
+  .note { font-style:italic; font-size:0.85rem; color:var(--muted); margin-top:0.75rem; line-height:1.55; }
+
+  .tip { position:fixed; z-index:50; pointer-events:none; background:var(--ink); color:var(--bg); font-family:'IBM Plex Mono',monospace; font-size:10px; line-height:1.5; padding:0.45rem 0.6rem; border-radius:3px; max-width:260px; opacity:0; transition:opacity 0.1s; white-space:pre-line; }
+  .tip.on { opacity:1; }
+
+  table { width:100%; border-collapse:collapse; border:1px solid var(--border); background:var(--bg); }
+  th { font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:400; letter-spacing:0.18em; text-transform:uppercase; color:var(--faint); text-align:left; padding:0.65rem 1rem; border-bottom:1px solid var(--border); background:var(--surface); }
+  td { padding:0.7rem 1rem; border-top:1px dashed var(--border); font-size:0.98rem; vertical-align:middle; }
+  td.n, th.n { font-family:'IBM Plex Mono',monospace; font-size:0.8rem; text-align:right; white-space:nowrap; }
+  td .sub { display:block; font-style:italic; font-size:0.82rem; color:var(--muted); }
+  .table-scroll { overflow-x:auto; }
+
+  .pager { display:flex; align-items:center; gap:0.5rem; }
+  .pager button, .linkbtn { background:none; border:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; color:var(--accent); cursor:pointer; padding:0.2rem 0.4rem; }
+  .pager button:disabled { color:var(--border); cursor:default; }
+
+  /* spending bars */
+  .cats { display:grid; gap:0.55rem; }
+  .cat { display:grid; grid-template-columns:9.5rem 1fr 6.5rem; gap:0.75rem; align-items:center; }
+  .cat .name { font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cat .amt { font-family:'IBM Plex Mono',monospace; font-size:0.8rem; text-align:right; white-space:nowrap; }
+  .cat .amt small { display:block; font-size:0.68rem; color:var(--faint); }
+  .track { position:relative; height:14px; background:var(--surface); border-radius:2px; }
+  .fill { position:absolute; left:0; top:0; bottom:0; background:var(--accent); border-radius:2px; }
+  .fill.over { background:var(--loss); }
+  .avg { position:absolute; top:-3px; bottom:-3px; width:0; border-left:2px dotted var(--muted); }
+  .budget { position:absolute; top:-4px; bottom:-4px; width:2px; background:var(--ink); }
+
+  .badge { display:inline-flex; align-items:center; gap:0.35rem; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; padding:0.15rem 0.5rem; border-radius:2px; border:1px solid currentColor; white-space:nowrap; }
+  .badge.good { color:var(--green); } .badge.warn { color:var(--gold); } .badge.bad { color:var(--red); background:#f5e8e8; } .badge.na { color:var(--faint); }
+
+  input[type=number], select { font-family:'IBM Plex Mono',monospace; font-size:0.85rem; color:var(--ink); background:var(--bg); border:1px solid var(--border); border-radius:2px; padding:0.35rem 0.5rem; }
+  input[type=number] { width:7rem; text-align:right; }
+  input:focus-visible, select:focus-visible, button:focus-visible, .drop:focus-within { outline:2px solid var(--accent-light); outline-offset:1px; }
+  .btn { display:inline-block; background:var(--accent); color:white; border:none; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.65rem 1.2rem; border-radius:3px; cursor:pointer; }
+  .btn:hover { background:var(--accent-light); } .btn:disabled { background:var(--faint); cursor:default; }
+  .btn.small { font-size:0.65rem; padding:0.4rem 0.75rem; }
+  .btn.ghost { background:none; color:var(--accent); border:1px solid var(--accent); }
+
+  .drop { display:block; border:1px dashed var(--accent-light); background:var(--bg); padding:1.75rem 1.5rem; text-align:center; cursor:pointer; transition:background 0.15s; }
+  .drop.on { background:var(--accent-faint); }
+  .drop b { font-weight:400; color:var(--accent); }
+  .drop .sub { display:block; font-style:italic; font-size:0.85rem; color:var(--muted); margin-top:0.4rem; }
+  .drop input { position:absolute; width:1px; height:1px; opacity:0; }
+  .queue { margin-top:0.75rem; }
+  .queue .row { display:grid; grid-template-columns:1fr auto auto; gap:0.75rem; align-items:center; padding:0.6rem 0; border-top:1px dashed var(--border); font-size:0.92rem; }
+  .queue .fname { font-family:'IBM Plex Mono',monospace; font-size:0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .how { margin-top:0.5rem; }
+  .how summary { cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--accent); padding:0.4rem 0; }
+  .how ol { padding-left:1.4rem; font-size:0.92rem; line-height:1.6; color:var(--muted); }
+  .how li { margin:0.3rem 0; } .how li b { font-weight:400; color:var(--ink); }
+
+  .hint { font-style:italic; font-size:0.95rem; color:var(--muted); padding:1.5rem; border:1px dashed var(--border); text-align:center; line-height:1.7; }
+  .hint a { color:var(--accent); }
+  .msg { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); margin-left:0.75rem; }
+  .msg.err { color:var(--red); }
+
+  .crumb { position:relative; z-index:2; background:var(--surface); border-top:1px solid var(--border); padding:0.75rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--faint); text-align:center; }
+  .crumb a { color:var(--accent); text-decoration:none; }
+
+  @media(max-width:700px) {
+    .header { padding:4rem 1rem 2rem; }
+    main { padding:2rem 1rem 3rem; }
+    .cell { padding:1.1rem 1rem; }
+    .cat { grid-template-columns:6.5rem 1fr 5.5rem; gap:0.5rem; }
+    .tiles { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
+    .tile .v { font-size:1.5rem; }
+    td, th { padding:0.6rem 0.6rem; }
+  }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
+</style>
+</head>
+<body>
+<div class="bg-layer"><div class="orb orb1"></div><div class="orb orb2"></div></div>
+<a class="home-btn" href="index.html">← Home</a>
+<div class="header">
+  <div class="header-label">Life — Money</div>
+  <h1>Finance</h1>
+  <div class="header-sub">Vanguard Super · Vanguard Personal Investor · Macquarie. Tracking only, not advice.</div>
+</div>
+<div class="status" id="status">Loading…</div>
+<main id="main"></main>
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="crumb"><a href="index.html">Home</a> &rsaquo; Finance</div>
+
+<script>
+const API = 'https://api.shaunzen.com';
+const PAGE = 'https://shaunzen.com/finance.html';
+const DEMO = new URLSearchParams(location.search).has('demo');
+const MAX_FILE = 10 * 1024 * 1024;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const mLabel = (m, long) => { const [y, mo] = m.split('-'); return long ? `${MONTHS[+mo - 1]} ${y}` : `${MONTHS[+mo - 1]} ${y.slice(2)}`; };
+const AUD = new Intl.NumberFormat('en-AU', { style:'currency', currency:'AUD', maximumFractionDigits:0 });
+const money = v => AUD.format(Math.round(v));
+const signed = v => (v > 0 ? '+' : v < 0 ? '−' : '') + AUD.format(Math.abs(Math.round(v)));
+const short = v => { const a = Math.abs(v), s = v < 0 ? '−' : ''; return a >= 1e6 ? `${s}$${(a / 1e6).toFixed(2)}m` : a >= 1e4 ? `${s}$${(a / 1e3).toFixed(0)}k` : a >= 1e3 ? `${s}$${(a / 1e3).toFixed(1)}k` : `${s}$${Math.round(a)}`; };
+const sum = (a, f = x => x) => a.reduce((t, x) => t + f(x), 0);
+const ACCOUNTS = [
+  { k:'super', label:'Vanguard Super', c:'var(--a-super)' },
+  { k:'invest', label:'Personal Investor', c:'var(--a-invest)' },
+  { k:'bank', label:'Macquarie', c:'var(--a-bank)' },
+];
+const UPLOAD_TYPES = [
+  { k:'macquarie-csv', label:'Macquarie: transactions (CSV)', accept:'.csv' },
+  { k:'vpi-csv', label:'Personal Investor: transactions (CSV)', accept:'.csv' },
+  { k:'vpi-pdf', label:'Personal Investor: statement (PDF)', accept:'.pdf' },
+  { k:'super-csv', label:'Super: transactions (CSV)', accept:'.csv' },
+  { k:'super-pdf', label:'Super: statement (PDF)', accept:'.pdf' },
+];
+let S = null;          // summary from the server (or demo)
+let spendIdx = null;   // which month the spending view shows
+
+// ---------- summary shape (what the server writes to KV) ----------
+// { generated, asOf:{super,invest,bank}, months:['YYYY-MM',…],
+//   super:[{m,open,close,sg,salsac,personal,tax,fees,insurance}],
+//   invest:[{m,open,close,deposits,withdrawals,distributions}],
+//   bank:[{m,close,income,spend,transfers,by:{cat:amt}}],
+//   categories:[…], budgets:{cat:amt}, review:[{id,merchant,count,suggested}], uploads:[{type,at,status,rows}] }
+// Growth is always worked out here: closing − opening − net money in.
+
+const superIn = r => r.sg + r.salsac + r.personal;
+const superOut = r => r.tax + r.fees + r.insurance;
+const superGrowth = r => r.close - r.open - superIn(r) + superOut(r);
+const investIn = r => r.deposits - r.withdrawals;
+const investGrowth = r => r.close - r.open - investIn(r);
+
+function render() {
+  charts = [];
+  const months = S.months, last = months.length - 1;
+  const nw = months.map((m, i) => ({ m, super:S.super[i]?.close ?? 0, invest:S.invest[i]?.close ?? 0, bank:S.bank[i]?.close ?? 0 }));
+  nw.forEach(r => r.total = r.super + r.invest + r.bank);
+  if (spendIdx == null || spendIdx > last) spendIdx = last;
+
+  // status strip
+  const today = new Date();
+  const ageDays = iso => Math.round((today - new Date(iso + 'T12:00:00')) / 864e5);
+  $('#status').innerHTML = (DEMO ? `<span class="demo">Demo: made-up numbers</span>` : '') +
+    ACCOUNTS.map(a => { const d = S.asOf[a.k]; const stale = !d || ageDays(d) > 40;
+      return `<span class="${stale ? 'stale' : ''}">${esc(a.label)}: ${d ? 'to ' + esc(new Date(d + 'T12:00:00').toLocaleDateString('en-AU', { day:'numeric', month:'short' })) : 'no data'}${stale ? ' · export due' : ''}</span>`; }).join('') +
+    `<a href="#upload">Upload exports</a>`;
+
+  // ---------- headline tiles ----------
+  const yr = Math.max(0, last - 12);
+  const nwNow = nw[last].total, nwYr = nw[yr].total;
+  const sYr = S.super.slice(yr + 1), iYr = S.invest.slice(yr + 1), bYr = S.bank.slice(yr + 1);
+  const putIn = sum(sYr, superIn) - sum(sYr, superOut) + sum(iYr, investIn);
+  const grew = sum(sYr, superGrowth) + sum(iYr, investGrowth);
+  const spentLast = S.bank[last].spend, spentAvg = sum(bYr, r => r.spend) / (bYr.length || 1);
+  let html = `<section><div class="section-label"><span>— Where things stand</span><span>${esc(mLabel(months[last], true))} vs 12 months earlier</span></div>
+    <div class="grid tiles">
+      ${tile('Net worth', short(nwNow), `<span class="${nwNow >= nwYr ? 'up' : 'down'}">${signed(nwNow - nwYr)}</span> in 12 months`)}
+      ${tile('Money you put in', short(putIn), 'super + investing, after fees and tax')}
+      ${tile('Market growth', `<span class="${grew >= 0 ? 'up' : 'down'}">${short(grew)}</span>`, 'super + investing, incl. distributions')}
+      ${tile('Spent last month', short(spentLast), `${spentLast > spentAvg ? 'above' : 'below'} the ${short(spentAvg)} monthly average`)}
+    </div></section>`;
+
+  // ---------- net worth ----------
+  html += `<section><div class="section-label"><span>— Net worth</span><span>month-end balances</span></div>
+    <div class="grid"><div class="cell"><div class="chart-title"><span>All three accounts, stacked</span><span>${esc(mLabel(months[0]))} – ${esc(mLabel(months[last]))}</span></div>
+    ${stackedBars(nw, ACCOUNTS, r => `${mLabel(r.m, true)}\nTotal ${money(r.total)}` + ACCOUNTS.map(a => `\n${a.label} ${money(r[a.k])}`).join(''))}
+    <div class="legend">${ACCOUNTS.map(a => `<span><i style="background:${a.c}"></i>${esc(a.label)}</span>`).join('')}</div></div></div></section>`;
+
+  // ---------- super ----------
+  html += growthSection({
+    title:'Super', sub:'contributions vs growth', rows:S.super, color:'var(--a-super)',
+    inOf:r => superIn(r) - superOut(r), growthOf:superGrowth,
+    tiles: rows => [
+      tile('Contributions', short(sum(rows, superIn)), `SG ${short(sum(rows, r => r.sg))} · salary sacrifice ${short(sum(rows, r => r.salsac))}${sum(rows, r => r.personal) ? ` · personal ${short(sum(rows, r => r.personal))}` : ''}`),
+      tile('Taken out', short(sum(rows, superOut)), `contributions tax ${short(sum(rows, r => r.tax))} · fees ${short(sum(rows, r => r.fees))} · insurance ${short(sum(rows, r => r.insurance))}`),
+      tile('Investment growth', `<span class="${sum(rows, superGrowth) >= 0 ? 'up' : 'down'}">${short(sum(rows, superGrowth))}</span>`, 'what the market added'),
+    ],
+    tipOf:r => `${mLabel(r.m, true)}\nBalance ${money(r.close)}\nContributions ${money(superIn(r))}\nTax, fees, insurance −${money(superOut(r))}\nGrowth ${signed(superGrowth(r))}`,
+  });
+
+  // ---------- investing ----------
+  html += growthSection({
+    title:'Personal Investor', sub:'contributions vs growth', rows:S.invest, color:'var(--a-invest)',
+    inOf:investIn, growthOf:investGrowth,
+    tiles: rows => [
+      tile('Money in', short(sum(rows, investIn)), `deposits ${short(sum(rows, r => r.deposits))}${sum(rows, r => r.withdrawals) ? ` · withdrawals ${short(sum(rows, r => r.withdrawals))}` : ''}`),
+      tile('Distributions', short(sum(rows, r => r.distributions)), 'part of growth'),
+      tile('Total growth', `<span class="${sum(rows, investGrowth) >= 0 ? 'up' : 'down'}">${short(sum(rows, investGrowth))}</span>`, 'price changes + distributions'),
+    ],
+    tipOf:r => `${mLabel(r.m, true)}\nBalance ${money(r.close)}\nMoney in ${signed(investIn(r))}\nDistributions ${money(r.distributions)}\nGrowth ${signed(investGrowth(r))}`,
+  });
+
+  // ---------- spending ----------
+  html += spendingSection();
+  html += reviewSection();
+  html += budgetSection();
+  html += uploadSection();
+
+  $('#main').innerHTML = html;
+  wire();
+}
+
+const tile = (k, v, s) => `<div class="cell tile"><div class="k">${esc(k)}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+
+// Super and investing share one layout: tiles for the last 12 months, then
+// balance vs "money in" (opening balance + cumulative net contributions). The gap is growth.
+function growthSection(o) {
+  const rows = o.rows, last = rows.length - 1, yr = rows.slice(Math.max(0, last - 11));
+  let cum = rows[0].open;
+  const pts = rows.map(r => { cum += o.inOf(r); return { m:r.m, bal:r.close, base:cum, r }; });
+  const totalGrowth = pts[last].bal - pts[last].base;
+  return `<section><div class="section-label"><span>— ${esc(o.title)}</span><span>${esc(o.sub)} · last 12 months</span></div>
+    <div class="grid tiles">${o.tiles(yr).join('')}</div>
+    <div class="grid" style="border-top:none"><div class="cell"><div class="chart-title"><span>Balance vs money put in</span><span>${signed(totalGrowth)} growth since ${esc(mLabel(rows[0].m))}</span></div>
+      ${gapChart(pts, o.color, p => o.tipOf(p.r))}
+      <div class="legend"><span><i class="ln" style="background:${o.color}"></i>balance</span><span><i class="dash"></i>money put in (net)</span><span><i style="background:${o.color};opacity:0.18"></i>growth</span></div>
+    </div></div></section>`;
+}
+
+function spendingSection() {
+  const b = S.bank, i = spendIdx, r = b[i];
+  const prev = b.slice(Math.max(0, i - 12), i);
+  const avg = c => prev.length ? sum(prev, x => x.by[c] || 0) / prev.length : 0;
+  const cats = S.categories.filter(c => (r.by[c] || 0) > 0 || avg(c) > 0 || S.budgets[c])
+    .sort((a, z) => (r.by[z] || 0) - (r.by[a] || 0));
+  const scale = Math.max(...cats.map(c => Math.max(r.by[c] || 0, avg(c), S.budgets[c] || 0)), 1) * 1.05;
+  const over = cats.filter(c => S.budgets[c] && (r.by[c] || 0) > S.budgets[c]);
+  const net = r.income - r.spend - r.transfers;
+  const bars = cats.map(c => {
+    const v = r.by[c] || 0, bud = S.budgets[c], a = avg(c), isOver = bud && v > bud;
+    const tipText = `${c}, ${mLabel(r.m, true)}\nSpent ${money(v)}\n12-month average ${money(a)}${bud ? `\nBudget ${money(bud)}${isOver ? ` (over by ${money(v - bud)})` : ''}` : ''}`;
+    return `<div class="cat" data-tip="${esc(tipText)}"><div class="name">${esc(c)}</div>
+      <div class="track"><div class="fill${isOver ? ' over' : ''}" style="width:${(v / scale * 100).toFixed(1)}%"></div>
+        ${a ? `<div class="avg" style="left:${(a / scale * 100).toFixed(1)}%"></div>` : ''}
+        ${bud ? `<div class="budget" style="left:${(bud / scale * 100).toFixed(1)}%"></div>` : ''}</div>
+      <div class="amt">${money(v)}${bud ? `<small>of ${money(bud)}</small>` : ''}</div></div>`;
+  }).join('');
+  const flow = b.map(x => ({ m:x.m, income:x.income, spend:x.spend, transfers:x.transfers }));
+  return `<section id="spending"><div class="section-label"><span>— Macquarie spending</span><span>where the money went</span></div>
+    <div class="grid tiles">
+      ${tile('Money in', short(r.income), 'pay and other income')}
+      ${tile('Spent', short(r.spend), `${over.length ? `<span class="down">${over.length} over budget</span>` : 'all budgets OK'}`)}
+      ${tile('To investing', short(r.transfers), 'transfers to your own accounts')}
+      ${tile('Left over', `<span class="${net >= 0 ? 'up' : 'down'}">${short(net)}</span>`, `account at ${short(r.close)}`)}
+    </div>
+    <div class="grid" style="border-top:none"><div class="cell">
+      <div class="chart-title"><span>By category</span>
+        <span class="pager"><button data-spend="-1" ${i > 0 ? '' : 'disabled'} aria-label="Previous month">←</button><b style="font-weight:400;color:var(--ink)">${esc(mLabel(r.m, true))}</b><button data-spend="1" ${i < b.length - 1 ? '' : 'disabled'} aria-label="Next month">→</button></span></div>
+      <div class="cats">${bars}</div>
+      <div class="legend"><span><i style="background:var(--accent)"></i>spent</span><span><i style="background:var(--loss)"></i>over budget</span><span><i style="width:2px;background:var(--ink)"></i>budget</span><span><i class="ln" style="border-top:2px dotted var(--muted);background:none;height:0"></i>12-month average</span></div>
+    </div>
+    <div class="cell"><div class="chart-title"><span>Money in vs out, each month</span><span>last ${Math.min(12, b.length)} months</span></div>
+      ${flowChart(flow.slice(-12))}
+      <div class="legend"><span><i style="background:var(--a-bank)"></i>money in</span><span><i style="background:var(--accent)"></i>spent</span><span><i style="background:var(--a-invest)"></i>to investing</span></div>
+    </div></div>
+    <div class="note">Transfers between your own accounts (for example into Personal Investor) aren't counted as spending.</div></section>`;
+}
+
+function reviewSection() {
+  if (!S.review.length) return '';
+  const opts = sel => S.categories.map(c => `<option${c === sel ? ' selected' : ''}>${esc(c)}</option>`).join('');
+  return `<section id="review"><div class="section-label"><span>— Check categories</span><span>${S.review.length} new merchant${S.review.length === 1 ? '' : 's'}</span></div>
+    <div class="table-scroll"><table><thead><tr><th>Merchant</th><th class="n">Times</th><th>Category</th><th></th></tr></thead><tbody>
+    ${S.review.map(x => `<tr><td>${esc(x.merchant)}<span class="sub">suggested: ${esc(x.suggested)}</span></td><td class="n">${x.count}</td>
+      <td><select data-review="${esc(x.id)}" aria-label="Category for ${esc(x.merchant)}">${opts(x.suggested)}</select></td>
+      <td class="n"><button class="btn small" data-confirm="${esc(x.id)}">Confirm</button></td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="note">Suggestions come from Claude on the server, which only sees the merchant name, never amounts or dates. Each one you confirm becomes a rule, so a merchant is only checked once.</div></section>`;
+}
+
+function budgetSection() {
+  return `<section id="budgets"><div class="section-label"><span>— Monthly budgets</span><span>blank = no budget</span></div>
+    <div class="grid tiles" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+    ${S.categories.map(c => `<div class="cell" style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;padding:0.8rem 1.1rem">
+      <label for="bud-${esc(c)}" style="font-size:0.95rem">${esc(c)}</label>
+      <input type="number" min="0" step="10" inputmode="numeric" id="bud-${esc(c)}" data-budget="${esc(c)}" value="${S.budgets[c] ?? ''}" placeholder="—"></div>`).join('')}
+    </div>
+    <div style="margin-top:0.9rem"><button class="btn" id="saveBudgets">Save budgets</button><span class="msg" id="budgetMsg"></span></div>
+    <div class="note">If a category goes over in a month, you get an email that says so, with no amounts in it.</div></section>`;
+}
+
+function uploadSection() {
+  const recent = (S.uploads || []).slice(0, 6);
+  const typeLabel = k => (UPLOAD_TYPES.find(t => t.k === k) || { label:k }).label;
+  return `<section id="upload"><div class="section-label"><span>— Upload exports</span><span>encrypted in this browser before sending</span></div>
+    <div class="grid"><div class="cell">
+      <label class="drop" id="drop"><input type="file" id="file" multiple accept=".csv,.pdf">
+        <b>Drop CSV or PDF exports here</b> or click to choose
+        <span class="sub">Up to 10 MB each. They're encrypted here with the server's public key, so only your server can read them.</span></label>
+      <div class="queue" id="queue"></div>
+      <details class="how"><summary>What to download from each site</summary>
+        <ol>
+          <li><b>Macquarie</b>: Online Banking → the account → search transactions for last month → <b>Export → CSV</b>.</li>
+          <li><b>Personal Investor</b>: Vanguard Online → Personal Investor → <b>Transactions</b> → <b>Download</b> → spreadsheet (CSV), last month. Also the month's <b>statement PDF</b>, for the closing balance.</li>
+          <li><b>Vanguard Super</b>: the member portal's transaction history (CSV if there is one, otherwise the statement PDF).</li>
+        </ol>
+        <div class="note" style="margin-top:0.3rem">Menu names still need confirming against each site on your first upload.</div>
+      </details>
+    </div>
+    ${recent.length ? `<div class="cell"><div class="chart-title"><span>Recent uploads</span></div><div class="table-scroll"><table><tbody>
+      ${recent.map(u => `<tr><td>${esc(typeLabel(u.type))}<span class="sub">${esc(new Date(u.at).toLocaleDateString('en-AU', { day:'numeric', month:'short', hour:'numeric', minute:'2-digit' }))}</span></td>
+        <td class="n">${u.rows != null ? `${u.rows} rows` : ''}</td>
+        <td class="n"><span class="badge ${{ processed:'good', queued:'na', rejected:'bad' }[u.status] || 'na'}">${esc(u.status)}</span></td></tr>`).join('')}
+    </tbody></table></div></div>` : ''}
+    </div></section>`;
+}
+
+// ---------- charts (inline SVG, same conventions as training.html) ----------
+let charts = [];
+const roundTop = (x, y, w, h, r) => `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
+function niceStep(max) { const raw = max / 4, p = 10 ** Math.floor(Math.log10(raw)), n = raw / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p; }
+function yGrid(W, padL, y, min, max) {
+  const step = niceStep(max - min); let g = '';
+  for (let v = Math.ceil(min / step) * step; v <= max; v += step) g += `<line x1="${padL}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="var(--border)" stroke-width="${v ? 0.5 : 1}"/><text x="${padL - 6}" y="${y(v) + 3}" text-anchor="end">${short(v)}</text>`;
+  return g;
+}
+function xLabels(rows, X, H, every) {
+  return rows.map((r, i) => (i % every === 0 || i === rows.length - 1) && !(i !== rows.length - 1 && rows.length - 1 - i < every / 2)
+    ? `<text x="${X(i)}" y="${H - 4}" text-anchor="middle">${esc(mLabel(r.m))}</text>` : '').join('');
+}
+
+function stackedBars(rows, series, tipOf) {
+  const W = 640, H = 200, padL = 40, padB = 18, top = 6, plotH = H - padB - top;
+  const max = Math.max(...rows.map(r => sum(series, s => r[s.k]))) * 1.08;
+  const bw = (W - padL) / rows.length, barW = Math.min(bw - 4, 22);
+  const y = v => top + plotH - v / max * plotH;
+  let bars = '';
+  rows.forEach((r, i) => {
+    const x = padL + i * bw + (bw - barW) / 2; let acc = 0;
+    const segs = series.filter(s => r[s.k] > 0);
+    segs.forEach((s, j) => {
+      const y0 = y(acc), y1 = y(acc + r[s.k]); acc += r[s.k];
+      const isTop = j === segs.length - 1, hgt = Math.max(0, y0 - y1 - (isTop ? 0 : 1.5));
+      bars += isTop ? `<path d="${roundTop(x, y1, barW, hgt, Math.min(3, hgt))}" fill="${s.c}"/>` : `<rect x="${x}" y="${y1 + 1.5}" width="${barW}" height="${hgt}" fill="${s.c}"/>`;
+    });
+    bars += `<rect x="${padL + i * bw}" y="0" width="${bw}" height="${H - padB}" fill="transparent" data-tip="${esc(tipOf(r))}"/>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Month-end net worth by account">${yGrid(W, padL, y, 0, max)}${bars}${xLabels(rows, i => padL + i * bw + bw / 2, H, 3)}</svg>`;
+}
+
+// Balance line over a dashed "money put in" line; the shaded gap between them is growth.
+function gapChart(pts, color, tipOf) {
+  const W = 640, H = 190, padL = 40, padB = 18, top = 8;
+  const vals = pts.flatMap(p => [p.bal, p.base]);
+  let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.1 || 1000; lo -= pad; hi += pad;
+  const X = i => padL + i / (pts.length - 1 || 1) * (W - padL - 4);
+  const Y = v => top + (1 - (v - lo) / (hi - lo)) * (H - padB - top);
+  const line = k => pts.map((p, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(p[k]).toFixed(1)}`).join('');
+  const area = line('bal') + pts.slice().reverse().map((p, j) => `L${X(pts.length - 1 - j).toFixed(1)},${Y(p.base).toFixed(1)}`).join('') + 'Z';
+  const colW = (W - padL) / pts.length;
+  const hits = pts.map((p, i) => `<rect x="${X(i) - colW / 2}" y="0" width="${colW}" height="${H - padB}" fill="transparent" data-tip="${esc(tipOf(p) + `\nTotal growth so far ${signed(p.bal - p.base)}`)}" data-dot="${i}"/>`).join('');
+  const id = charts.push({ X, Y, pts }) - 1;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" data-gap="${id}" aria-label="Balance compared with money put in">${yGrid(W, padL, Y, lo, hi)}
+    <path d="${area}" fill="${color}" opacity="0.14"/>
+    <path d="${line('base')}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <path d="${line('bal')}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle class="gd" r="4" fill="${color}" stroke="var(--bg)" stroke-width="2" opacity="0"/>
+    ${xLabels(pts, X, H, 3)}${hits}</svg>`;
+}
+
+function flowChart(rows) {
+  const W = 640, H = 170, padL = 40, padB = 18, top = 6, plotH = H - padB - top;
+  const max = Math.max(...rows.map(r => Math.max(r.income, r.spend + r.transfers))) * 1.08;
+  const bw = (W - padL) / rows.length, barW = Math.min((bw - 6) / 2, 16);
+  const y = v => top + plotH - v / max * plotH;
+  let bars = '';
+  rows.forEach((r, i) => {
+    const x = padL + i * bw + (bw - barW * 2 - 2) / 2;
+    const hIn = plotH - (y(r.income) - top), hSp = plotH - (y(r.spend) - top), hTr = plotH - (y(r.transfers) - top);
+    bars += `<path d="${roundTop(x, y(r.income), barW, hIn, Math.min(3, hIn))}" fill="var(--a-bank)"/>`;
+    bars += `<rect x="${x + barW + 2}" y="${y(r.spend)}" width="${barW}" height="${hSp}" fill="var(--accent)"/>`;
+    if (r.transfers > 0) bars += `<path d="${roundTop(x + barW + 2, y(r.spend) - hTr - 1.5, barW, hTr, Math.min(3, hTr))}" fill="var(--a-invest)"/>`;
+    bars += `<rect x="${padL + i * bw}" y="0" width="${bw}" height="${H - padB}" fill="transparent" data-tip="${esc(`${mLabel(r.m, true)}\nMoney in ${money(r.income)}\nSpent ${money(r.spend)}\nTo investing ${money(r.transfers)}\nLeft over ${signed(r.income - r.spend - r.transfers)}`)}"/>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Monthly money in compared with spending and investing">${yGrid(W, padL, y, 0, max)}${bars}${xLabels(rows, i => padL + i * bw + bw / 2, H, 2)}</svg>`;
+}
+
+// ---------- hover ----------
+const tip = $('#tip');
+function placeTip(text, x, y) {
+  tip.textContent = text; tip.classList.add('on');
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.max(8, Math.min(x + 12, innerWidth - r.width - 8)) + 'px';
+  tip.style.top = Math.max(y - r.height - 10, 8) + 'px';
+}
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest('[data-tip]');
+  document.querySelectorAll('svg[data-gap] .gd').forEach(d => d.setAttribute('opacity', 0));
+  if (!t) return tip.classList.remove('on');
+  placeTip(t.dataset.tip, e.clientX, e.clientY);
+  const svg = t.closest('svg[data-gap]');
+  if (svg && t.dataset.dot != null) {
+    const c = charts[+svg.dataset.gap], i = +t.dataset.dot, d = svg.querySelector('.gd');
+    d.setAttribute('cx', c.X(i)); d.setAttribute('cy', c.Y(c.pts[i].bal)); d.setAttribute('opacity', 1);
+  }
+});
+document.addEventListener('scroll', () => tip.classList.remove('on'), { passive:true });
+
+// ---------- interactions ----------
+function wire() {
+  document.querySelectorAll('[data-spend]').forEach(b => b.addEventListener('click', () => {
+    spendIdx += +b.dataset.spend; render(); $('#spending').scrollIntoView({ block:'nearest' });
+  }));
+  document.querySelectorAll('[data-confirm]').forEach(b => b.addEventListener('click', () => confirmCategory(b.dataset.confirm)));
+  $('#saveBudgets').addEventListener('click', saveBudgets);
+  const drop = $('#drop'), input = $('#file');
+  input.addEventListener('change', () => { handleFiles([...input.files]); input.value = ''; });
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('on'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('on'); }));
+  drop.addEventListener('drop', e => handleFiles([...e.dataTransfer.files]));
+}
+
+async function post(path, body) {
+  const res = await fetch(API + path, { method:'POST', credentials:'include', redirect:'manual',
+    headers:{ 'Content-Type':'text/plain' }, body });
+  if (res.type === 'opaqueredirect' || res.status === 401) throw new Error('signed out: sign in again');
+  const d = await res.json().catch(() => ({ error:`HTTP ${res.status}` }));
+  if (!res.ok || d.error) throw new Error(d.error || `HTTP ${res.status}`);
+  return d;
+}
+
+async function confirmCategory(id) {
+  const sel = document.querySelector(`select[data-review="${CSS.escape(id)}"]`);
+  const item = S.review.find(x => x.id === id);
+  const btn = document.querySelector(`[data-confirm="${CSS.escape(id)}"]`);
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    if (!DEMO) await post('/finance/categories', JSON.stringify({ id, merchant:item.merchant, category:sel.value }));
+    S.review = S.review.filter(x => x.id !== id);
+    render();
+  } catch (e) { btn.disabled = false; btn.textContent = 'Retry'; btn.title = e.message; }
+}
+
+async function saveBudgets() {
+  const budgets = {};
+  for (const el of document.querySelectorAll('[data-budget]')) {
+    const v = el.value.trim();
+    if (v === '') continue;
+    const n = Math.round(Number(v));
+    if (!Number.isFinite(n) || n < 0) { $('#budgetMsg').className = 'msg err'; $('#budgetMsg').textContent = `${el.dataset.budget}: enter a whole number of dollars`; el.focus(); return; }
+    budgets[el.dataset.budget] = n;
+  }
+  const btn = $('#saveBudgets'); btn.disabled = true;
+  try {
+    if (!DEMO) await post('/finance/budgets', JSON.stringify({ budgets }));
+    S.budgets = budgets; render();
+    $('#budgetMsg').className = 'msg'; $('#budgetMsg').textContent = DEMO ? 'Saved (demo only, nothing sent)' : 'Saved';
+  } catch (e) { btn.disabled = false; $('#budgetMsg').className = 'msg err'; $('#budgetMsg').textContent = e.message; }
+}
+
+// ---------- upload: encrypt in the browser, then send ----------
+// Envelope "SZF1": magic(4) | wrappedKeyLen u16 | RSA-OAEP(SHA-256)-wrapped AES-256 key | iv(12) | AES-GCM(inner)
+// inner = metaLen u32 | meta JSON {name,type,size,at} | file bytes. The worker only ever stores the envelope.
+const MAGIC = new TextEncoder().encode('SZF1');
+let pubKey = null;
+async function getPublicKey() {
+  if (pubKey) return pubKey;
+  if (DEMO) {
+    const pair = await crypto.subtle.generateKey({ name:'RSA-OAEP', modulusLength:3072, publicExponent:new Uint8Array([1, 0, 1]), hash:'SHA-256' }, true, ['wrapKey', 'unwrapKey']);
+    return pubKey = pair.publicKey;
+  }
+  const res = await fetch(API + '/finance/pubkey', { credentials:'include', redirect:'manual', cache:'no-store' });
+  if (res.type === 'opaqueredirect' || res.status === 401) throw new Error('signed out: sign in again');
+  if (!res.ok) throw new Error(`couldn't get the server's key (HTTP ${res.status})`);
+  const b64 = (await res.text()).replace(/-----[^-]+-----|\s/g, '');
+  const der = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  return pubKey = await crypto.subtle.importKey('spki', der, { name:'RSA-OAEP', hash:'SHA-256' }, false, ['wrapKey']);
+}
+async function encryptFile(file, type) {
+  const pub = await getPublicKey();
+  const aes = await crypto.subtle.generateKey({ name:'AES-GCM', length:256 }, true, ['encrypt']);
+  const wrapped = new Uint8Array(await crypto.subtle.wrapKey('raw', aes, pub, { name:'RSA-OAEP' }));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const meta = new TextEncoder().encode(JSON.stringify({ name:file.name, type, size:file.size, at:new Date().toISOString() }));
+  const inner = new Uint8Array(4 + meta.length + file.size);
+  new DataView(inner.buffer).setUint32(0, meta.length);
+  inner.set(meta, 4); inner.set(new Uint8Array(await file.arrayBuffer()), 4 + meta.length);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name:'AES-GCM', iv }, aes, inner));
+  const out = new Uint8Array(6 + wrapped.length + 12 + ct.length);
+  out.set(MAGIC, 0); new DataView(out.buffer).setUint16(4, wrapped.length);
+  out.set(wrapped, 6); out.set(iv, 6 + wrapped.length); out.set(ct, 18 + wrapped.length);
+  return out;
+}
+function guessType(f) {
+  const n = f.name.toLowerCase(), pdf = n.endsWith('.pdf');
+  if (/super/.test(n)) return pdf ? 'super-pdf' : 'super-csv';
+  if (/vanguard|vpi|personal.?investor|holding/.test(n)) return pdf ? 'vpi-pdf' : 'vpi-csv';
+  if (/macquarie|transactions?/.test(n) && !pdf) return 'macquarie-csv';
+  return '';
+}
+function handleFiles(files) {
+  const q = $('#queue');
+  for (const f of files) {
+    const row = document.createElement('div'); row.className = 'row';
+    const ok = /\.(csv|pdf)$/i.test(f.name) && f.size <= MAX_FILE && f.size > 0;
+    const g = guessType(f);
+    row.innerHTML = `<div class="fname" title="${esc(f.name)}">${esc(f.name)}</div>
+      ${ok ? `<select aria-label="What is ${esc(f.name)}?"><option value="">What is this file?</option>${UPLOAD_TYPES.filter(t => f.name.toLowerCase().endsWith(t.accept)).map(t => `<option value="${t.k}"${t.k === g ? ' selected' : ''}>${esc(t.label)}</option>`).join('')}</select>
+        <button class="btn small">Send</button>`
+      : `<span class="badge bad">${f.size > MAX_FILE ? 'over 10 MB' : 'CSV or PDF only'}</span><span></span>`}`;
+    q.prepend(row);
+    if (!ok) continue;
+    const btn = row.querySelector('button'), sel = row.querySelector('select');
+    btn.addEventListener('click', async () => {
+      if (!sel.value) { sel.focus(); return; }
+      btn.disabled = true; sel.disabled = true; btn.textContent = 'Encrypting…';
+      try {
+        const env = await encryptFile(f, sel.value);
+        btn.textContent = 'Sending…';
+        if (!DEMO) await post('/finance/upload', new Blob([env]));
+        row.lastElementChild.outerHTML = `<span class="badge good">${DEMO ? `encrypted ${(env.length / 1024).toFixed(0)} KB · not sent (demo)` : 'sent · queued'}</span>`;
+        S.uploads = [{ type:sel.value, at:new Date().toISOString(), status:'queued' }, ...(S.uploads || [])];
+      } catch (e) {
+        btn.disabled = false; sel.disabled = false; btn.textContent = 'Retry';
+        row.insertAdjacentHTML('beforeend', `<span class="msg err" style="grid-column:1/-1;margin:0">${esc(e.message)}</span>`);
+      }
+    });
+  }
+}
+
+// ---------- load ----------
+function signedOut() {
+  const href = `${API}/login?next=${encodeURIComponent(PAGE)}`;
+  $('#status').innerHTML = `<a href="${href}">Sign in to see your finances</a> · <a href="?demo">demo</a>`;
+  $('#main').innerHTML = `<div class="hint">Your finances are private.<br><a class="btn" style="margin-top:1rem" href="${href}">Sign in</a><br><a href="?demo">Or see the demo with made-up numbers</a></div>`;
+}
+async function load() {
+  if (DEMO) { S = demo(); return render(); }
+  try {
+    const res = await fetch(API + '/finance/summary', { credentials:'include', redirect:'manual', cache:'no-store' });
+    if (res.type === 'opaqueredirect' || res.status === 401) return signedOut();
+    const d = await res.json();
+    if (d.error) throw new Error(d.error);
+    if (!d.months || !d.months.length) {
+      S = { ...d, months:[], review:[], uploads:d.uploads || [], categories:d.categories || [], budgets:d.budgets || {} };
+      $('#status').textContent = 'No data yet';
+      $('#main').innerHTML = `<div class="hint">Nothing processed yet. Upload your first exports below; the server picks them up within about 15 minutes.</div>` + uploadSection();
+      const drop = $('#drop'), input = $('#file');
+      input.addEventListener('change', () => { handleFiles([...input.files]); input.value = ''; });
+      drop.addEventListener('dragover', e => e.preventDefault());
+      drop.addEventListener('drop', e => { e.preventDefault(); handleFiles([...e.dataTransfer.files]); });
+      return;
+    }
+    S = d; render();
+  } catch (e) {
+    $('#status').textContent = 'Couldn’t load';
+    $('#main').innerHTML = `<div class="hint">Couldn’t load your finances (${esc(e.message)}).<br><a href="${API}/login?next=${encodeURIComponent(PAGE)}">Sign in again</a> or see the <a href="?demo">demo</a>.</div>`;
+  }
+}
+
+// ?demo: two years of made-up numbers with the same shape the server will produce.
+function demo() {
+  let seed = 20261119;
+  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const gauss = () => Math.sqrt(-2 * Math.log(rnd() || 1e-9)) * Math.cos(2 * Math.PI * rnd());
+  const now = new Date(), months = [];
+  for (let k = 24; k >= 1; k--) { const d = new Date(now.getFullYear(), now.getMonth() - k, 1); months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`); }
+  const cats = ['Housing', 'Groceries', 'Dining out', 'Transport', 'Utilities', 'Health & fitness', 'Shopping', 'Entertainment', 'Travel', 'Gifts & donations', 'Other'];
+  let sup = 142300, inv = 38200, bal = 8400;
+  const S_ = [], I_ = [], B_ = [];
+  for (const m of months) {
+    const mo = +m.slice(5);
+    // super
+    const sg = 950, salsac = 500, personal = mo === 6 ? 2000 : 0, tax = Math.round((sg + salsac) * 0.15);
+    const fees = Math.round(sup * 0.0019 / 12 + 6.5), insurance = 38, ret = Math.round(sup * (0.006 + gauss() * 0.018));
+    const sOpen = sup; sup = sOpen + sg + salsac + personal - tax - fees - insurance + ret;
+    S_.push({ m, open:sOpen, close:sup, sg, salsac, personal, tax, fees, insurance });
+    // personal investor
+    const deposits = 1000 + (mo === 8 ? 3000 : 0), distributions = [1, 4, 7, 10].includes(mo) ? Math.round(inv * 0.009) : 0;
+    const iOpen = inv; inv = iOpen + deposits + distributions + Math.round(inv * (0.005 + gauss() * 0.024));
+    I_.push({ m, open:iOpen, close:inv, deposits, withdrawals:0, distributions });
+    // macquarie
+    const vary = (base, sd) => Math.max(0, Math.round(base + gauss() * sd));
+    const by = {
+      'Housing':2100, 'Groceries':vary(760, 70), 'Dining out':vary(300, 80), 'Transport':vary(230, 45),
+      'Utilities':vary(170, 20) + ([1, 4, 7, 10].includes(mo) ? 380 : 0), 'Health & fitness':vary(185, 25),
+      'Shopping':vary(290, 140), 'Entertainment':vary(115, 40), 'Travel':[6, 12].includes(mo) ? vary(1700, 300) : (rnd() < 0.15 ? vary(250, 80) : 0),
+      'Gifts & donations':mo === 12 ? vary(600, 100) : vary(40, 30), 'Other':vary(130, 50),
+    };
+    const income = 6150 + (mo === 7 ? 1400 : 0) + (rnd() < 0.2 ? vary(120, 60) : 0), spend = sum(Object.values(by)), transfers = deposits;
+    bal = bal + income - spend - transfers;
+    B_.push({ m, close:bal, income, spend, transfers, by });
+  }
+  const last = months[months.length - 1], [ly, lm] = last.split('-').map(Number);
+  const monthEnd = new Date(ly, lm, 0), iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const daysAgo = n => new Date(Date.now() - n * 864e5).toISOString();
+  return {
+    generated:new Date().toISOString(), asOf:{ super:iso(monthEnd), invest:iso(monthEnd), bank:iso(monthEnd) },
+    months, super:S_, invest:I_, bank:B_, categories:cats,
+    budgets:{ 'Groceries':800, 'Dining out':300, 'Transport':250, 'Shopping':350, 'Entertainment':150 },
+    review:[
+      { id:'d1', merchant:'SQ *BREWLAB WEST END', count:4, suggested:'Dining out' },
+      { id:'d2', merchant:'AMAZON MKTPLC AU SYDNEY', count:3, suggested:'Shopping' },
+      { id:'d3', merchant:'TRANSLINK GO CARD TOPUP', count:6, suggested:'Transport' },
+      { id:'d4', merchant:'PHYSIO PLUS NEWSTEAD', count:1, suggested:'Health & fitness' },
+    ],
+    uploads:[
+      { type:'macquarie-csv', at:daysAgo(16), status:'processed', rows:143 },
+      { type:'vpi-csv', at:daysAgo(16), status:'processed', rows:7 },
+      { type:'vpi-pdf', at:daysAgo(16), status:'processed', rows:null },
+      { type:'super-pdf', at:daysAgo(16), status:'processed', rows:null },
+    ],
+  };
+}
+
+load();
+</script>
+</body>
+</html>
