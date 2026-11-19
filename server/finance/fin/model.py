@@ -52,7 +52,8 @@ def raw_path(file_id: str, ext: str):
 # ---------- rebuild ----------
 def rebuild(con) -> dict[str, tuple[str, str | None, int]]:
     """Re-read every stored raw file. Returns {file id: (status, reason, rows)}."""
-    con.execute("DELETE FROM txns"); con.execute("DELETE FROM points"); con.execute("DELETE FROM periods")
+    for t in ("txns", "points", "periods", "accounts"):   # all derived from the raw files
+        con.execute(f"DELETE FROM {t}")
     results = {}
     for f in con.execute("SELECT * FROM files ORDER BY received").fetchall():
         p = raw_path(f["id"], f["ext"])
