@@ -6,7 +6,7 @@
 //
 // Bindings: STATE (KV). Vars: TEAM, AUD, HA_URL, SITE_ORIGIN.
 // Secrets: AGENT_SECRET (set at deploy), HA_TOKEN, GITHUB_TOKEN, HARDCOVER_TOKEN, READ_LATER_TOKEN,
-// KINDLE_UPLOAD_TOKEN, SHIFTS_PUSH_TOKEN and SHIFTS_FEED_TOKEN (plus var SHIFTS_USER_ID)
+// KINDLE_UPLOAD_TOKEN, SHIFTS_PUSH_TOKEN, SHIFTS_FEED_TOKEN (plus var SHIFTS_USER_ID) and FINANCE_SECRET
 // (optional, add them in the Cloudflare dashboard; tiles show "connect" hints until then).
 // GITHUB_TOKEN: fine-grained, read-only Contents on the private book-register repo
 // (var BOOKS_REPO, default sh4unn/book-register). It feeds /books and the Reading tile.
@@ -63,6 +63,7 @@ export default {
       if (url.pathname === '/agent/kindle-upload') return await kindleUpload(req, env);
       if (url.pathname.startsWith('/agent/shifts')) return await shifts(req, env, url);
       if (url.pathname.startsWith('/agent/coach/')) return await coachAgent(req, env, url);
+      if (url.pathname.startsWith('/agent/finance/')) return await financeAgent(req, env, url);
       if (url.pathname.startsWith('/agent/')) return await agent(req, env, url);
 
       const who = await verifyAccess(req, env);
@@ -100,6 +101,7 @@ export default {
           return cors(env, json(out, out.error ? 400 : 200));
         }
       }
+      if (url.pathname.startsWith('/finance/')) return cors(env, await financePage(req, env, url, who));
       if (url.pathname === '/inbox') {
         if (req.method === 'GET') return cors(env, json(await listInbox(env)));
         if (req.method === 'POST') {
@@ -829,6 +831,135 @@ async function coachApprove(env, body, who) {
     await env.STATE.put(`coach:plan:${body.week}`, JSON.stringify(rec));
   }
   return { ok: true, approved: rec.approved };
+}
+
+// ---------- Finance (finance.html ↔ finance-sync on the EC2 server) ----------
+// The page encrypts each export in the browser with the server's RSA public key (envelope "SZF1"), so this worker
+// only ever holds ciphertext. The server polls /agent/finance/*, decrypts and parses on its own disk, then PUTs back
+// a summary (monthly totals only: no transactions, no account numbers). Budgets and confirmed categories go the
+// other way. Agent routes use their own FINANCE_SECRET (not AGENT_SECRET), so the other agents can't read them.
+// KV: fin:summary, fin:pubkey, fin:budgets, fin:catq (confirmed categories not yet picked up), fin:uploads (log),
+// fin:up:<id> (encrypted file, expires after 14 days whether or not it was picked up).
+const FIN_MAX_BYTES = 12 * 1024 * 1024;   // page allows 10 MB; the envelope adds a little
+const FIN_MAX_QUEUED = 30;
+const FIN_UPLOAD_TTL_S = 14 * 86400;
+const FIN_TYPES = ['macquarie-csv', 'vpi-csv', 'vpi-pdf', 'super-csv', 'super-pdf'];
+const FIN_ID_RE = /^[0-9a-z-]{4,64}$/;
+
+async function financePage(req, env, url, who) {
+  const p = url.pathname.slice('/finance'.length);
+  if (req.method === 'GET' && p === '/summary') return json(await financeSummary(env));
+  if (req.method === 'GET' && p === '/pubkey') {
+    const pem = await env.STATE.get('fin:pubkey');
+    return pem ? new Response(pem, { headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' } })
+      : json({ error: 'The server has not set up its key yet' }, 503);
+  }
+  if (req.method !== 'POST') return new Response('Not found', { status: 404 });
+  if (req.headers.get('Origin') !== env.SITE_ORIGIN) return new Response('Bad origin', { status: 403 });
+
+  if (p === '/upload') {
+    const type = url.searchParams.get('type') || '';
+    if (!FIN_TYPES.includes(type)) return json({ error: 'unknown file type' }, 400);
+    const bytes = new Uint8Array(await req.arrayBuffer());
+    if (bytes.length < 64 || bytes.length > FIN_MAX_BYTES) return json({ error: 'file too big or empty' }, 400);
+    if (new TextDecoder().decode(bytes.slice(0, 4)) !== 'SZF1') return json({ error: 'not an encrypted upload' }, 400);
+    const log = (await env.STATE.get('fin:uploads', 'json')) || [];
+    if (log.filter(u => u.status === 'queued').length >= FIN_MAX_QUEUED) return json({ error: 'Too many files waiting; try again once the server has caught up' }, 429);
+    const id = `${Date.now().toString(36)}-${crypto.randomUUID().slice(0, 8)}`;
+    await env.STATE.put(`fin:up:${id}`, bytes, { expirationTtl: FIN_UPLOAD_TTL_S });
+    log.unshift({ id, type, at: new Date().toISOString(), size: bytes.length, status: 'queued', by: who });
+    await env.STATE.put('fin:uploads', JSON.stringify(log.slice(0, 60)));
+    return json({ ok: true, id });
+  }
+
+  let body;
+  try { body = JSON.parse(await req.text()); } catch { return json({ error: 'bad json' }, 400); }
+  if (p === '/budgets') {
+    const out = {};
+    for (const [k, v] of Object.entries(body.budgets || {}).slice(0, 60)) {
+      const n = Math.round(Number(v));
+      if (typeof k === 'string' && k.length <= 60 && Number.isFinite(n) && n >= 0 && n <= 1e7) out[k] = n;
+    }
+    await env.STATE.put('fin:budgets', JSON.stringify(out));
+    return json({ ok: true, budgets: out });
+  }
+  if (p === '/categories') {
+    const { id, merchant, category } = body;
+    if (!FIN_ID_RE.test(String(id || ''))) return json({ error: 'bad id' }, 400);
+    if (typeof merchant !== 'string' || typeof category !== 'string' || merchant.length > 200 || category.length > 60) return json({ error: 'bad category' }, 400);
+    const q = ((await env.STATE.get('fin:catq', 'json')) || []).filter(x => x.id !== id);
+    q.push({ id, merchant, category, at: new Date().toISOString() });
+    await env.STATE.put('fin:catq', JSON.stringify(q.slice(-500)));
+    return json({ ok: true });
+  }
+  return new Response('Not found', { status: 404 });
+}
+
+// What the page reads: the server's last summary, with the page's own newer inputs laid over it
+// (budgets saved since, merchants already confirmed but not yet picked up, the upload log).
+async function financeSummary(env) {
+  const [s, budgets, catq, log] = await Promise.all([
+    env.STATE.get('fin:summary', 'json'), env.STATE.get('fin:budgets', 'json'),
+    env.STATE.get('fin:catq', 'json'), env.STATE.get('fin:uploads', 'json'),
+  ]);
+  const out = s || { months: [], categories: [], review: [] };
+  const done = new Set((catq || []).map(x => x.id));
+  out.review = (out.review || []).filter(x => !done.has(x.id));
+  if (budgets) out.budgets = budgets;
+  out.budgets = out.budgets || {};
+  out.uploads = (log || []).map(({ type, at, status, rows }) => ({ type, at, status, rows }));
+  return out;
+}
+
+async function financeAgent(req, env, url) {
+  const auth = req.headers.get('Authorization') || '';
+  if (!env.FINANCE_SECRET || !timingSafeEqual(auth, `Bearer ${env.FINANCE_SECRET}`)) return new Response('Unauthorized', { status: 401 });
+  const p = url.pathname.slice('/agent/finance'.length);
+  // Everything the server needs each poll, in one read-only call (KV reads are cheap, writes are not).
+  if (req.method === 'GET' && p === '/inbox') {
+    const [log, budgets, catq] = await Promise.all([
+      env.STATE.get('fin:uploads', 'json'), env.STATE.get('fin:budgets', 'json'), env.STATE.get('fin:catq', 'json')]);
+    return json({ uploads: (log || []).filter(u => u.status === 'queued').map(({ id, type, at, size }) => ({ id, type, at, size })),
+      budgets: budgets || {}, categories: catq || [] });
+  }
+  const m = p.match(/^\/upload\/([0-9a-z-]+)$/);
+  if (req.method === 'GET' && m) {
+    const bytes = await env.STATE.get(`fin:up:${m[1]}`, 'arrayBuffer');
+    return bytes ? new Response(bytes, { headers: { 'Content-Type': 'application/octet-stream', 'Cache-Control': 'no-store' } }) : json({ error: 'gone' }, 404);
+  }
+  if (req.method === 'POST' && p === '/done') {
+    // [{id, status:'processed'|'rejected', rows?}] – deletes the encrypted file and updates the log.
+    const items = (await req.json()).filter(x => FIN_ID_RE.test(String(x.id || '')));
+    const log = (await env.STATE.get('fin:uploads', 'json')) || [];
+    for (const it of items) {
+      const u = log.find(u => u.id === it.id);
+      if (u) { u.status = it.status === 'processed' ? 'processed' : 'rejected'; u.rows = Number.isFinite(it.rows) ? it.rows : null; }
+      await env.STATE.delete(`fin:up:${it.id}`);
+    }
+    await env.STATE.put('fin:uploads', JSON.stringify(log));
+    return json({ ok: true });
+  }
+  if (req.method === 'POST' && p === '/categories-ack') {
+    const ids = new Set((await req.json()).ids || []);
+    const q = ((await env.STATE.get('fin:catq', 'json')) || []).filter(x => !ids.has(x.id));
+    await env.STATE.put('fin:catq', JSON.stringify(q));
+    return json({ ok: true });
+  }
+  if (req.method === 'PUT' && p === '/summary') {
+    const text = await req.text();
+    if (text.length > 1024 * 1024) return json({ error: 'summary too big' }, 400);
+    const s = JSON.parse(text);
+    if (!Array.isArray(s.months)) return json({ error: 'bad summary' }, 400);
+    await env.STATE.put('fin:summary', text);
+    return json({ ok: true });
+  }
+  if (req.method === 'PUT' && p === '/pubkey') {
+    const pem = (await req.text()).trim();
+    if (!/^-----BEGIN PUBLIC KEY-----[\s\S]+-----END PUBLIC KEY-----$/.test(pem)) return json({ error: 'not a PEM public key' }, 400);
+    await env.STATE.put('fin:pubkey', pem);
+    return json({ ok: true });
+  }
+  return new Response('Not found', { status: 404 });
 }
 
 // ---------- helpers ----------

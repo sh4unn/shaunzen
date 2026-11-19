@@ -570,7 +570,7 @@ function handleFiles(files) {
       try {
         const env = await encryptFile(f, sel.value);
         btn.textContent = 'Sending…';
-        if (!DEMO) await post('/finance/upload', new Blob([env]));
+        if (!DEMO) await post(`/finance/upload?type=${encodeURIComponent(sel.value)}`, new Blob([env]));
         row.lastElementChild.outerHTML = `<span class="badge good">${DEMO ? `encrypted ${(env.length / 1024).toFixed(0)} KB · not sent (demo)` : 'sent · queued'}</span>`;
         S.uploads = [{ type:sel.value, at:new Date().toISOString(), status:'queued' }, ...(S.uploads || [])];
       } catch (e) {
