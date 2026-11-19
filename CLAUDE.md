@@ -112,6 +112,7 @@ The launcher is static and public. Everything live comes from `api.shaunzen.com`
 | `finance.html` | Finance page — static shell; data from `api.shaunzen.com/finance/summary` after sign-in; uploads encrypted in the browser (no financial data in this public repo) |
 | `books.html` | Reading page — static shell; all data comes from `api.shaunzen.com/books` after sign-in (no reading data in this public repo) |
 | `workers/api/worker.js` | Source of the `api.shaunzen.com` worker |
+| `server/finance/` | finance-sync for `finance.html`: decrypts uploads, parses Macquarie/Vanguard exports, publishes monthly summaries (see its README). Code only; data lives on the server under `~ec2-user/finance` |
 | `server/install-agent.sh` | Installs heartbeat/inbox agent + terminal home-screen tags on the EC2 server |
 | `manifest.json` | PWA manifest |
 | `sw.js` | Service worker — caches the launcher shell |

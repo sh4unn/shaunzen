@@ -843,7 +843,7 @@ async function coachApprove(env, body, who) {
 const FIN_MAX_BYTES = 12 * 1024 * 1024;   // page allows 10 MB; the envelope adds a little
 const FIN_MAX_QUEUED = 30;
 const FIN_UPLOAD_TTL_S = 14 * 86400;
-const FIN_TYPES = ['macquarie-csv', 'vpi-csv', 'vpi-pdf', 'super-csv', 'super-pdf'];
+const FIN_TYPES = ['macquarie-pdf', 'macquarie-csv', 'vpi-pdf', 'vpi-csv', 'super-csv', 'super-pdf'];
 const FIN_ID_RE = /^[0-9a-z-]{4,64}$/;
 
 async function financePage(req, env, url, who) {

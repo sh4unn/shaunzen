@@ -164,40 +164,48 @@ const money = v => AUD.format(Math.round(v));
 const signed = v => (v > 0 ? '+' : v < 0 ? '−' : '') + AUD.format(Math.abs(Math.round(v)));
 const short = v => { const a = Math.abs(v), s = v < 0 ? '−' : ''; return a >= 1e6 ? `${s}$${(a / 1e6).toFixed(2)}m` : a >= 1e4 ? `${s}$${(a / 1e3).toFixed(0)}k` : a >= 1e3 ? `${s}$${(a / 1e3).toFixed(1)}k` : `${s}$${Math.round(a)}`; };
 const sum = (a, f = x => x) => a.reduce((t, x) => t + f(x), 0);
-const ACCOUNTS = [
-  { k:'super', label:'Vanguard Super', c:'var(--a-super)' },
-  { k:'invest', label:'Personal Investor', c:'var(--a-invest)' },
-  { k:'bank', label:'Macquarie', c:'var(--a-bank)' },
-];
+const ACCOUNT_STYLE = {
+  super:{ label:'Vanguard Super', c:'var(--a-super)' },
+  invest:{ label:'Personal Investor', c:'var(--a-invest)' },
+  bank:{ label:'Macquarie', c:'var(--a-bank)' },
+  loan:{ label:'Home loan', c:'var(--loss)' },
+};
+let ACCOUNTS = [];   // from S.accounts: [{k,label,c}]
 const UPLOAD_TYPES = [
+  { k:'macquarie-pdf', label:'Macquarie: transaction listing (PDF)', accept:'.pdf' },
   { k:'macquarie-csv', label:'Macquarie: transactions (CSV)', accept:'.csv' },
+  { k:'vpi-pdf', label:'Personal Investor: performance report (PDF)', accept:'.pdf' },
   { k:'vpi-csv', label:'Personal Investor: transactions (CSV)', accept:'.csv' },
-  { k:'vpi-pdf', label:'Personal Investor: statement (PDF)', accept:'.pdf' },
-  { k:'super-csv', label:'Super: transactions (CSV)', accept:'.csv' },
+  { k:'super-csv', label:'Super: account activity (CSV)', accept:'.csv' },
   { k:'super-pdf', label:'Super: statement (PDF)', accept:'.pdf' },
 ];
 let S = null;          // summary from the server (or demo)
 let spendIdx = null;   // which month the spending view shows
 
 // ---------- summary shape (what the server writes to KV) ----------
-// { generated, asOf:{super,invest,bank}, months:['YYYY-MM',…],
+// { generated, asOf:{super,invest,bank,loan}, months:['YYYY-MM',…], accounts:[{k,label}],
+//   networth:[{m,super,invest,bank,loan,total,partial}], loan:[{m,close,drawn,repaid,interest,fees}],
+//   (any balance can be null = not known yet; est = estimated between statements)
 //   super:[{m,open,close,sg,salsac,personal,tax,fees,insurance}],
 //   invest:[{m,open,close,deposits,withdrawals,distributions}],
 //   bank:[{m,close,income,spend,transfers,by:{cat:amt}}],
 //   categories:[…], budgets:{cat:amt}, review:[{id,merchant,count,suggested}], uploads:[{type,at,status,rows}] }
 // Growth is always worked out here: closing − opening − net money in.
 
-const superIn = r => r.sg + r.salsac + r.personal;
+// Balances can be null (not known yet, e.g. no super statement uploaded); growth is then null too.
+const known = r => r && r.open != null && r.close != null;
+const superIn = r => r.sg + r.salsac + r.personal + (r.rollin || 0);
 const superOut = r => r.tax + r.fees + r.insurance;
-const superGrowth = r => r.close - r.open - superIn(r) + superOut(r);
+const superGrowth = r => known(r) ? r.close - r.open - superIn(r) + superOut(r) : null;
 const investIn = r => r.deposits - r.withdrawals;
-const investGrowth = r => r.close - r.open - investIn(r);
+const investGrowth = r => known(r) ? r.close - r.open - investIn(r) : null;
+const sumKnown = (a, f) => { const v = a.map(f).filter(x => x != null); return v.length ? sum(v) : null; };
 
 function render() {
   charts = [];
   const months = S.months, last = months.length - 1;
-  const nw = months.map((m, i) => ({ m, super:S.super[i]?.close ?? 0, invest:S.invest[i]?.close ?? 0, bank:S.bank[i]?.close ?? 0 }));
-  nw.forEach(r => r.total = r.super + r.invest + r.bank);
+  ACCOUNTS = (S.accounts || []).map(a => ({ ...ACCOUNT_STYLE[a.k], ...a, c:ACCOUNT_STYLE[a.k]?.c || 'var(--faint)' }));
+  const nw = S.networth;
   if (spendIdx == null || spendIdx > last) spendIdx = last;
 
   // status strip
@@ -209,52 +217,57 @@ function render() {
     `<a href="#upload">Upload exports</a>`;
 
   // ---------- headline tiles ----------
-  const yr = Math.max(0, last - 12);
+  const yr = Math.max(0, last - 12), span = last - yr;
   const nwNow = nw[last].total, nwYr = nw[yr].total;
-  const sYr = S.super.slice(yr + 1), iYr = S.invest.slice(yr + 1), bYr = S.bank.slice(yr + 1);
+  const sYr = (S.super || []).slice(yr + (last ? 1 : 0)), iYr = (S.invest || []).slice(yr + (last ? 1 : 0)), bYr = (S.bank || []).slice(yr + (last ? 1 : 0));
   const putIn = sum(sYr, superIn) - sum(sYr, superOut) + sum(iYr, investIn);
-  const grew = sum(sYr, superGrowth) + sum(iYr, investGrowth);
-  const spentLast = S.bank[last].spend, spentAvg = sum(bYr, r => r.spend) / (bYr.length || 1);
-  let html = `<section><div class="section-label"><span>— Where things stand</span><span>${esc(mLabel(months[last], true))} vs 12 months earlier</span></div>
+  const grew = sumKnown([...sYr.map(superGrowth), ...iYr.map(investGrowth)], x => x);
+  const missing = ACCOUNTS.filter(a => nw[last][a.k] == null).map(a => a.label);
+  const bLast = S.bank?.[last], spentAvg = bYr.length ? sum(bYr, r => r.spend) / bYr.length : 0;
+  let html = `<section><div class="section-label"><span>— Where things stand</span><span>${esc(mLabel(months[last], true))} vs ${span ? `${span} month${span === 1 ? '' : 's'} earlier` : 'start'}</span></div>
     <div class="grid tiles">
-      ${tile('Net worth', short(nwNow), `<span class="${nwNow >= nwYr ? 'up' : 'down'}">${signed(nwNow - nwYr)}</span> in 12 months`)}
+      ${tile('Net worth', nwNow == null ? '—' : short(nwNow), missing.length ? `without ${esc(missing.join(', '))} (no balance yet)` : nwYr != null && span ? `<span class="${nwNow >= nwYr ? 'up' : 'down'}">${signed(nwNow - nwYr)}</span> in ${span} months` : 'assets less the home loan')}
       ${tile('Money you put in', short(putIn), 'super + investing, after fees and tax')}
-      ${tile('Market growth', `<span class="${grew >= 0 ? 'up' : 'down'}">${short(grew)}</span>`, 'super + investing, incl. distributions')}
-      ${tile('Spent last month', short(spentLast), `${spentLast > spentAvg ? 'above' : 'below'} the ${short(spentAvg)} monthly average`)}
+      ${tile('Market growth', grew == null ? '—' : `<span class="${grew >= 0 ? 'up' : 'down'}">${short(grew)}</span>`, grew == null ? 'needs opening and closing balances' : 'where balances are known')}
+      ${bLast ? tile('Spent last month', short(bLast.spend), `${bLast.spend > spentAvg ? 'above' : 'below'} the ${short(spentAvg)} monthly average`) : ''}
     </div></section>`;
 
   // ---------- net worth ----------
   html += `<section><div class="section-label"><span>— Net worth</span><span>month-end balances</span></div>
-    <div class="grid"><div class="cell"><div class="chart-title"><span>All three accounts, stacked</span><span>${esc(mLabel(months[0]))} – ${esc(mLabel(months[last]))}</span></div>
-    ${stackedBars(nw, ACCOUNTS, r => `${mLabel(r.m, true)}\nTotal ${money(r.total)}` + ACCOUNTS.map(a => `\n${a.label} ${money(r[a.k])}`).join(''))}
-    <div class="legend">${ACCOUNTS.map(a => `<span><i style="background:${a.c}"></i>${esc(a.label)}</span>`).join('')}</div></div></div></section>`;
+    <div class="grid"><div class="cell"><div class="chart-title"><span>Assets stacked up, home loan below the line</span><span>${esc(mLabel(months[0]))} – ${esc(mLabel(months[last]))}</span></div>
+    ${stackedBars(nw, ACCOUNTS, r => `${mLabel(r.m, true)}\nNet worth ${r.total == null ? '—' : money(r.total)}${r.partial ? ' (some balances unknown)' : ''}` + ACCOUNTS.map(a => `\n${a.label} ${r[a.k] == null ? 'not known yet' : money(r[a.k])}`).join(''))}
+    <div class="legend">${ACCOUNTS.map(a => `<span><i style="background:${a.c}"></i>${esc(a.label)}</span>`).join('')}<span><i class="ln" style="background:var(--ink)"></i>net worth</span></div></div></div></section>`;
 
   // ---------- super ----------
-  html += growthSection({
+  if (S.super?.length) html += growthSection({
     title:'Super', sub:'contributions vs growth', rows:S.super, color:'var(--a-super)',
     inOf:r => superIn(r) - superOut(r), growthOf:superGrowth,
     tiles: rows => [
-      tile('Contributions', short(sum(rows, superIn)), `SG ${short(sum(rows, r => r.sg))} · salary sacrifice ${short(sum(rows, r => r.salsac))}${sum(rows, r => r.personal) ? ` · personal ${short(sum(rows, r => r.personal))}` : ''}`),
-      tile('Taken out', short(sum(rows, superOut)), `contributions tax ${short(sum(rows, r => r.tax))} · fees ${short(sum(rows, r => r.fees))} · insurance ${short(sum(rows, r => r.insurance))}`),
-      tile('Investment growth', `<span class="${sum(rows, superGrowth) >= 0 ? 'up' : 'down'}">${short(sum(rows, superGrowth))}</span>`, 'what the market added'),
+      tile('Contributions', short(sum(rows, superIn)), [['SG', r => r.sg], ['salary sacrifice', r => r.salsac], ['personal', r => r.personal], ['rolled in', r => r.rollin || 0]]
+        .filter(([, f]) => sum(rows, f)).map(([l, f]) => `${l} ${short(sum(rows, f))}`).join(' · ') || 'none yet'),
+      tile('Taken out', short(sum(rows, superOut)), [['contributions tax', r => r.tax], ['fees', r => r.fees], ['insurance', r => r.insurance]]
+        .filter(([, f]) => sum(rows, f)).map(([l, f]) => `${l} ${short(sum(rows, f))}`).join(' · ') || 'none yet'),
+      (g => tile('Investment growth', g == null ? '—' : `<span class="${g >= 0 ? 'up' : 'down'}">${short(g)}</span>`, g == null ? 'upload a super statement PDF for the balance' : 'what the market added'))(sumKnown(rows, superGrowth)),
     ],
-    tipOf:r => `${mLabel(r.m, true)}\nBalance ${money(r.close)}\nContributions ${money(superIn(r))}\nTax, fees, insurance −${money(superOut(r))}\nGrowth ${signed(superGrowth(r))}`,
+    tipOf:r => `${mLabel(r.m, true)}${r.est ? ' (balance estimated)' : ''}\nBalance ${r.close == null ? 'not known yet' : money(r.close)}\nContributions ${money(superIn(r))}\nTax, fees, insurance −${money(superOut(r))}\nGrowth ${superGrowth(r) == null ? '—' : signed(superGrowth(r))}`,
   });
 
   // ---------- investing ----------
-  html += growthSection({
+  if (S.invest?.length) html += growthSection({
     title:'Personal Investor', sub:'contributions vs growth', rows:S.invest, color:'var(--a-invest)',
     inOf:investIn, growthOf:investGrowth,
     tiles: rows => [
       tile('Money in', short(sum(rows, investIn)), `deposits ${short(sum(rows, r => r.deposits))}${sum(rows, r => r.withdrawals) ? ` · withdrawals ${short(sum(rows, r => r.withdrawals))}` : ''}`),
       tile('Distributions', short(sum(rows, r => r.distributions)), 'part of growth'),
-      tile('Total growth', `<span class="${sum(rows, investGrowth) >= 0 ? 'up' : 'down'}">${short(sum(rows, investGrowth))}</span>`, 'price changes + distributions'),
+      (g => tile('Total growth', g == null ? '—' : `<span class="${g >= 0 ? 'up' : 'down'}">${short(g)}</span>`, 'price changes + distributions'))(sumKnown(rows, investGrowth)),
     ],
-    tipOf:r => `${mLabel(r.m, true)}\nBalance ${money(r.close)}\nMoney in ${signed(investIn(r))}\nDistributions ${money(r.distributions)}\nGrowth ${signed(investGrowth(r))}`,
+    tipOf:r => `${mLabel(r.m, true)}${r.est ? ' (balance estimated)' : ''}\nBalance ${r.close == null ? 'not known yet' : money(r.close)}\nMoney in ${signed(investIn(r))}\nGrowth ${investGrowth(r) == null ? '—' : signed(investGrowth(r))}`,
   });
 
+  if (S.loan?.length) html += loanSection();
+
   // ---------- spending ----------
-  html += spendingSection();
+  if (S.bank?.length) html += spendingSection();
   html += reviewSection();
   html += budgetSection();
   html += uploadSection();
@@ -268,16 +281,36 @@ const tile = (k, v, s) => `<div class="cell tile"><div class="k">${esc(k)}</div>
 // Super and investing share one layout: tiles for the last 12 months, then
 // balance vs "money in" (opening balance + cumulative net contributions). The gap is growth.
 function growthSection(o) {
-  const rows = o.rows, last = rows.length - 1, yr = rows.slice(Math.max(0, last - 11));
-  let cum = rows[0].open;
-  const pts = rows.map(r => { cum += o.inOf(r); return { m:r.m, bal:r.close, base:cum, r }; });
-  const totalGrowth = pts[last].bal - pts[last].base;
-  return `<section><div class="section-label"><span>— ${esc(o.title)}</span><span>${esc(o.sub)} · last 12 months</span></div>
+  const all = o.rows, last = all.length - 1, yr = all.slice(Math.max(0, last - 11));
+  const rows = all.slice(all.findIndex(known) >= 0 ? all.findIndex(known) : all.length).filter(r => r.close != null);
+  let chart = `<div class="note" style="margin:0">No balance yet, so growth can't be shown. Contributions and fees above come from the transaction list.</div>`;
+  if (rows.length >= 1) {
+    let cum = rows[0].open ?? rows[0].close - o.inOf(rows[0]);
+    const pts = rows.map(r => { cum += o.inOf(r); return { m:r.m, bal:r.close, base:cum, r }; });
+    const p = pts[pts.length - 1];
+    chart = `<div class="chart-title"><span>Balance vs money put in</span><span>${signed(p.bal - p.base)} growth since ${esc(mLabel(rows[0].m))}</span></div>
+      ${pts.length >= 2 ? gapChart(pts, o.color, q => o.tipOf(q.r)) : ''}
+      <div class="legend"><span><i class="ln" style="background:${o.color}"></i>balance</span><span><i class="dash"></i>money put in (net)</span><span><i style="background:${o.color};opacity:0.18"></i>growth</span>${rows.some(r => r.est) ? '<span>· some month-end balances estimated between statements</span>' : ''}</div>`;
+  }
+  return `<section><div class="section-label"><span>— ${esc(o.title)}</span><span>${esc(o.sub)} · last ${yr.length} month${yr.length === 1 ? '' : 's'}</span></div>
     <div class="grid tiles">${o.tiles(yr).join('')}</div>
-    <div class="grid" style="border-top:none"><div class="cell"><div class="chart-title"><span>Balance vs money put in</span><span>${signed(totalGrowth)} growth since ${esc(mLabel(rows[0].m))}</span></div>
-      ${gapChart(pts, o.color, p => o.tipOf(p.r))}
-      <div class="legend"><span><i class="ln" style="background:${o.color}"></i>balance</span><span><i class="dash"></i>money put in (net)</span><span><i style="background:${o.color};opacity:0.18"></i>growth</span></div>
-    </div></div></section>`;
+    <div class="grid" style="border-top:none"><div class="cell">${chart}</div></div></section>`;
+}
+
+function loanSection() {
+  const rows = S.loan, last = rows.length - 1, yr = rows.slice(Math.max(0, last - 11));
+  const owed = rows[last].close == null ? null : -rows[last].close;
+  const pts = rows.filter(r => r.close != null).map(r => ({ m:r.m, bal:-r.close, base:-r.close, r }));
+  return `<section><div class="section-label"><span>— Home loan</span><span>Macquarie offset home loan · last ${yr.length} month${yr.length === 1 ? '' : 's'}</span></div>
+    <div class="grid tiles">
+      ${tile('Owing', owed == null ? '—' : short(owed), 'month-end balance')}
+      ${tile('Repaid', short(sum(yr, r => r.repaid)), 'repayments, incl. interest')}
+      ${tile('Interest', short(sum(yr, r => r.interest)), sum(yr, r => r.fees) ? `plus ${short(sum(yr, r => r.fees))} in fees` : 'charged to the loan')}
+    </div>
+    ${pts.length >= 2 ? `<div class="grid" style="border-top:none"><div class="cell"><div class="chart-title"><span>Amount owing</span></div>
+      ${gapChart(pts, 'var(--loss)', q => `${mLabel(q.m, true)}\nOwing ${money(q.bal)}\nRepaid ${money(q.r.repaid)}\nInterest ${money(q.r.interest)}${q.r.drawn ? `\nDrawn ${money(q.r.drawn)}` : ''}`)}
+    </div></div>` : ''}
+    <div class="note">Repayments from the offset accounts count as transfers, not spending. Money in an offset account still counts as an asset in net worth.</div></section>`;
 }
 
 function spendingSection() {
@@ -304,7 +337,7 @@ function spendingSection() {
       ${tile('Money in', short(r.income), 'pay and other income')}
       ${tile('Spent', short(r.spend), `${over.length ? `<span class="down">${over.length} over budget</span>` : 'all budgets OK'}`)}
       ${tile('To investing', short(r.transfers), 'transfers to your own accounts')}
-      ${tile('Left over', `<span class="${net >= 0 ? 'up' : 'down'}">${short(net)}</span>`, `account at ${short(r.close)}`)}
+      ${tile('Left over', `<span class="${net >= 0 ? 'up' : 'down'}">${short(net)}</span>`, r.close == null ? 'money in less money out' : `offset accounts at ${short(r.close)}`)}
     </div>
     <div class="grid" style="border-top:none"><div class="cell">
       <div class="chart-title"><span>By category</span>
@@ -353,11 +386,11 @@ function uploadSection() {
       <div class="queue" id="queue"></div>
       <details class="how"><summary>What to download from each site</summary>
         <ol>
-          <li><b>Macquarie</b>: Online Banking → the account → search transactions for last month → <b>Export → CSV</b>.</li>
-          <li><b>Personal Investor</b>: Vanguard Online → Personal Investor → <b>Transactions</b> → <b>Download</b> → spreadsheet (CSV), last month. Also the month's <b>statement PDF</b>, for the closing balance.</li>
-          <li><b>Vanguard Super</b>: the member portal's transaction history (CSV if there is one, otherwise the statement PDF).</li>
+          <li><b>Macquarie</b>: the <b>Transaction Listing Report</b> PDF for each account (both offset accounts and the home loan), last month or anything since your last upload. Overlaps are fine.</li>
+          <li><b>Personal Investor</b>: the <b>Account Performance Report</b> PDF with the date range set to last month. One report per month gives an exact month-end balance.</li>
+          <li><b>Vanguard Super</b>: the <b>account activity</b> CSV, plus a statement PDF showing the balance when you have one. Without a balance, super shows contributions and fees but no growth.</li>
         </ol>
-        <div class="note" style="margin-top:0.3rem">Menu names still need confirming against each site on your first upload.</div>
+        <div class="note" style="margin-top:0.3rem">The server reads each file within about 15 minutes. If a file isn't recognised it's marked rejected here; nothing from it is shown or emailed.</div>
       </details>
     </div>
     ${recent.length ? `<div class="cell"><div class="chart-title"><span>Recent uploads</span></div><div class="table-scroll"><table><tbody>
@@ -383,22 +416,25 @@ function xLabels(rows, X, H, every) {
 }
 
 function stackedBars(rows, series, tipOf) {
-  const W = 640, H = 200, padL = 40, padB = 18, top = 6, plotH = H - padB - top;
-  const max = Math.max(...rows.map(r => sum(series, s => r[s.k]))) * 1.08;
+  // Positive values stack up from zero, negative ones (the home loan) hang below it; a tick marks net worth.
+  const W = 640, H = 220, padL = 44, padB = 18, top = 6, plotH = H - padB - top;
+  const pos = r => sum(series, s => Math.max(0, r[s.k] || 0)), neg = r => sum(series, s => Math.min(0, r[s.k] || 0));
+  const max = Math.max(1, ...rows.map(pos)) * 1.08, min = Math.min(0, ...rows.map(neg)) * 1.08;
   const bw = (W - padL) / rows.length, barW = Math.min(bw - 4, 22);
-  const y = v => top + plotH - v / max * plotH;
+  const y = v => top + (max - v) / (max - min) * plotH;
   let bars = '';
   rows.forEach((r, i) => {
-    const x = padL + i * bw + (bw - barW) / 2; let acc = 0;
-    const segs = series.filter(s => r[s.k] > 0);
-    segs.forEach((s, j) => {
-      const y0 = y(acc), y1 = y(acc + r[s.k]); acc += r[s.k];
-      const isTop = j === segs.length - 1, hgt = Math.max(0, y0 - y1 - (isTop ? 0 : 1.5));
-      bars += isTop ? `<path d="${roundTop(x, y1, barW, hgt, Math.min(3, hgt))}" fill="${s.c}"/>` : `<rect x="${x}" y="${y1 + 1.5}" width="${barW}" height="${hgt}" fill="${s.c}"/>`;
-    });
+    const x = padL + i * bw + (bw - barW) / 2;
+    let up = 0, down = 0;
+    for (const s of series) {
+      const v = r[s.k] || 0;
+      if (v > 0) { bars += `<rect x="${x}" y="${y(up + v)}" width="${barW}" height="${Math.max(0, y(up) - y(up + v) - 1)}" fill="${s.c}"/>`; up += v; }
+      else if (v < 0) { bars += `<rect x="${x}" y="${y(down) + 1}" width="${barW}" height="${Math.max(0, y(down + v) - y(down) - 1)}" fill="${s.c}" opacity="0.75"/>`; down += v; }
+    }
+    if (r.total != null) bars += `<line x1="${x - 3}" x2="${x + barW + 3}" y1="${y(r.total)}" y2="${y(r.total)}" stroke="var(--ink)" stroke-width="2.5"${r.partial ? ' stroke-dasharray="3 2"' : ''}/>`;
     bars += `<rect x="${padL + i * bw}" y="0" width="${bw}" height="${H - padB}" fill="transparent" data-tip="${esc(tipOf(r))}"/>`;
   });
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Month-end net worth by account">${yGrid(W, padL, y, 0, max)}${bars}${xLabels(rows, i => padL + i * bw + bw / 2, H, 3)}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Month-end balances by account, with net worth">${yGrid(W, padL, y, min, max)}<line x1="${padL}" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--muted)" stroke-width="1"/>${bars}${xLabels(rows, i => padL + i * bw + bw / 2, H, 3)}</svg>`;
 }
 
 // Balance line over a dashed "money put in" line; the shaded gap between them is growth.
@@ -546,6 +582,9 @@ async function encryptFile(file, type) {
 }
 function guessType(f) {
   const n = f.name.toLowerCase(), pdf = n.endsWith('.pdf');
+  if (/^transaction_report/.test(n)) return 'macquarie-pdf';
+  if (/^account-activity/.test(n) && !pdf) return 'super-csv';
+  if (/performance/.test(n)) return 'vpi-pdf';
   if (/super/.test(n)) return pdf ? 'super-pdf' : 'super-csv';
   if (/vanguard|vpi|personal.?investor|holding/.test(n)) return pdf ? 'vpi-pdf' : 'vpi-csv';
   if (/macquarie|transactions?/.test(n) && !pdf) return 'macquarie-csv';
@@ -619,19 +658,23 @@ function demo() {
   const now = new Date(), months = [];
   for (let k = 24; k >= 1; k--) { const d = new Date(now.getFullYear(), now.getMonth() - k, 1); months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`); }
   const cats = ['Housing', 'Groceries', 'Dining out', 'Transport', 'Utilities', 'Health & fitness', 'Shopping', 'Entertainment', 'Travel', 'Gifts & donations', 'Other'];
-  let sup = 142300, inv = 38200, bal = 8400;
-  const S_ = [], I_ = [], B_ = [];
+  let sup = 142300, inv = 38200, bal = 18400, loanBal = 520000;
+  const S_ = [], I_ = [], B_ = [], L_ = [];
   for (const m of months) {
     const mo = +m.slice(5);
     // super
     const sg = 950, salsac = 500, personal = mo === 6 ? 2000 : 0, tax = Math.round((sg + salsac) * 0.15);
     const fees = Math.round(sup * 0.0019 / 12 + 6.5), insurance = 38, ret = Math.round(sup * (0.006 + gauss() * 0.018));
     const sOpen = sup; sup = sOpen + sg + salsac + personal - tax - fees - insurance + ret;
-    S_.push({ m, open:sOpen, close:sup, sg, salsac, personal, tax, fees, insurance });
+    S_.push({ m, open:sOpen, close:sup, est:false, sg, salsac, personal, rollin:0, tax, fees, insurance });
     // personal investor
     const deposits = 1000 + (mo === 8 ? 3000 : 0), distributions = [1, 4, 7, 10].includes(mo) ? Math.round(inv * 0.009) : 0;
     const iOpen = inv; inv = iOpen + deposits + distributions + Math.round(inv * (0.005 + gauss() * 0.024));
-    I_.push({ m, open:iOpen, close:inv, deposits, withdrawals:0, distributions });
+    I_.push({ m, open:iOpen, close:inv, est:false, deposits, withdrawals:0, distributions });
+    // home loan: 30-year P&I at ~6%, repaid from the offset account (a transfer, not spending)
+    const interest = Math.round(loanBal * 0.06 / 12), repaid = 3300;
+    loanBal = loanBal + interest - repaid;
+    L_.push({ m, close:-loanBal, drawn:0, repaid, interest, fees:10 });
     // macquarie
     const vary = (base, sd) => Math.max(0, Math.round(base + gauss() * sd));
     const by = {
@@ -640,7 +683,8 @@ function demo() {
       'Shopping':vary(290, 140), 'Entertainment':vary(115, 40), 'Travel':[6, 12].includes(mo) ? vary(1700, 300) : (rnd() < 0.15 ? vary(250, 80) : 0),
       'Gifts & donations':mo === 12 ? vary(600, 100) : vary(40, 30), 'Other':vary(130, 50),
     };
-    const income = 6150 + (mo === 7 ? 1400 : 0) + (rnd() < 0.2 ? vary(120, 60) : 0), spend = sum(Object.values(by)), transfers = deposits;
+    delete by['Housing'];   // the mortgage is a transfer to the loan
+    const income = 9600 + (mo === 7 ? 1400 : 0) + (rnd() < 0.2 ? vary(120, 60) : 0), spend = sum(Object.values(by)), transfers = deposits + 3300;
     bal = bal + income - spend - transfers;
     B_.push({ m, close:bal, income, spend, transfers, by });
   }
@@ -648,8 +692,10 @@ function demo() {
   const monthEnd = new Date(ly, lm, 0), iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const daysAgo = n => new Date(Date.now() - n * 864e5).toISOString();
   return {
-    generated:new Date().toISOString(), asOf:{ super:iso(monthEnd), invest:iso(monthEnd), bank:iso(monthEnd) },
-    months, super:S_, invest:I_, bank:B_, categories:cats,
+    generated:new Date().toISOString(), asOf:{ super:iso(monthEnd), invest:iso(monthEnd), bank:iso(monthEnd), loan:iso(monthEnd) },
+    months, super:S_, invest:I_, bank:B_, loan:L_, categories:cats,
+    accounts:[{ k:'super', label:'Vanguard Super' }, { k:'invest', label:'Personal Investor' }, { k:'bank', label:'Macquarie' }, { k:'loan', label:'Home loan' }],
+    networth:months.map((m, i) => ({ m, super:S_[i].close, invest:I_[i].close, bank:B_[i].close, loan:L_[i].close, total:S_[i].close + I_[i].close + B_[i].close + L_[i].close, partial:false })),
     budgets:{ 'Groceries':800, 'Dining out':300, 'Transport':250, 'Shopping':350, 'Entertainment':150 },
     review:[
       { id:'d1', merchant:'SQ *BREWLAB WEST END', count:4, suggested:'Dining out' },

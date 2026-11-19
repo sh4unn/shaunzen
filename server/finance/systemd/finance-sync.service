@@ -1,0 +1,21 @@
+# finance-sync: one run (decrypt new uploads, rebuild, publish the summary, emails). Runs as ec2-user.
+# Logs are counts only. Secrets and data stay in /home/ec2-user/finance (.secrets, data) with mode 700/600.
+[Unit]
+Description=finance-sync for finance.html
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ec2-user
+UMask=0077
+WorkingDirectory=/home/ec2-user/finance/app/server/finance
+Environment=HOME=/home/ec2-user
+Environment=PATH=/home/ec2-user/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=TZ=Australia/Brisbane
+ExecStartPre=-/usr/bin/git -C /home/ec2-user/finance/app pull -q --ff-only
+ExecStart=/usr/bin/flock -w 600 /home/ec2-user/finance/data/.lock /home/ec2-user/finance/.venv/bin/python -m fin.sync
+TimeoutStartSec=900
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
