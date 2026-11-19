@@ -62,6 +62,7 @@ export default {
       if (url.pathname === '/agent/add-book') return await addBookLine(req, env);
       if (url.pathname === '/agent/kindle-upload') return await kindleUpload(req, env);
       if (url.pathname.startsWith('/agent/shifts')) return await shifts(req, env, url);
+      if (url.pathname.startsWith('/agent/coach/')) return await coachAgent(req, env, url);
       if (url.pathname.startsWith('/agent/')) return await agent(req, env, url);
 
       const who = await verifyAccess(req, env);
@@ -74,6 +75,14 @@ export default {
       if (req.method === 'GET' && url.pathname === '/summary') return cors(env, json(await summary(env)));
       if (req.method === 'GET' && url.pathname === '/books') return cors(env, json(await books(env)));
       if (req.method === 'GET' && url.pathname === '/training') return cors(env, json(await training(env)));
+      if (req.method === 'GET' && url.pathname === '/coach') return cors(env, json(await coachGet(env, url)));
+      if (req.method === 'POST' && url.pathname === '/coach/approve') {
+        if (req.headers.get('Origin') !== env.SITE_ORIGIN) return new Response('Bad origin', { status: 403 });
+        let body;
+        try { body = JSON.parse(await req.text()); } catch { return cors(env, json({ error: 'bad json' }, 400)); }
+        const out = await coachApprove(env, body, who);
+        return cors(env, json(out, out.error ? 400 : 200));
+      }
       if (req.method === 'POST' && (url.pathname === '/books/resolve' || url.pathname === '/books/add')) {
         if (req.headers.get('Origin') !== env.SITE_ORIGIN) return new Response('Bad origin', { status: 403 });
         let body;
@@ -757,6 +766,69 @@ async function training(env) {
   const v = JSON.parse(raw);
   await cachePut(env, 'training', { t: Date.now(), v });
   return v;
+}
+
+// ---------- Coach (weekly training plans from garmin-coach on the EC2 server) ----------
+// The server plans each week (Sunday 3pm), POSTs it here and emails a link to plan.html. Approving there marks
+// that exact version (by hash) approved; the server polls /agent/coach/status and writes the workouts to Garmin.
+// Agent routes use the existing AGENT_SECRET (systemd hands it to the coach service). KV: coach:plan:<week>,
+// coach:weeks (last 12 Mondays), coach:today (this morning's readiness).
+const COACH_KEEP = 12;
+const WEEK_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+async function coachAgent(req, env, url) {
+  const auth = req.headers.get('Authorization') || '';
+  if (!env.AGENT_SECRET || !timingSafeEqual(auth, `Bearer ${env.AGENT_SECRET}`)) return new Response('Unauthorized', { status: 401 });
+  const p = url.pathname.slice('/agent/coach'.length);
+  if (req.method === 'POST' && p === '/plan') {
+    const rec = await req.json();
+    if (!WEEK_RE.test(rec.week || '') || !rec.hash || !rec.plan) return json({ error: 'bad plan' }, 400);
+    rec.approved = null; rec.pushed = null; rec.received = new Date().toISOString();
+    await env.STATE.put(`coach:plan:${rec.week}`, JSON.stringify(rec));
+    const weeks = ((await env.STATE.get('coach:weeks', 'json')) || []).filter(w => w !== rec.week);
+    weeks.push(rec.week);
+    weeks.sort();
+    await env.STATE.put('coach:weeks', JSON.stringify(weeks.slice(-COACH_KEEP)));
+    return json({ ok: true });
+  }
+  if (req.method === 'GET' && p === '/status') {
+    const rec = await env.STATE.get(`coach:plan:${url.searchParams.get('week')}`, 'json');
+    return json(rec ? { hash: rec.hash, approved: rec.approved, pushed: rec.pushed } : {});
+  }
+  if (req.method === 'POST' && p === '/pushed') {
+    const b = await req.json();
+    const rec = WEEK_RE.test(b.week || '') && await env.STATE.get(`coach:plan:${b.week}`, 'json');
+    if (!rec || rec.hash !== b.hash) return json({ error: 'no such plan' }, 404);
+    rec.pushed = { at: new Date().toISOString(), count: Number(b.count) || 0 };
+    await env.STATE.put(`coach:plan:${b.week}`, JSON.stringify(rec));
+    return json({ ok: true });
+  }
+  if (req.method === 'POST' && p === '/today') {
+    const b = await req.json();
+    await cachePut(env, 'coach:today', { at: new Date().toISOString(), readiness: b.readiness || null, change: b.change || null });
+    return json({ ok: true });
+  }
+  return new Response('Not found', { status: 404 });
+}
+
+async function coachGet(env, url) {
+  const weeks = (await env.STATE.get('coach:weeks', 'json')) || [];
+  const asked = url.searchParams.get('week');
+  const week = asked && WEEK_RE.test(asked) ? asked : weeks[weeks.length - 1];
+  const plan = week ? await env.STATE.get(`coach:plan:${week}`, 'json') : null;
+  return { weeks, plan, today: await env.STATE.get('coach:today', 'json') };
+}
+
+async function coachApprove(env, body, who) {
+  if (!WEEK_RE.test(body.week || '')) return { error: 'bad week' };
+  const rec = await env.STATE.get(`coach:plan:${body.week}`, 'json');
+  if (!rec) return { error: 'no plan for that week' };
+  if (rec.hash !== body.hash) return { error: 'This plan changed after you opened it. Reload and check it again.' };
+  if (!rec.approved) {
+    rec.approved = { at: new Date().toISOString(), by: who, hash: rec.hash };
+    await env.STATE.put(`coach:plan:${body.week}`, JSON.stringify(rec));
+  }
+  return { ok: true, approved: rec.approved };
 }
 
 // ---------- helpers ----------

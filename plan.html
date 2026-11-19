@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan — Shaunzen</title>
+<meta name="theme-color" content="#2a5a6a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=New+Rocker&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f0f4f5; --surface:#e4ecee; --border:#c0ced2;
+    --ink:#1a2628; --muted:#4a6068; --faint:#8fa0a5;
+    --accent:#2a5a6a; --accent-light:#3a7a8c; --accent-faint:#e0ecf0;
+    --gold:#8a6a20; --green:#3a6a2a; --red:#7a2020;
+    --s-run:#0077a8; --s-bike:#c45e2a; --s-row:#3a8a2e; --s-strength:#7048a6; --s-class:#8a6a20;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:'Spectral',serif; min-height:100vh; }
+  .bg-layer { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .orb { position:absolute; border-radius:50%; filter:blur(120px); opacity:0.15; }
+  .orb1 { width:60vw; height:60vw; background:radial-gradient(circle,#bfcbce,transparent 70%); top:-20%; left:-20%; }
+  .orb2 { width:45vw; height:45vw; background:radial-gradient(circle,#0077a8,transparent 70%); bottom:-15%; right:-15%; }
+  @keyframes up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .home-btn { position:fixed; top:1rem; left:1rem; z-index:100; background:var(--accent); color:white; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:0.5rem 0.9rem; border-radius:3px; }
+  .header { position:relative; z-index:2; text-align:center; padding:5rem 2rem 2.5rem; border-bottom:1px solid var(--border); }
+  .header-label { font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:300; letter-spacing:0.4em; text-transform:uppercase; color:var(--faint); margin-bottom:0.9rem; }
+  h1 { font-family:'New Rocker',cursive; font-size:clamp(3rem,10vw,6rem); font-weight:400; line-height:1; margin-bottom:0.5rem; animation:up 0.9s ease both; }
+  .header-sub { font-style:italic; font-size:0.9rem; color:var(--faint); }
+  .status { position:relative; z-index:2; display:flex; justify-content:center; align-items:center; gap:1rem; flex-wrap:wrap; padding:0.7rem 1rem; border-bottom:1px solid var(--border); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; color:var(--faint); }
+  .status a, .status button { color:var(--accent); text-decoration:none; background:none; border:none; font:inherit; cursor:pointer; padding:0.2rem 0.4rem; }
+  .status button:disabled { color:var(--border); cursor:default; }
+  main { position:relative; z-index:2; max-width:860px; margin:0 auto; padding:2.25rem 1rem 4rem; }
+  section { margin-bottom:2.25rem; animation:up 0.7s ease both 0.3s; }
+  .section-label { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--faint); margin-bottom:0.8rem; }
+  .headline { font-size:1.1rem; line-height:1.65; padding:1.25rem 1.5rem; border:1px solid var(--border); background:var(--surface); }
+  .meta { display:flex; flex-wrap:wrap; gap:0.4rem 1.2rem; margin-top:0.8rem; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); }
+  .days { border:1px solid var(--border); }
+  .day { display:grid; grid-template-columns:5.5rem 1fr; gap:0 1rem; padding:1rem 1.25rem; border-top:1px dashed var(--border); background:var(--bg); }
+  .day:first-child { border-top:none; }
+  .day.today { background:var(--accent-faint); }
+  .dname { font-family:'IBM Plex Mono',monospace; font-size:0.8rem; color:var(--muted); padding-top:0.15rem; }
+  .dname b { display:block; font-weight:400; font-size:1.05rem; color:var(--ink); }
+  .item { margin-bottom:0.75rem; } .item:last-child { margin-bottom:0; }
+  .item .t { font-size:1.02rem; } .item .t i { font-style:normal; display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:0.5rem; vertical-align:1px; }
+  .item .d { font-style:italic; font-size:0.88rem; color:var(--muted); line-height:1.5; margin-top:0.15rem; }
+  .steps { font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); margin-top:0.35rem; line-height:1.6; }
+  .rest { font-style:italic; color:var(--faint); }
+  .badge { display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; padding:0.1rem 0.45rem; border-radius:2px; border:1px solid currentColor; margin-left:0.4rem; vertical-align:1px; }
+  .badge.hard { color:var(--red); } .badge.controlled { color:var(--gold); } .badge.skip { color:var(--faint); }
+  .badge.good { color:var(--green); } .badge.warn { color:var(--gold); } .badge.bad { color:var(--red); }
+  .notes { border:1px solid var(--border); padding:1rem 1.5rem 1rem 2.5rem; background:var(--bg); } .notes li { margin:0.35rem 0; line-height:1.5; font-size:0.95rem; }
+  .approve { text-align:center; padding:1.5rem; border:1px solid var(--border); background:var(--surface); }
+  .btn { display:inline-block; background:var(--accent); color:white; border:none; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.8rem 1.6rem; border-radius:3px; cursor:pointer; }
+  .btn:hover { background:var(--accent-light); } .btn:disabled { background:var(--faint); cursor:default; }
+  .approve p { font-style:italic; font-size:0.9rem; color:var(--muted); margin-top:0.75rem; }
+  .ready { display:flex; flex-wrap:wrap; gap:0.5rem 1.5rem; align-items:baseline; padding:1rem 1.5rem; border:1px solid var(--border); background:var(--bg); font-size:0.95rem; }
+  .ready .n { font-family:'IBM Plex Mono',monospace; font-size:0.85rem; color:var(--muted); }
+  .hint { font-style:italic; font-size:0.95rem; color:var(--muted); padding:1.5rem; border:1px dashed var(--border); text-align:center; line-height:1.7; }
+  .hint a { color:var(--accent); }
+  .crumb { position:relative; z-index:2; background:var(--surface); border-top:1px solid var(--border); padding:0.75rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--faint); }
+  .crumb a { color:var(--accent); text-decoration:none; }
+  @media(max-width:600px) { .header{padding:4rem 1rem 2rem;} .day{grid-template-columns:1fr; gap:0.4rem;} .dname b{display:inline; margin-right:0.4rem;} }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; } }
+</style>
+</head>
+<body>
+<div class="bg-layer"><div class="orb orb1"></div><div class="orb orb2"></div></div>
+<a class="home-btn" href="index.html">← Home</a>
+<div class="header">
+  <div class="header-label">Life — Training</div>
+  <h1>Plan</h1>
+  <div class="header-sub">HYROX Brisbane · Men's Open · 31 March 2027</div>
+</div>
+<div class="status" id="status">Loading…</div>
+<main id="main"></main>
+<div class="crumb"><a href="index.html">Home</a> &rsaquo; <a href="training.html">Training</a> &rsaquo; Plan</div>
+
+<script>
+const API = 'https://api.shaunzen.com';
+const PAGE = 'https://shaunzen.com/plan.html';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const SPORT = { run:['Run','--s-run'], bike:['Bike','--s-bike'], row:['Row','--s-row'], cardio:['Cardio','--s-row'], strength:['Strength','--s-strength'], mobility:['Mobility','--s-strength'] };
+const todayISO = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+const fmtDate = (iso, opts) => new Date(iso + 'T12:00:00').toLocaleDateString('en-AU', opts);
+let state = null;
+
+function stepLen(s) {
+  if (s.min != null) return `${s.min}′`;
+  if (s.sec != null) return `${s.sec}″`;
+  if (s.km != null) return `${s.km} km`;
+  if (s.m != null) return `${s.m} m`;
+  return 'lap';
+}
+function stepTarget(s) {
+  if (s.zone) return ` Z${s.zone}`;
+  if (s.pace) return ` @ ${s.pace[0]}–${s.pace[1]}/km`;
+  if (s.hr) return ` ${s.hr[0]}–${s.hr[1]} bpm`;
+  return '';
+}
+function stepsText(steps) {
+  return steps.map(s => s.type === 'repeat'
+    ? `${s.times} × (${stepsText(s.steps)})`
+    : `${s.type === 'interval' ? '' : s.type + ' '}${stepLen(s)}${stepTarget(s)}`).join(' · ');
+}
+function minutes(steps) {
+  return steps.reduce((t, s) => t + (s.type === 'repeat' ? s.times * minutes(s.steps)
+    : s.min != null ? s.min : s.sec != null ? s.sec / 60 : s.km != null ? s.km * 6 : 5), 0);
+}
+
+function render(d) {
+  state = d;
+  const rec = d.plan;
+  const weeks = d.weeks || [];
+  if (!rec) {
+    $('#status').textContent = 'No plans yet';
+    $('#main').innerHTML = `<div class="hint">No plan yet. The coach writes next week's plan on Sunday afternoon and emails you a link.</div>`;
+    return;
+  }
+  const i = weeks.indexOf(rec.week);
+  $('#status').innerHTML = `
+    <button ${i > 0 ? '' : 'disabled'} data-week="${esc(weeks[i - 1] || '')}">← Prev</button>
+    <span>Week of ${esc(fmtDate(rec.week, { day:'numeric', month:'short', year:'numeric' }))}</span>
+    <button ${i >= 0 && i < weeks.length - 1 ? '' : 'disabled'} data-week="${esc(weeks[i + 1] || '')}">Next →</button>`;
+  const p = rec.plan, today = todayISO();
+  const totalMin = Math.round(p.sessions.reduce((t, s) => t + minutes(s.steps), 0));
+
+  let html = `<section><div class="headline">${esc(p.summary)}
+    <div class="meta"><span>${esc(rec.phase)} phase</span><span>${rec.week_type === 'easier' ? 'Easier week' : rec.week_type === 'taper' ? 'Taper' : 'Normal week'}</span>
+    <span>${esc(rec.weeks_to_race)} weeks to race</span><span>${p.sessions.length} sessions · ${Math.floor(totalMin / 60)}h ${totalMin % 60}m + classes</span></div></div></section>`;
+
+  const r = d.today && d.today.readiness;
+  if (r && r.date === today && rec.dates[today]) {
+    const cls = { green:'good', amber:'warn', red:'bad' }[r.status] || '';
+    html += `<section><div class="section-label">This morning</div><div class="ready">
+      <span>Readiness <span class="badge ${cls}">${esc(r.status)}</span></span><span>${esc(r.why)}</span>
+      <span class="n">HRV ${r.hrv ?? '–'} (base ${r.hrv_base ?? '–'}) · RHR ${r.rhr ?? '–'} (base ${r.rhr_base ?? '–'}) · sleep ${r.sleep != null ? r.sleep.toFixed(1) + ' h' : '–'}</span>
+      ${d.today.change ? `<span>Changed today: ${esc(d.today.change)}</span>` : ''}</div></section>`;
+  }
+
+  html += `<section><div class="section-label">The week</div><div class="days">`;
+  for (const [date, dow] of Object.entries(rec.dates)) {
+    const items = [];
+    for (const k of p.classes.filter(k => k.date === date)) {
+      items.push(`<div class="item"><div class="t"><i style="background:var(--s-class)"></i>Gym class${k.time ? ' ' + esc(k.time) : ''}<span class="badge ${esc(k.intensity)}">${esc(k.intensity)}</span></div>${k.note ? `<div class="d">${esc(k.note)}</div>` : ''}</div>`);
+    }
+    for (const s of p.sessions.filter(s => s.date === date)) {
+      const [label, color] = SPORT[s.sport] || [s.sport, '--faint'];
+      items.push(`<div class="item"><div class="t"><i style="background:var(${color})"></i>${esc(s.name)}${s.adjusted ? `<span class="badge warn">adjusted</span>` : ''}</div>
+        <div class="d">${esc(s.description)}</div><div class="steps">${esc(label)} · ${esc(stepsText(s.steps))}</div></div>`);
+    }
+    if (!items.length) items.push(`<div class="rest">${dow === 'Sat' ? 'Rest day: family' : 'Rest'}</div>`);
+    html += `<div class="day${date === today ? ' today' : ''}"><div class="dname"><b>${esc(dow)}</b>${esc(fmtDate(date, { day:'numeric', month:'short' }))}</div><div>${items.join('')}</div></div>`;
+  }
+  html += `</div></section>`;
+
+  if (p.notes && p.notes.length) html += `<section><div class="section-label">Notes</div><ul class="notes">${p.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul></section>`;
+
+  const lastDay = Object.keys(rec.dates).pop();
+  html += `<section><div class="approve" id="approve">`;
+  if (rec.pushed) html += `<span class="badge good">On your watch</span><p>${rec.pushed.count} workouts written to Garmin ${esc(new Date(rec.pushed.at).toLocaleString('en-AU', { weekday:'short', hour:'numeric', minute:'2-digit' }))}.</p>`;
+  else if (rec.approved) html += `<span class="badge good">Approved</span><p>The workouts reach Garmin within about 10 minutes, then your watch on its next sync.</p>`;
+  else if (lastDay < today) html += `<p>This week is over.</p>`;
+  else html += `<button class="btn" id="approveBtn">Approve · send to watch</button><p>Writes the ${p.sessions.length} sessions above to your Garmin calendar. Classes aren't sent.</p>`;
+  html += `</div></section>`;
+  $('#main').innerHTML = html;
+  const btn = $('#approveBtn');
+  if (btn) btn.addEventListener('click', approve);
+}
+
+async function approve() {
+  const btn = $('#approveBtn');
+  btn.disabled = true; btn.textContent = 'Approving…';
+  if (location.search.includes('demo')) { state.plan.approved = { at: new Date().toISOString() }; return render(state); }
+  try {
+    const res = await fetch(API + '/coach/approve', { method:'POST', credentials:'include', redirect:'manual',
+      headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ week: state.plan.week, hash: state.plan.hash }) });
+    if (res.type === 'opaqueredirect' || res.status === 401) throw new Error('signed out: sign in again');
+    const d = await res.json();
+    if (d.error) throw new Error(d.error);
+    state.plan.approved = d.approved;
+    render(state);
+  } catch (e) {
+    btn.disabled = false; btn.textContent = 'Approve · send to watch';
+    $('#approve').insertAdjacentHTML('beforeend', `<p style="color:var(--red)">${esc(e.message)}</p>`);
+  }
+}
+
+function signedOut() {
+  const href = `${API}/login?next=${encodeURIComponent(PAGE + location.search)}`;
+  $('#status').innerHTML = `<a href="${href}">Sign in to see your plan</a>`;
+  $('#main').innerHTML = `<div class="hint">Your training plan is private.<br><a class="btn" style="margin-top:1rem" href="${href}">Sign in</a></div>`;
+}
+
+async function load(week) {
+  if (location.search.includes('demo')) return render(demo());
+  try {
+    const q = week ? `?week=${encodeURIComponent(week)}` : '';
+    const res = await fetch(API + '/coach' + q, { credentials:'include', redirect:'manual', cache:'no-store' });
+    if (res.type === 'opaqueredirect' || res.status === 401) return signedOut();
+    const d = await res.json();
+    if (d.error) throw new Error(d.error);
+    render(d);
+  } catch (e) {
+    $('#status').textContent = 'Couldn’t load the plan';
+    $('#main').innerHTML = `<div class="hint">Couldn’t load the plan (${esc(e.message)}).<br><a href="${API}/login?next=${encodeURIComponent(PAGE)}">Sign in again</a> or see the <a href="?demo">demo</a>.</div>`;
+  }
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('#status button[data-week]');
+  if (!b || b.disabled) return;
+  history.replaceState(null, '', `?week=${b.dataset.week}`);
+  load(b.dataset.week);
+});
+
+// ?demo: a made-up Base-phase week so the page can be seen without signing in.
+function demo() {
+  const mon = new Date(); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7));
+  const iso = n => { const d = new Date(mon); d.setDate(d.getDate() + n); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+  const dates = Object.fromEntries(['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d, i) => [iso(i), d]));
+  const easy = (min) => [{ type:'warmup', min:8, zone:1 }, { type:'interval', min:min - 13, zone:2 }, { type:'cooldown', min:5, zone:1 }];
+  return { weeks:[iso(0)], today:null, plan:{ week:iso(0), hash:'demo', phase:'Base', week_type:'normal', weeks_to_race:18.4, dates, approved:null, pushed:null, plan:{
+    summary:'First Base week: easy aerobic volume. Four relaxed 5pm sessions and a steady long run, all zone 2 or below. Keep two classes controlled so the easy work stays easy.',
+    classes:[{ date:iso(0), time:'05:00', intensity:'hard', note:'Go for it.' }, { date:iso(1), time:'05:00', intensity:'controlled', note:'About 80%, crisp form.' },
+             { date:iso(2), time:'05:00', intensity:'hard' }, { date:iso(3), time:'05:00', intensity:'controlled' }, { date:iso(4), time:'05:00', intensity:'hard', note:'Last hard one of the week.' }],
+    sessions:[{ date:iso(0), sport:'row', name:"Easy row 40'", description:'Low stroke rate (20-22), conversational.', steps:easy(40) },
+              { date:iso(1), sport:'run', name:"Easy run 40'", description:'Slow enough to talk in sentences.', steps:easy(40) },
+              { date:iso(2), sport:'bike', name:"Easy bike 45'", description:'Spin, no grinding.', steps:easy(45) },
+              { date:iso(3), sport:'run', name:"Easy run 35'", description:'Short and relaxed before the weekend.', steps:easy(35) },
+              { date:iso(6), sport:'run', name:"Long run 85'", description:'The key session. Even effort, drink every 20 minutes.', steps:easy(85) }],
+    notes:['Brisbane heat: let pace drop to keep heart rate in zone 2.'] } } };
+}
+
+load(new URLSearchParams(location.search).get('week'));
+</script>
+</body>
+</html>
