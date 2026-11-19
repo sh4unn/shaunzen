@@ -23,6 +23,9 @@ from . import config
 
 SPEND = config.SPEND_CATEGORIES
 BUILTIN = [  # (substring in the merchant key, category). Generic chains only.
+    (("CASH WITHDRAWAL", "ATM "), "Cash withdrawals"),
+    ((" ELEVEN ", "BAYWASH", "CAR WASH"), "Transport"),
+    (("PYPL PAYIN", "ZIPPAY", "ZIPMONEY", "ZIP PAY", "AFTERPAY", "HUMM", "KLARNA"), "Buy now, pay later"),
     (("WOOLWORTHS", "COLES", "ALDI", "IGA ", "HARRIS FARM", "FOODWORKS", "FOODWO"), "Groceries"),
     (("UBER EATS", "UBER *EATS", "MENULOG", "DOORDASH", "GUZMAN", "GYG", "MCDONALD", "KFC", "SUBWAY", "HUNGRY JACK", "DOMINO",
       "CAFE", "COFFEE", "BAKERY", "ZARRAFFA", "STARBUCKS", "SUSHI", "PIZZA", "BURGER", "HJS", "HJ S"), "Dining out"),
@@ -33,7 +36,7 @@ BUILTIN = [  # (substring in the merchant key, category). Generic chains only.
     (("KMART", "BUNNINGS", "JB HI", "AMAZON", "TARGET", "BIG W", "OFFICEWORKS", "IKEA", "SYDNEY TOOLS", "MYER", "DAVID JONES",
       "BIKES", "REBEL", "ANACONDA", "EBAY"), "Shopping"),
     (("ORIGIN", "AGL", "ENERGEX", "ENERGY", "TELSTRA", "OPTUS", "VODAFONE", "AUSSIE BROADBAND", "COUNCIL", "URBAN UTILITIES",
-      "WATER", "INSURANCE", "BUPA", "MEDIBANK", "NRMA", "RACQ"), "Utilities"),
+      "WATER", "INSURANCE", "BUPA", "MEDIBANK", "NRMA", "RACQ", "RATES", "DEFT", "SUPERLOOP", "STARLINK"), "Utilities"),
     (("QANTAS", "VIRGIN AUS", "JETSTAR", "AIRBNB", "BOOKING.COM", "HOTEL", "EXPEDIA"), "Travel"),
 ]
 STATES = {"QL", "QLD", "NS", "NSW", "VI", "VIC", "SA", "WA", "TA", "TAS", "NT", "ACT", "AU", "AUS"}
@@ -43,16 +46,22 @@ def describe(desc: str) -> tuple[str, str]:
     """(key, kind) for a bank description. kind: merchant | payee | transfer | income."""
     d = re.sub(r"\s+", " ", desc).strip()
     low = d.lower()
-    if any(w in low for w in ("linked account", "internal transfer", "home loan", "loan repayment", "to loan", "offset")):
-        return "TRANSFER", "transfer"
+    if any(w in low for w in ("linked account", "internal transfer", "home loan", "loan repayment", "to loan", "offset",
+                              "direct debit to account", "vanguard")):
+        return "TRANSFER", "transfer"      # own accounts: loan repayments, Personal Investor auto-invest
     if low.startswith("interest"):
         return "INTEREST", "income"
+    if re.match(r"^(atm )?withdrawal", low):
+        return "CASH WITHDRAWAL", "merchant"
+    if m := re.match(r"^(?:recurring )+payment to (.+?)(?: - .*)?$", d, re.I):   # direct debits to billers
+        words = [w for w in re.sub(r"[^A-Z&.' -]", " ", m.group(1).upper()).split() if w not in STATES]
+        return " ".join(words[:3])[:40] or "UNKNOWN", "merchant"
     m = re.match(r"^(?:recurring )?(?:funds )?(?:transfer )?(to|from) (.+?)(?: - .*)?$", d, re.I)
     if m and not low.startswith(("purchase", "online purchase")):
         name = re.sub(r"[^A-Z ]", "", m.group(2).upper()).strip()
         name = re.sub(r"\s+", " ", name)[:40] or "UNKNOWN"
         return f"{m.group(1).upper()} {name}", "payee"
-    body = re.sub(r"^(online purchase from|purchase at|debit card purchase|refund from|bpay( to)?|direct debit( to)?|eftpos)\s+", "", d, flags=re.I)
+    body = re.sub(r"^(online purchase from|purchase (at|from)|debit card purchase|refund from|bpay( to)?|direct debit( to)?|eftpos)\s+", "", d, flags=re.I)
     body = re.sub(r"^(SQ|ZLR|PP|SP|LS|IZ|CKO|PAYPAL) ?\*", "", body.upper())
     words = [w for w in re.sub(r"[^A-Z&.' -]", " ", body).split() if w not in STATES]
     key = " ".join(words[:3]) or "UNKNOWN"
@@ -104,9 +113,11 @@ def refresh(con) -> int:
     new_merchants = []
     for key, (kind, n, amount) in counts.items():
         con.execute("UPDATE rules SET seen=? WHERE key=?", (n, key))
-        if key in existing:
-            continue
         b = builtin(key) if kind == "merchant" else None
+        if key in existing:
+            if b:   # a built-in rule beats an unconfirmed suggestion made before it existed
+                con.execute("UPDATE rules SET category=?, source='builtin', confirmed=1 WHERE key=? AND confirmed=0", (b, key))
+            continue
         if b:
             con.execute("INSERT INTO rules VALUES (?,?,?,?,?,?)", (key, rule_id(key), b, "builtin", 1, n))
         elif kind == "payee":

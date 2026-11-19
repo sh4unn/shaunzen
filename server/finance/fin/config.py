@@ -25,7 +25,7 @@ REMINDER_DAY = 7          # export reminder if nothing has arrived since the 1st
 
 # Spending categories shown on the page, in this order. The non-spending ones are kept out of the totals.
 SPEND_CATEGORIES = ["Housing", "Groceries", "Dining out", "Transport", "Utilities", "Health & fitness",
-                    "Shopping", "Entertainment", "Travel", "Gifts & donations", "Other"]
+                    "Shopping", "Entertainment", "Travel", "Gifts & donations", "Cash withdrawals", "Buy now, pay later", "Other"]
 INCOME, TRANSFER = "Income", "Transfer"
 ALL_CATEGORIES = SPEND_CATEGORIES + [INCOME, TRANSFER]
 
