@@ -137,7 +137,8 @@ def macquarie_pdf(text: str) -> Parsed:
         bsb = re.sub(r"\D", "", lines[lines.index("BSB") + 1]) if "BSB" in lines else ""
     except (ValueError, IndexError):
         raise Unrecognised("no account number found") from None
-    out = Parsed(account=(account_key("macquarie", bsb, acct), label, "loan" if loan else "bank"))
+    # keyed by the last 4 digits, the only part open banking (Redbark) exposes, so both sources land on one account
+    out = Parsed(account=(account_key("macquarie", acct[-4:]), label, "loan" if loan else "bank"))
 
     year = month = None
     prev_bal = None
@@ -406,7 +407,47 @@ def detect(data: bytes, text: str | None) -> str | None:
     return None
 
 
+def redbark_json(data: bytes) -> Parsed:
+    """One account's file written by fin/redbark.py: account, current balance, posted transactions."""
+    import json
+    doc = json.loads(data)
+    a = doc.get("account") or {}
+    last4 = re.sub(r"\D", "", a.get("account_number") or "")[-4:]
+    inst = (a.get("institution") or "").lower()
+    if not last4:
+        raise Unrecognised("Redbark account without a number")
+    loan = a.get("type") == "loan" or "loan" in (a.get("name") or "").lower()
+    key = account_key("macquarie", last4) if "macquarie" in inst else account_key(inst, last4)
+    out = Parsed(account=(key, a.get("name") or "Bank account", "loan" if loan else "bank"))
+    for t in (doc.get("transactions") or {}).values():
+        d = date.fromisoformat(t.get("post_date") or t["date"])
+        amt = (t.get("amount") or {}).get("amount")
+        if amt is None:
+            continue
+        desc = t.get("description") or t.get("merchant_name") or ""
+        out.txns.append(Txn(d, round(amt / 100, 2), desc, loan_kind(desc) if loan else "", None))
+    out.txns.sort(key=lambda t: t.d)
+    bal = doc.get("balance")
+    if bal and out.txns:
+        # Only today's balance is given: work back through the transactions for each earlier day's closing balance.
+        seen = date.fromisoformat(bal["observed_at"][:10])
+        running = bal["amount"] / 100
+        days = sorted({t.d for t in out.txns if t.d <= seen}, reverse=True)
+        by_day = {}
+        for t in out.txns:
+            by_day[t.d] = by_day.get(t.d, 0) + t.amount
+        out.points.append(Point(seen, round(running, 2)))
+        for d in days:
+            out.points.append(Point(d, round(running, 2)))
+            running -= by_day[d]
+        if days:
+            out.points.append(Point(days[-1] - timedelta(days=1), round(running, 2)))
+    return out
+
+
 def parse(file_type: str, data: bytes) -> Parsed:
+    if file_type == "redbark":
+        return redbark_json(data)
     is_pdf = data[:5] == b"%PDF-"
     text = pdf_text(data) if is_pdf else None
     file_type = detect(data, text) or file_type

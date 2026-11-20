@@ -9,6 +9,7 @@ Logs are counts only. Usage: python -m fin.sync [--rebuild] [--dry-run]
   --rebuild   re-read every raw file even if nothing new arrived (after a parser change)
   --dry-run   don't talk to the worker or send email; print the summary's shape (no figures)
   --setup     create the upload key if needed and publish its public key
+  --redbark   fetch from Redbark now instead of waiting for the 6-hourly fetch
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ import sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from . import categorise, config, model, remote
+from . import categorise, config, model, redbark, remote
 
 EXT = {"csv": "csv", "pdf": "pdf"}
 
@@ -105,6 +106,16 @@ def main(argv: list[str]) -> int:
 
     done, stored = take_uploads(con, inbox.get("uploads") or [])
     changed |= stored > 0
+
+    # Macquarie via Redbark (open banking), at most every 6 hours; --redbark forces a fetch now
+    if not dry and redbark.enabled():
+        try:
+            n_acc, n_new = redbark.sync(con, force="--redbark" in argv)
+            if n_acc:
+                print(f"redbark: {n_acc} accounts, {n_new} new transactions")
+            changed |= n_new > 0
+        except Exception as e:  # noqa: BLE001 – a Redbark outage must not stop uploads or emails
+            print(f"redbark skipped: {str(e)[:80] if isinstance(e, RuntimeError) else type(e).__name__}")
 
     if changed:
         results = model.rebuild(con)

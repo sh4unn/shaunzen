@@ -57,6 +57,7 @@ def rebuild(con) -> dict[str, tuple[str, str | None, int]]:
     for t in ("txns", "points", "periods", "accounts"):   # all derived from the raw files
         con.execute(f"DELETE FROM {t}")
     results = {}
+    redbark = []
     for f in con.execute("SELECT * FROM files ORDER BY received").fetchall():
         p = raw_path(f["id"], f["ext"])
         if not p.exists():
@@ -69,8 +70,19 @@ def rebuild(con) -> dict[str, tuple[str, str | None, int]]:
         except Exception as e:  # noqa: BLE001 – a parser bug must not stop the other files
             results[f["id"]] = ("rejected", f"parser error ({type(e).__name__})", 0)
             continue
-        store(con, f["id"], parsed)
+        if f["type"] == "redbark":
+            redbark.append((f["id"], parsed))
+        else:
+            store(con, f["id"], parsed)
         results[f["id"]] = ("processed", None, parsed.rows())
+    # Open-banking data wins from its first transaction on: drop PDF/CSV rows for the same account from then.
+    for fid, parsed in redbark:
+        if parsed.txns:
+            first = min(t.d for t in parsed.txns).isoformat()
+            key = parsed.account[0]
+            con.execute("DELETE FROM txns WHERE account=? AND d>=? AND file<>?", (key, first, fid))
+            con.execute("DELETE FROM points WHERE account=? AND d>=?", (key, first))
+        store(con, fid, parsed)
     # balances typed on the page (super has no balance in its CSV); a typed balance wins over a parsed one that day
     keys = {"super": (parsers.SUPER_KEY, "Vanguard Super"), "invest": (parsers.VPI_KEY, "Personal Investor")}
     for r in con.execute("SELECT kind, d, amount FROM manual ORDER BY d").fetchall():

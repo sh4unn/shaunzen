@@ -30,6 +30,16 @@ No bank or Vanguard logins are used, stored or automated. This folder is code on
 | Vanguard Super | **account activity** CSV (`Date, Description, Type, Amount`) | Contributions, fees, insurance, roll-ins. It has no balance |
 | Vanguard Super | A statement PDF with the balance (layout not seen yet) | Opening and closing balance |
 
+## Macquarie via Redbark (optional)
+
+If `~/finance/.secrets/redbark_token` exists (a Redbark API key, mode 600), `fin/redbark.py` pulls posted Macquarie transactions and balances from Redbark's v2 API every 6 hours. That replaces the Transaction Listing PDFs. Each account is kept as `data/raw/rb-<hash>.json`.
+
+- From an account's first Redbark transaction onwards, Redbark is treated as correct and overlapping PDF rows are dropped.
+- Accounts are matched by the last 4 digits of the account number.
+- Earlier daily balances are worked back from the current balance.
+- Run `python -m fin.sync --redbark` to fetch now.
+- The consent is read-only and lapses after at most 12 months, so renew it in Redbark.
+
 ## Categories
 
 - Card merchants are matched first by the built-in rules in `fin/categorise.py`.
