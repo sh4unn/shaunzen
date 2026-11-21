@@ -95,6 +95,11 @@
 
   .badge { display:inline-flex; align-items:center; gap:0.35rem; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.06em; padding:0.15rem 0.5rem; border-radius:2px; border:1px solid currentColor; white-space:nowrap; }
   .badge.good { color:var(--green); } .badge.warn { color:var(--gold); } .badge.bad { color:var(--red); background:#f5e8e8; } .badge.na { color:var(--faint); }
+  .breaks { border:1px solid var(--border); }
+  .breaks .row { padding:0.8rem 1.25rem; border-top:1px dashed var(--border); background:var(--bg); }
+  .breaks .row:first-child { border-top:none; }
+  .breaks .t { font-size:1.02rem; line-height:1.5; }
+  .breaks .a { font-style:italic; color:var(--muted); font-size:0.88rem; margin-top:0.2rem; line-height:1.5; }
 
   input[type=number], select { font-family:'IBM Plex Mono',monospace; font-size:0.85rem; color:var(--ink); background:var(--bg); border:1px solid var(--border); border-radius:2px; padding:0.35rem 0.5rem; }
   input[type=number] { width:7rem; text-align:right; }
@@ -273,6 +278,7 @@ function render() {
 
   // ---------- spending ----------
   if (S.bank?.length) html += spendingSection();
+  if (S.trim?.items?.length) html += trimSection();
   html += reviewSection();
   html += budgetSection();
   html += uploadSection();
@@ -399,6 +405,14 @@ document.addEventListener('click', async e => {
     msg.className = 'msg'; msg.textContent = save ? 'Saved. The charts update within about 15 minutes.' : 'Undo saved. Updates within about 15 minutes.';
   } catch (err) { msg.className = 'msg err'; msg.textContent = err.message; btn.disabled = false; }
 });
+
+// Harsh monthly trim review, built on the server from last full month (fin/trim.py). Red first.
+function trimSection() {
+  const t = S.trim, badge = { bad:['bad', 'fix'], warn:['warn', 'watch'], ok:['good', 'ok'] };
+  return `<section id="trim"><div class="section-label"><span>— Trim review</span><span>${esc(mLabel(t.month, true))} · ${t.bad} red flag${t.bad === 1 ? '' : 's'}, ${t.warn} warning${t.warn === 1 ? '' : 's'}</span></div>
+    <div class="breaks">${t.items.map(i => `<div class="row"><div class="t"><span class="badge ${badge[i.level][0]}">${badge[i.level][1]}</span> ${esc(i.title)}</div><div class="a">${esc(i.detail)}</div></div>`).join('')}</div>
+    <div class="note">Blunt on purpose. Targets: everyday spending ${money(t.living_target)} a month, offset +${money(t.save_target)} a month. Tracking, not financial advice.</div></section>`;
+}
 
 function reviewSection() {
   if (!S.review.length) return '';
@@ -769,6 +783,12 @@ function demo() {
     accounts:[{ k:'super', label:'Vanguard Super' }, { k:'invest', label:'Personal Investor' }, { k:'bank', label:'Macquarie' }, { k:'loan', label:'Home loan' }],
     networth:months.map((m, i) => ({ m, super:S_[i].close, invest:I_[i].close, bank:B_[i].close, loan:L_[i].close, total:S_[i].close + I_[i].close + B_[i].close + L_[i].close, partial:false })),
     budgets:{ 'Groceries':800, 'Dining out':300, 'Transport':250, 'Shopping':350, 'Entertainment':150 },
+    trim:{ month:months[months.length - 1], bad:2, warn:2, living_target:1200, save_target:1000, items:[
+      { level:'bad', title:'Cash: $420 in 3 withdrawals. Budget: $0.', detail:"Cash is spending you can't see. If it paid for something real, re-file it on the spending chart. If you can't say what it bought, that's the leak." },
+      { level:'bad', title:'Dining out: $186 against a $100 budget, $86 over.', detail:'Either the budget is fantasy or the spending is. Pick one and fix it.' },
+      { level:'warn', title:'Takeaway: 7 runs, $112.', detail:"About one every 4 days. Each one feels small. Together they're a week of groceries." },
+      { level:'warn', title:'Subscriptions: 6 recurring, about $96 a month.', detail:"Apple TV+ $16; Paramount+ $13; Disney+ $10; Spotify $8. Anything you didn't use last month, cancel today." },
+      { level:'ok', title:'Offset grew $1,140, at or above the +$1,000 target.', detail:'On track.' } ] },
     review:[
       { id:'d1', merchant:'SQ *BREWLAB WEST END', count:4, suggested:'Dining out' },
       { id:'d2', merchant:'AMAZON MKTPLC AU SYDNEY', count:3, suggested:'Shopping' },

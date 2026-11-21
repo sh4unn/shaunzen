@@ -21,7 +21,7 @@ import sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from . import categorise, config, model, redbark, remote
+from . import categorise, config, model, redbark, remote, trim
 
 EXT = {"csv": "csv", "pdf": "pdf"}
 
@@ -93,6 +93,8 @@ def main(argv: list[str]) -> int:
             # one typed balance per account per day: the newest wins
             con.execute("DELETE FROM manual WHERE kind=? AND d=? AND id<>?", (b["account"], b["date"], b["id"]))
         bal_acked.append(b.get("id"))
+    if bal_acked:
+        model.kv_set(con, "last_upload", now().isoformat())   # a typed balance counts as this month's update
     con.commit()
     changed |= bool(bal_acked)
     adj = inbox.get("adjustments") or []
@@ -128,6 +130,7 @@ def main(argv: list[str]) -> int:
             if status == "rejected":
                 print(f"file {fid}: rejected: {reason}")     # reason never contains file contents
         s = model.summary(con)
+        s["trim"] = trim.review(con, s)
         print(f"rebuilt: {len(results)} files, {sum(r[2] for r in results.values())} rows, {len(s['months'])} months, "
               f"{len(s['review'])} to review, {new_suggestions} new suggestions")
         if dry:
@@ -179,10 +182,18 @@ def emails(con, stored_now: bool) -> None:
         if remote.email("Finance: a budget was exceeded", f"A spending category went over its monthly budget. Open {config.PAGE}"):
             model.kv_set(con, f"budget_mail:{month}", sorted(s_month | sent))
 
+    # harsh trim review: one email on TRIM_EMAIL_ON (the review itself is on the page; the email has no figures)
+    if t.date().isoformat() >= config.TRIM_EMAIL_ON and not model.kv_get(con, "trim_mail_sent"):
+        r = trim.review(con, model.summary(con))
+        if r and remote.email("Finance: your trim review is ready",
+                              f"Last month's trim review: {r['bad']} red flag{'s' if r['bad'] != 1 else ''}, {r['warn']} warning{'s' if r['warn'] != 1 else ''}. "
+                              f"No figures here. Read it at {config.PAGE}#trim"):
+            model.kv_set(con, "trim_mail_sent", t.isoformat())
+
     # export reminder: nothing uploaded since the 1st by REMINDER_DAY, once a month
     last = model.kv_get(con, "last_upload")
     if t.day >= config.REMINDER_DAY and model.kv_get(con, "reminder_month") != month and (not last or last[:7] < month):
-        if remote.email("Finance: exports due", f"Time to download last month's exports and upload them at {config.PAGE}"):
+        if remote.email("Finance: balances due", f"Time to enter this month's Vanguard Super and Personal Investor balances at {config.PAGE}#upload (and the super CSV if it's a new quarter)."):
             model.kv_set(con, "reminder_month", month)
     con.commit()
 

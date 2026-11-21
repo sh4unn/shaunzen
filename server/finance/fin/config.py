@@ -22,6 +22,7 @@ MODEL = os.environ.get("FIN_MODEL", "claude-haiku-5-5")
 MONTHS_SHOWN = 24
 TZ = "Australia/Brisbane"
 REMINDER_DAY = 7          # export reminder if nothing has arrived since the 1st by this day
+TRIM_EMAIL_ON = os.environ.get("FIN_TRIM_EMAIL_ON", "2026-12-12")   # one-off "trim review ready" email (asked for Nov 2026)
 
 # Spending categories shown on the page, in this order. The non-spending ones are kept out of the totals.
 SPEND_CATEGORIES = ["Housing", "Groceries", "Dining out", "Transport", "Utilities", "Health & fitness",
