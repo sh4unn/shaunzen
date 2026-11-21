@@ -25,6 +25,8 @@ Copy a `tool-card` line in `index.html` into the right section (Work / Life / Sy
 
 Every page uses the same CSS variables and fonts. Do not deviate.
 
+**One exception: `finance.html`** has its own fintech-style look (system sans-serif, dark by default with a light toggle, card layout), at Shaun's request in Nov 2026. It still keeps the home button and breadcrumb. Its chart colours are validated for colour-blind safety in both themes. Don't apply that look to other pages, and don't pull finance.html back to the site theme.
+
 **Fonts (Google Fonts):**
 - `'New Rocker', cursive` — headings (`h1`) only
 - `'Spectral', serif` — body text

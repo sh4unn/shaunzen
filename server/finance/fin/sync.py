@@ -21,7 +21,7 @@ import sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from . import categorise, config, model, redbark, remote, trim
+from . import categorise, config, discretionary, model, redbark, remote, trim
 
 EXT = {"csv": "csv", "pdf": "pdf"}
 
@@ -131,6 +131,7 @@ def main(argv: list[str]) -> int:
                 print(f"file {fid}: rejected: {reason}")     # reason never contains file contents
         s = model.summary(con)
         s["trim"] = trim.review(con, s)
+        s["discretionary"] = discretionary.build(con, s)
         print(f"rebuilt: {len(results)} files, {sum(r[2] for r in results.values())} rows, {len(s['months'])} months, "
               f"{len(s['review'])} to review, {new_suggestions} new suggestions")
         if dry:
