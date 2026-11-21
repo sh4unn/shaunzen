@@ -40,6 +40,10 @@ If `~/finance/.secrets/redbark_token` exists (a Redbark API key, mode 600), `fin
 - Run `python -m fin.sync --redbark` to fetch now.
 - The consent is read-only and lapses after at most 12 months, so renew it in Redbark.
 
+## Personal Investor deposits from the bank
+
+Vanguard direct debits on the Macquarie accounts count as money into Personal Investor, but only for dates that no Account Performance Report or Vanguard CSV already covers, so nothing is counted twice. With those and a typed month-end balance, contributions vs growth needs no Vanguard export at all.
+
 ## Categories
 
 - Card merchants are matched first by the built-in rules in `fin/categorise.py`.

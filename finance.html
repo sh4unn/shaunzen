@@ -439,13 +439,14 @@ function uploadSection() {
         <input type="text" inputmode="decimal" id="balAmt" placeholder="$0.00" aria-label="Balance in dollars">
         <button class="btn small" id="saveBalance">Save</button><span class="msg" id="balMsg"></span>
       </div>
-      <details class="how"><summary>What to download from each site</summary>
+      <details class="how"><summary>What to do each month</summary>
         <ol>
-          <li><b>Macquarie</b>: the <b>Transaction Listing Report</b> PDF for each account (both offset accounts and the home loan), last month or anything since your last upload. Overlaps are fine.</li>
-          <li><b>Personal Investor</b>: the <b>Account Performance Report</b> PDF with the date range set to last month. One report per month gives an exact month-end balance.</li>
-          <li><b>Vanguard Super</b>: the <b>account activity</b> CSV, plus the balance shown in the portal, typed into the box above (or a statement PDF). Growth shows once there are two balances a month or more apart.</li>
+          <li><b>Macquarie</b>: nothing. It comes in through Redbark every 6 hours. (Transaction Listing PDFs still work if Redbark is ever down.)</li>
+          <li><b>Monthly</b>: type the <b>Vanguard Super</b> and <b>Personal Investor</b> balances into the box above. Your Personal Investor deposits are read from the "Direct debit From Vanguard" payments in Macquarie, so that's enough for contributions vs growth.</li>
+          <li><b>Quarterly</b>: upload the Super <b>account activity</b> CSV, so super's change splits into employer contributions, fees and market growth.</li>
+          <li><b>Optional</b>: the Personal Investor <b>Account Performance Report</b> PDF gives Vanguard's own figures, and replaces the bank-side estimate for the dates it covers.</li>
         </ol>
-        <div class="note" style="margin-top:0.3rem">The server reads each file within about 15 minutes. If a file isn't recognised it's marked rejected here; nothing from it is shown or emailed.</div>
+        <div class="note" style="margin-top:0.3rem">The server reads uploads within about 15 minutes. A file it can't read is marked rejected here, and nothing from it is shown or emailed.</div>
       </details>
     </div>
     ${recent.length ? `<div class="cell"><div class="chart-title"><span>Recent uploads</span></div><div class="table-scroll"><table><tbody>

@@ -187,7 +187,26 @@ def _account(con, key: str, kind: str, flow_kinds: tuple[str, ...] | None) -> Ac
         flows = [(date.fromisoformat(r["d"]), r["amount"]) for r in con.execute(
             f"SELECT d, amount FROM txns WHERE account=? AND kind IN ({','.join('?' * len(flow_kinds))})", (key, *flow_kinds))]
     pers = [(date.fromisoformat(r["start"]), date.fromisoformat(r["end"]), r["net_in"]) for r in con.execute("SELECT * FROM periods WHERE account=?", (key,))]
+    if kind == "invest":
+        flows += investing_from_bank(con, pers, flows)
     return Account(kind, pts, flows, pers)
+
+
+def investing_from_bank(con, periods, own_flows) -> list[tuple[date, float]]:
+    """Money into Personal Investor as seen from the bank side: Vanguard direct debits on the Macquarie accounts
+    (out of the bank = into Vanguard). Used only for dates no Vanguard report or Vanguard CSV already covers,
+    so a deposit is never counted twice. Super is a different Vanguard product but isn't paid from the bank."""
+    covered = [(s, e) for s, e, _ in periods]
+    if own_flows:
+        covered.append((min(d for d, _ in own_flows), max(d for d, _ in own_flows)))
+    out = []
+    for r in con.execute("SELECT t.d, t.amount, t.desc FROM txns t JOIN accounts a ON a.key=t.account WHERE a.kind='bank'"):
+        if "vanguard" not in r["desc"].lower() or "super" in r["desc"].lower():
+            continue
+        d = date.fromisoformat(r["d"])
+        if not any(s <= d <= e for s, e in covered):
+            out.append((d, -r["amount"]))        # −$200 in the bank = +$200 into Personal Investor
+    return out
 
 
 SUPER_FLOW = ("sg", "salsac", "personal", "rollin", "tax", "fees", "insurance", "other")
