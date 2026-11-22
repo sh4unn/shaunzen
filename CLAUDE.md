@@ -84,7 +84,7 @@ Standard home-btn CSS:
 | Host | What | How |
 |------|------|-----|
 | `shaunzen.com` | This launcher | GitHub Pages, Cloudflare DNS |
-| `home.shaunzen.com` | Home Assistant | Nabu Casa |
+| `home.shaunzen.com` | Home Assistant | Cloudflared add-on on the HA box (tunnel `homeassistant`, it rewrites the DNS record on start). No Access: the companion app can't pass it, so HA's own login protects it. Browser Integrity Check is off for this host (config rule) because it blocked the EC2 energy scripts. Reverse-proxy settings (X-Forwarded-For, trusted proxies `172.30.32.0/23`, `fd0c:ac1e:2100::/48`) live in HA's UI since 2026.11, not `configuration.yaml` |
 | `energy.shaunzen.com` | Energy dashboard | Cloudflare Access |
 | `terminal.shaunzen.com` | Web terminal on EC2 `claude-code-server` (Sydney) | ttyd on 127.0.0.1:7681 → Cloudflare Tunnel → Cloudflare Access. ttyd rejects requests without `Cf-Access-Authenticated-User-Email` |
 | `api.shaunzen.com` | Live data for the launcher | Worker `shaunzen-api` (`workers/api/worker.js`), KV `shaunzen-api-state`, behind Access (plus JWT check in the worker). `/agent/*` is an Access bypass authenticated by the `AGENT_SECRET` bearer |
